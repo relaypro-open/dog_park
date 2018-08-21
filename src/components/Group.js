@@ -1,0 +1,400 @@
+import React, { Component } from 'react';
+import { api } from '../api';
+import { profilesFetchData } from '../actions/profiles';
+import { groupsFetchData } from '../actions/groups';
+import { handleSelectedTab } from '../actions/app'
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom'
+import { withStyles } from '@material-ui/core/styles';
+import { CircularProgress, Button } from '@material-ui/core'
+import AddIcon from '@material-ui/icons/Add';
+import Select from '@material-ui/core/Select'
+import MenuItem from '@material-ui/core/MenuItem'
+import TextField from '@material-ui/core/TextField';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditGroup from './EditGroup'
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormControl from '@material-ui/core/FormControl';
+
+const styles = theme => ({
+  root: {
+    ...theme.mixins.gutters(),
+    paddingTop: theme.spacing.unit * 2,
+    paddingBottom: theme.spacing.unit * 2,
+    maxWidth: 700,
+  },
+  rightIcon: {
+    marginLeft: theme.spacing.unit,
+  },
+  progress: {
+    margin: 'auto',
+    width: '50%',
+  },
+  speedDialButton: {
+    right: theme.spacing.unit * 3,
+    bottom: theme.spacing.unit * 3,
+    position: 'fixed',
+    color: 'secondary'
+  },
+});
+
+
+class Group extends Component {
+
+    constructor(props) {
+      super(props);
+
+      this.state = {
+        group: null,
+        hasErrored: false,
+        isLoading: false,
+        noExist: false,
+        groupName: '',
+        groupId: '',
+        groupProfileName: '',
+        groupProfileId: '',
+        groupProfileVersion: '',
+        saveGroupOpen: false,
+        isDeleting: false,
+        deleteHasErrored: false,
+        deleteGroupStatus: '',
+        deleteGroupOpen: false,
+        saveButtonDisabled: true,
+        defaultProfileId: '',
+        editGroupStatus: '',
+
+      };
+
+    }
+
+    componentDidMount = () => {
+      if (this.props.profiles === {}){
+        this.props.fetchProfiles();
+      }
+      this.fetchGroup(this.props.match.params.id);
+      this.props.handleSelectedTab(0);
+
+    };
+
+    componentDidUpdate = (prevProps) => {
+      if (this.props !== prevProps) {
+        this.setState({isLoading: false});
+        this.setState({hasErrored: false});
+        this.setState({noExist: false});
+        this.fetchGroup(this.props.match.params.id);
+        this.setState({isDeleting: false});
+        this.setState({deleteHasErrored: false});
+        this.setState({editGroupStatus: ''});
+        this.setState({deleteGroupStatus: ''});
+        this.setState({saveButtonDisabled: true});
+      }
+    };
+
+    fetchGroup = (groupId) => {
+      this.setState({isLoading: true});
+
+      api.get('group/' + groupId )
+      .then((response) => {
+        if (response.status === 200) {
+          this.setState({isLoading: false});
+          return response.data;
+        } else if (response.status === 404) {
+          this.setState({noExist: true});
+          throw Error(response.statusText);
+        } else {
+          console.log("here!!");
+          throw Error(response.statusText);
+        }
+      })
+      .then((group) => {
+        console.log(group);
+        this.setState(group);
+        this.setState({groupName: group.name});
+        this.setState({groupId: group.id});
+        if ('profile_name' in group) {
+          this.setState({groupProfileName: group.profile_name});
+        } else {
+          this.setState({groupProfileName: ''});
+        }
+        if ('profile_version' in group) {
+          this.setState({groupProfileVersion: group.profile_version});
+        } else {
+          this.setState({groupProfileVersion: ''});
+        }
+        if ('profile_id' in group) {
+          this.setState({groupProfileId: group.profile_id});
+          this.setState({defaultProfileId: group.profile_id});
+        } else {
+          this.setState({groupProfileVersion: ''});
+        }
+      })
+      .catch(() => this.setState({hasErrored:true}));
+    }
+
+    createGroup = () => {
+        this.setState({isLoading: true});
+
+        api.post('group', {
+          "name": this.state.createGroupName,
+          "profile_name": this.props.profiles[this.state.createGroupProfile],
+          "profile_version": "latest"
+        }).then((response) => {
+          if (response.status === 201) {
+            let re = /\/api\/group\/(.+)/;
+            this.setState({isLoading: false});
+            let groupId = response.headers.location;
+            let newGroupId = groupId.replace(re, '$1');
+            return newGroupId;
+          } else {
+            throw Error(response.statusText);
+          }
+        })
+        .then((groupId) => {
+          this.setState({createGroupOpen: false});
+          this.setState({createGroupName: ''});
+          this.setState({createGroupProfile: ''});
+          this.props.history.push('/group/' + groupId);
+          this.props.fetchGroups();
+        })
+        .catch(() => this.setState({hasErrored: true}));
+    }
+
+    updateGroup = () => {
+      this.setState({isLoading: true});
+      this.setState({editGroupStatus: <div><CircularProgress className={this.props.classes.progress}/></div>});
+      api.put('/group/' + this.state.groupId, {
+        "profile_name": this.props.profiles[this.state.groupProfileId],
+        "profile_id": this.state.groupProfileId
+      }).then((response) => {
+        if (response.status === 200) {
+          this.setState({isLoading: false});
+          this.setState({editGroupStatus: ''});
+          this.setState({defaultProfileId: this.state.groupProfileId});
+          this.setState({saveButtonDisabled: true});
+          this.handleCloseButton();
+          this.fetchGroup(this.state.groupId);
+          //this.props.handleCloseButton();
+          return response.data;
+        } else {
+          throw Error(response.statusText);
+        }
+      })
+      .then((group) => {
+        console.log(group);
+      })
+      .catch(() => {
+        this.setState({editGroupStatus: <div>An error has occurred!</div>});
+        this.setState({hasErrored:true})
+      });
+    }
+
+    deleteGroup = () => {
+      this.setState({isDeleting: true});
+      this.setState({deleteGroupStatus: <div><CircularProgress className={this.props.classes.progress}/></div>});
+      api.delete('/group/' + this.props.match.params.id
+      ).then((response) => {
+        if (response.status === 204) {
+          this.setState({isDeleting: false});
+          this.setState({deleteGroupStatus: <div>Deleted!</div>});
+          this.fetchGroup(this.props.match.params.id);
+          this.props.fetchGroups();
+        } else {
+          throw Error(response.statusText);
+        }
+      })
+      .catch(() => {
+        this.setState({deleteGroupStatus: <div>An error has occurred!</div>});
+        this.setState({deleteHasErrored:true})
+      });
+    }
+
+    handleNameInput = (event) => {
+      this.setState({groupName: event.target.value});
+    }
+
+    handleIdInput = (event) => {
+      this.setState({groupId: event.target.value});
+    }
+
+    handleProfileNameInput = (event) => {
+      this.setState({groupProfileName: event.target.value});
+    }
+
+    handleProfileSelect = (event) => {
+      this.setState({groupProfileId: event.target.value});
+      if (event.target.value !== this.state.defaultProfileId) {
+        this.setState({saveButtonDisabled: false});
+      } else {
+        this.setState({saveButtonDisabled: true});
+      }
+    }
+
+    handleProfileVersionInput = (event) => {
+      this.setState({groupProfileVersion: event.target.value});
+    }
+
+    handleEditButton = (event) => {
+      this.setState({editGroupOpen: !this.state.editGroupOpen});
+    }
+
+    handleSaveButton = (event) => {
+      this.setState({saveGroupOpen: !this.state.saveGroupOpen});
+    }
+
+    handleDeleteButton = (event) => {
+      this.setState({deleteGroupOpen: !this.state.deleteGroupOpen});
+    }
+
+    handleCloseButton = (event) => {
+      this.setState({saveGroupOpen: false});
+    }
+
+    handleDeleteCloseButton = (event) => {
+      this.setState({deleteGroupOpen: false});
+    }
+
+    render() {
+      if (this.state.hasErrored && this.state.noExist) {
+          return <p>This group no longer exists!</p>;
+      } else if (this.state.hasErrored || this.props.profilesHasErrored) {
+          return <p>Sorry! There was an error loading the items</p>;
+      }
+      if (this.state.isLoading || this.props.profilesIsLoading || this.state.isDeleting) {
+          return <div> <CircularProgress className={this.props.classes.progress}/></div>;
+      }
+
+      const { classes, theme } = this.props;
+
+      const profiles = Object.keys(this.props.profiles).map(profile => {
+        //let profileName = this.props.profiles[profile][0];
+        return <MenuItem key={profile} value={this.props.profiles[profile][0].id}>{profile}</MenuItem>
+      })
+
+
+      return (
+        <div>
+          <form autoComplete="off">
+              <Paper className={this.props.classes.root} elevation={1}>
+                <Typography variant="title">
+                  <strong>Group:</strong> {this.state.groupName}
+                </Typography>
+                <br/>
+                <Typography variant='body1'>
+                  <strong>Group ID:</strong> {this.state.groupId}
+                </Typography>
+                <br/>
+                <Typography variant='body1'>
+                  <strong>Group Profile:</strong>
+                </Typography>
+                <Select
+                  value={this.state.groupProfileId}
+                  onChange={this.handleProfileSelect}
+                  fullWidth
+                >
+                  {profiles}
+                </Select>
+                <br/>
+              </Paper>
+          </form>
+          <br/>
+          <Button onClick={this.handleSaveButton} variant='contained' color="primary" disabled={this.state.saveButtonDisabled}>
+            Save
+          </Button>
+          <Button onClick={this.handleDeleteButton} color="primary">
+            Delete
+            <DeleteIcon className={classes.rightIcon}/>
+          </Button>
+          {this.state.deleteGroupStatus}
+
+
+
+          <Dialog
+            open={this.state.saveGroupOpen}
+            onClose={this.handleCloseButton}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogTitle id="form-dialog-title">Confirm edit of group: {this.state.groupName}?</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Are you sure you want to change the profile to: {this.props.profiles[this.state.groupProfileId]}?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.handleCloseButton} color="primary">
+                Cancel
+              </Button>
+              <Button onClick={this.updateGroup} variant="contained" color="primary">
+                Submit Change
+              </Button>
+              &nbsp;&nbsp;{this.state.editGroupStatus}
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            open={this.state.deleteGroupOpen}
+            onClose={this.handleDeleteCloseButton}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogTitle id="form-dialog-title">Confirm delete of: {this.state.groupName}?</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Are you sure you want to delete: {this.state.groupName}?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.handleDeleteCloseButton} color="primary">
+                Cancel
+              </Button>
+              <Button onClick={this.deleteGroup} variant="contained" color="primary">
+                Delete
+                <DeleteIcon className={classes.rightIcon}/>
+              </Button>
+              &nbsp;&nbsp;{this.state.deleteGroupStatus}
+            </DialogActions>
+          </Dialog>
+        </div>
+
+      );
+    };
+}
+
+
+
+const mapStateToProps = (state) => {
+    return {
+        profiles: state.profiles,
+        profilesHasErrored: state.profilesHasErrored,
+        profilesIsLoading: state.profilesIsLoading
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        fetchProfiles: () => dispatch(profilesFetchData()),
+        fetchGroups: () => dispatch(groupsFetchData()),
+        handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(withStyles(styles)(Group)));
+
+
+/*
+<EditGroup
+  groupName={this.state.groupName}
+  groupId={this.state.groupId}
+  groupProfileId={this.state.groupProfileId}
+  groupProfileName={this.state.groupProfileName}
+  groupProfileVersion={this.state.groupProfileVersion}
+  open={this.state.editGroupOpen}
+  profiles={this.props.profiles}
+  handleCloseButton={this.handleEditButton}
+  fetchGroup={this.fetchGroup}
+  history={this.props.history}
+/>*/
