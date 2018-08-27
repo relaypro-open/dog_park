@@ -1,31 +1,41 @@
-import {handleAction} from 'redux-actions';
+import { handleAction } from 'redux-actions';
 import moment from 'moment';
 
-export const profilesHasErrored = handleAction('PROFILES_HAS_ERRORED', (state, action) => {
-    return action.payload
+export const profilesHasErrored = handleAction(
+  'PROFILES_HAS_ERRORED',
+  (state, action) => {
+    return action.payload;
   },
   false
 );
 
-export const profilesIsLoading = handleAction('PROFILES_IS_LOADING', (state, action) => {
-    return action.payload
+export const profilesIsLoading = handleAction(
+  'PROFILES_IS_LOADING',
+  (state, action) => {
+    return action.payload;
   },
   false
 );
 
-export const profiles = handleAction('PROFILES_FETCH_DATA_SUCCESS', (state, action) => {
+export const profiles = handleAction(
+  'PROFILES_FETCH_DATA_SUCCESS',
+  (state, action) => {
     let profiles = {};
 
-    action.payload.map((profile) => {
+    action.payload.map(profile => {
       let tempProfile = {};
-      tempProfile = { 'id': profile.id, 'name': profile.name, 'created': profile.created };
+      tempProfile = {
+        id: profile.id,
+        name: profile.name,
+        created: profile.created,
+      };
       if (profile.name in profiles) {
         profiles[profile.name].push(tempProfile);
       } else {
         profiles[profile.name] = [tempProfile];
       }
-      //return profiles[profile.id] = { 'name': profile.name, 'created': profile.created }
-    })
+      return true;
+    });
 
     Object.values(profiles).map(profile => {
       profile.sort((a, b) => {
@@ -33,13 +43,14 @@ export const profiles = handleAction('PROFILES_FETCH_DATA_SUCCESS', (state, acti
         let tsB = moment(Object.values(b)[0].created);
 
         if (tsA.valueOf() < tsB.valueOf()) {
-            return 1;
+          return 1;
         } else if (tsA.valueOf() > tsB.valueOf()) {
-            return -1;
+          return -1;
         } else {
-            return 0;
+          return 0;
         }
       });
+      return true;
     });
 
     return profiles;

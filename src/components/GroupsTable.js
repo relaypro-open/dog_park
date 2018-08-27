@@ -1,7 +1,14 @@
 import React from 'react';
 import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
-import { Table, TableBody, TableCell, TableHead, TableRow, Paper } from '@material-ui/core';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Paper,
+} from '@material-ui/core';
 
 const styles = theme => ({
   root: {
@@ -14,7 +21,7 @@ const styles = theme => ({
   },
 });
 
-const GroupsTable = (props) => {
+const GroupsTable = props => {
   const { classes, groups } = props;
 
   return (
@@ -32,10 +39,10 @@ const GroupsTable = (props) => {
               <TableRow
                 key={group.id}
                 hover
-                onClick={(event) => {
-                  props.history.push("/group/" + group.id);
-                }}>
-
+                onClick={event => {
+                  props.history.push('/group/' + group.id);
+                }}
+              >
                 <TableCell>{group.name}</TableCell>
                 <TableCell>{group.id}</TableCell>
               </TableRow>
@@ -45,6 +52,6 @@ const GroupsTable = (props) => {
       </Table>
     </Paper>
   );
-}
+};
 
 export default withRouter(withStyles(styles)(GroupsTable));

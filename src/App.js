@@ -2,15 +2,23 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 import guard_dog from './dog-training.png';
-import logo from './republic_logo_white.png'
+import logo from './republic_logo_white.png';
 import './App.css';
-import {withRouter, Link, Route} from 'react-router-dom'
-import { MuiThemeProvider, withStyles } from '@material-ui/core/styles'
-import { dogTheme } from './styles/muiTheme'
-import { AppBar, Toolbar, Typography, Drawer, Divider, List, IconButton, Tooltip, Button} from '@material-ui/core';
+import { withRouter, Link, Route } from 'react-router-dom';
+import { MuiThemeProvider, withStyles } from '@material-ui/core/styles';
+import { dogTheme } from './styles/muiTheme';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Drawer,
+  Divider,
+  List,
+  IconButton,
+  Tooltip,
+} from '@material-ui/core';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import CreateGroup from './components/CreateGroup';
 import Tabs from '@material-ui/core/Tabs';
@@ -24,9 +32,6 @@ import MenuIcon from '@material-ui/icons/Menu';
 import AddIcon from '@material-ui/icons/Add';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import HomePage from './pages/HomePage';
-import EditPage from './pages/EditPage';
-import ReviewPage from './pages/ReviewPage';
 import Groups from './components/Groups';
 import Group from './components/Group';
 import Profiles from './components/Profiles';
@@ -39,12 +44,12 @@ import Services from './components/Services';
 import Host from './components/Host';
 
 //redux store
-import { groupsFetchData } from './actions/groups'
-import { profilesFetchData } from './actions/profiles'
-import { zonesFetchData } from './actions/zones'
-import { hostsFetchData } from './actions/hosts'
-import { servicesFetchData } from './actions/services'
-import { handleSelectedTab } from './actions/app'
+import { groupsFetchData } from './actions/groups';
+import { profilesFetchData } from './actions/profiles';
+import { zonesFetchData } from './actions/zones';
+import { hostsFetchData } from './actions/hosts';
+import { servicesFetchData } from './actions/services';
+import { handleSelectedTab } from './actions/app';
 
 const drawerWidth = 240;
 
@@ -84,7 +89,7 @@ const styles = theme => ({
     right: theme.spacing.unit * 3,
     bottom: theme.spacing.unit * 3,
     position: 'fixed',
-    color: 'secondary'
+    color: 'secondary',
   },
   menuButton: {
     marginLeft: 12,
@@ -145,35 +150,32 @@ const styles = theme => ({
   },
   flex: {
     flexGrow: 1,
-  }
+  },
 });
 
 class App extends Component {
-
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
-        sideBarActive: false,
-        qaListActive: false,
-        proListActive: false,
-        selectedTab: 0,
-        speedDialOpen: false,
-        isLoading: false,
-        hasErrored: false,
-        groupName: '',
-        seletedProfile: '',
+      sideBarActive: false,
+      qaListActive: false,
+      proListActive: false,
+      selectedTab: 0,
+      speedDialOpen: false,
+      isLoading: false,
+      hasErrored: false,
+      groupName: '',
+      seletedProfile: '',
     };
-
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.fetchGroups();
     this.props.fetchProfiles();
     this.props.fetchZones();
     this.props.fetchServices();
     this.props.fetchHosts();
   }
-
 
   handleDrawerOpen = () => {
     this.setState({ sideBarActive: true });
@@ -184,7 +186,7 @@ class App extends Component {
   };
 
   handleTabChange = (event, value) => {
-    switch(value) {
+    switch (value) {
       case 0:
         this.props.history.push('/groups');
         break;
@@ -204,26 +206,25 @@ class App extends Component {
         this.props.history.push('/groups');
     }
     this.props.handleSelectedTab(value);
-  }
+  };
 
   handleSpeedDialClick = () => {
-    this.setState({speedDialOpen: !this.state.speedDialOpen});
+    this.setState({ speedDialOpen: !this.state.speedDialOpen });
   };
 
   handleSpeedDialOpen = () => {
-    this.setState({speedDialOpen: true});
+    this.setState({ speedDialOpen: true });
   };
 
   handleSpeedDialClose = () => {
-    this.setState({speedDialOpen: false});
+    this.setState({ speedDialOpen: false });
   };
 
   handleAddGroup = () => {
     this.props.history.push('/createGroup');
-  }
+  };
 
   render() {
-
     const { classes, theme } = this.props;
     const { sideBarActive } = this.state;
 
@@ -238,119 +239,166 @@ class App extends Component {
       >
         <div className={classes.drawerHeader}>
           <IconButton onClick={this.handleDrawerClose}>
-            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+            {theme.direction === 'rtl' ? (
+              <ChevronRightIcon />
+            ) : (
+              <ChevronLeftIcon />
+            )}
           </IconButton>
           <Typography variant="subheading" color="inherit">
             Groups
           </Typography>
           <Tooltip id="tooltip-fab" title="Add Group">
-          <IconButton onClick={() => {
-            this.props.history.push('/createGroup');
-          }}>
-            <AddIcon />
-          </IconButton>
+            <IconButton
+              onClick={() => {
+                this.props.history.push('/createGroup');
+              }}
+            >
+              <AddIcon />
+            </IconButton>
           </Tooltip>
         </div>
         <Divider />
-        <List component="nav"
+        <List
+          component="nav"
           subheader={<ListSubheader component="div">Production</ListSubheader>}
         >
-        {
-          this.props.groups.map(group =>
-            <Link key={"link" + group.id} to={"/group/" + group.id} style={{ textDecoration: 'none' }}><ListItem key={group.id} button>
-              <ListItemText primary={group.name} />
-            </ListItem></Link>
-          )
-        }</List>
+          {this.props.groups.map(group => (
+            <Link
+              key={'link' + group.id}
+              to={'/group/' + group.id}
+              style={{ textDecoration: 'none' }}
+            >
+              <ListItem key={group.id} button>
+                <ListItemText primary={group.name} />
+              </ListItem>
+            </Link>
+          ))}
+        </List>
         <Divider />
-        <List></List>
+        <List />
       </Drawer>
     );
 
     return (
-        <div className="App">
+      <div className="App">
         <div>
-            <MuiThemeProvider theme={dogTheme}>
-              <div className={classes.appFrame}>
-              <AppBar className={classNames(classes.appBar, {
-                [classes.appBarShift]: sideBarActive,
-                [classes[`appBarShift-left`]]: sideBarActive,
-              })} >
-                  <Toolbar disableGutters={!sideBarActive}>
+          <MuiThemeProvider theme={dogTheme}>
+            <div className={classes.appFrame}>
+              <AppBar
+                className={classNames(classes.appBar, {
+                  [classes.appBarShift]: sideBarActive,
+                  [classes[`appBarShift-left`]]: sideBarActive,
+                })}
+              >
+                <Toolbar disableGutters={!sideBarActive}>
                   <IconButton
                     color="inherit"
                     aria-label="open drawer"
                     onClick={this.handleDrawerOpen}
-                    className={classNames(classes.menuButton, sideBarActive && classes.hide)}
+                    className={classNames(
+                      classes.menuButton,
+                      sideBarActive && classes.hide
+                    )}
                   >
                     <MenuIcon />
                   </IconButton>
-                  <Typography variant="title" color="inherit" >
+                  <Typography variant="title" color="inherit">
                     Dog Park
                   </Typography>
-                  {<span>&nbsp;&nbsp;&nbsp;&nbsp;<img alt="guard_dog" className={classes.icon_img} src={guard_dog}/>&nbsp;&nbsp;</span>}
-                  <Tabs className={classes.flex} value={this.props.selectedTab} onChange={this.handleTabChange}>
+                  {
+                    <span>
+                      &nbsp;&nbsp;&nbsp;&nbsp;<img
+                        alt="guard_dog"
+                        className={classes.icon_img}
+                        src={guard_dog}
+                      />&nbsp;&nbsp;
+                    </span>
+                  }
+                  <Tabs
+                    className={classes.flex}
+                    value={this.props.selectedTab}
+                    onChange={this.handleTabChange}
+                  >
                     <Tab label="Groups" />
                     <Tab label="Profiles" />
                     <Tab label="Services" />
                     <Tab label="Hosts" />
                     <Tab label="Zones" />
                   </Tabs>
-                  {<span><img alt="guard_dog" className={classes.logo_img} src={logo}/></span>}
+                  {
+                    <span>
+                      <img
+                        alt="guard_dog"
+                        className={classes.logo_img}
+                        src={logo}
+                      />
+                    </span>
+                  }
                 </Toolbar>
               </AppBar>
-                {drawer}
+              {drawer}
               <main
-                  className={classNames(classes.content, classes[`content-left`], {
+                className={classNames(
+                  classes.content,
+                  classes[`content-left`],
+                  {
                     [classes.contentShift]: sideBarActive,
                     [classes[`contentShift-left`]]: sideBarActive,
-                  })}
+                  }
+                )}
               >
-                  <div className={classes.drawerHeader} />
-                <Route exact={true} path="/" component={HomePage}/>
-                <Route exact={true} path="/edit/:id" component={EditPage}/>
-                <Route exact={true} path="/review/:id" component={ReviewPage}/>
-                <Route exact={true} path="/groups" component={Groups}/>
-                <Route path="/group/:id" component={Group}/>
-                <Route exact={true} path="/profiles" component={Profiles}/>
-                <Route exact={true} path="/zones" component={Zones}/>
-                <Route exact={true} path="/createGroup" component={CreateGroup}/>
-                <Route path="/profile/:id" component={Profile}/>
-                <Route path="/zone/:id" component={Zone}/>
-                <Route exact={true} path="/hosts" component={Hosts}/>
-                <Route path="/host/:id" component={Host}/>
-                <Route exact={true} path="/services" component={Services}/>
-                <Route path="/service/:id" component={Service}/>
+                <div className={classes.drawerHeader} />
+                <Route exact={true} path="/" component={Groups} />
+                <Route exact={true} path="/groups" component={Groups} />
+                <Route path="/group/:id" component={Group} />
+                <Route exact={true} path="/profiles" component={Profiles} />
+                <Route exact={true} path="/zones" component={Zones} />
+                <Route
+                  exact={true}
+                  path="/createGroup"
+                  component={CreateGroup}
+                />
+                <Route path="/profile/:id" component={Profile} />
+                <Route path="/zone/:id" component={Zone} />
+                <Route exact={true} path="/hosts" component={Hosts} />
+                <Route path="/host/:id" component={Host} />
+                <Route exact={true} path="/services" component={Services} />
+                <Route path="/service/:id" component={Service} />
               </main>
             </div>
-
-            </MuiThemeProvider>
+          </MuiThemeProvider>
         </div>
-        </div>
+      </div>
     );
   }
 }
 
-const mapStateToProps = (state) => {
-    return {
-        groups: state.groups,
-        hosts: state.hosts,
-        selectedTab: state.selectedTab,
-    };
+const mapStateToProps = state => {
+  return {
+    groups: state.groups,
+    hosts: state.hosts,
+    selectedTab: state.selectedTab,
+  };
 };
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        fetchGroups: () => dispatch(groupsFetchData()),
-        fetchProfiles: () => dispatch(profilesFetchData()),
-        fetchZones: () => dispatch(zonesFetchData()),
-        fetchHosts: () => dispatch(hostsFetchData()),
-        fetchServices: () => dispatch(servicesFetchData()),
-        handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
-    };
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchGroups: () => dispatch(groupsFetchData()),
+    fetchProfiles: () => dispatch(profilesFetchData()),
+    fetchZones: () => dispatch(zonesFetchData()),
+    fetchHosts: () => dispatch(hostsFetchData()),
+    fetchServices: () => dispatch(servicesFetchData()),
+    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+  };
 };
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(withStyles(styles, { withTheme: true })(App)));
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(withStyles(styles, { withTheme: true })(App))
+);
 
 /*<SpeedDial
   ariaLabel="SpeedDial example"

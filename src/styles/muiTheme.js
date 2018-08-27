@@ -1,6 +1,6 @@
 import { createMuiTheme } from '@material-ui/core/styles';
-import indigo from '@material-ui/core/colors/indigo';
-import pink from '@material-ui/core/colors/pink';
+//import indigo from '@material-ui/core/colors/indigo';
+//import pink from '@material-ui/core/colors/pink';
 import red from '@material-ui/core/colors/red';
 
 // All the following keys are optional.
@@ -10,12 +10,12 @@ export const dogTheme = createMuiTheme({
     primary: {
       main: '#212121',
       light: '#484848',
-      dark: '#000000'
+      dark: '#000000',
     },
     secondary: {
       main: '#6fc55d',
       light: '#8bd07d',
-      dark: '#4d8941'
+      dark: '#4d8941',
       //main: '#3949ab',
       //light: '#6f74dd',
       //dark: '#00227b',

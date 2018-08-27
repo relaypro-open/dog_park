@@ -1,36 +1,48 @@
-import {handleAction, handleActions} from 'redux-actions';
+import { handleAction, handleActions } from 'redux-actions';
 
-
-export const groupHasErrored = handleAction('GROUP_HAS_ERRORED', (state, action) => {
+export const groupHasErrored = handleAction(
+  'GROUP_HAS_ERRORED',
+  (state, action) => {
     return action.payload;
   },
   false
 );
-export const groupIsLoading = handleAction('GROUP_IS_LOADING', (state, action) => {
+export const groupIsLoading = handleAction(
+  'GROUP_IS_LOADING',
+  (state, action) => {
     return action.payload;
   },
   false
 );
-export const editGroupOpen = handleAction('EDIT_GROUP_OPEN', (state, action) => {
+export const editGroupOpen = handleAction(
+  'EDIT_GROUP_OPEN',
+  (state, action) => {
     return action.payload;
   },
   false
 );
-export const createGroupHasErrored = handleAction('CREATE_GROUP_HAS_ERRORED', (state, action) => {
+export const createGroupHasErrored = handleAction(
+  'CREATE_GROUP_HAS_ERRORED',
+  (state, action) => {
     return action.payload;
   },
   false
 );
-export const createGroupIsLoading = handleAction('CREATE_GROUP_IS_LOADING', (state, action) => {
+export const createGroupIsLoading = handleAction(
+  'CREATE_GROUP_IS_LOADING',
+  (state, action) => {
     return action.payload;
   },
   false
 );
 export const group = handleActions(
   {
-    'GROUP_FETCH_DATA_SUCCESS':
-    (state, action) => {
-      let groupName, groupId, groupProfileId, groupProfileName, groupProfileVersion
+    GROUP_FETCH_DATA_SUCCESS: (state, action) => {
+      let groupName,
+        groupId,
+        groupProfileId,
+        groupProfileName,
+        groupProfileVersion;
       groupName = action.payload.name;
       groupId = action.payload.id;
       groupProfileId = '';
@@ -52,22 +64,18 @@ export const group = handleActions(
         groupProfileId,
         groupProfileName,
         groupProfileVersion,
-      }
+      };
     },
-    'CREATE_GROUP_SUCCESS':
-    (state, action) => {
+    CREATE_GROUP_SUCCESS: (state, action) => {
       return action.payload;
     },
-    'UPDATE_GROUP_PROFILE_NAME':
-    (state, action) => {
-
-    }
+    UPDATE_GROUP_PROFILE_NAME: (state, action) => {},
   },
   {
     groupName: '',
     groupId: '',
     groupProfileId: '',
     groupProfileName: '',
-    groupProfileVersion: ''
+    groupProfileVersion: '',
   }
 );

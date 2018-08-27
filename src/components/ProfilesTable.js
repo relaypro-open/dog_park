@@ -1,7 +1,14 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { withRouter } from 'react-router';
-import { Table, TableBody, TableCell, TableHead, TableRow, Paper } from '@material-ui/core';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Paper,
+} from '@material-ui/core';
 
 const styles = theme => ({
   root: {
@@ -14,7 +21,7 @@ const styles = theme => ({
   },
 });
 
-const ProfilesTable = (props) => {
+const ProfilesTable = props => {
   const { classes, profiles } = props;
 
   return (
@@ -33,9 +40,10 @@ const ProfilesTable = (props) => {
               <TableRow
                 key={profile}
                 hover
-                onClick={(event) => {
-                  props.history.push("/profile/" + profiles[profile][0].id);
-                }}>
+                onClick={event => {
+                  props.history.push('/profile/' + profiles[profile][0].id);
+                }}
+              >
                 <TableCell>{profile}</TableCell>
                 <TableCell>{profiles[profile][0].id}</TableCell>
                 <TableCell>{profiles[profile][0].created}</TableCell>
@@ -46,6 +54,6 @@ const ProfilesTable = (props) => {
       </Table>
     </Paper>
   );
-}
+};
 
 export default withRouter(withStyles(styles)(ProfilesTable));

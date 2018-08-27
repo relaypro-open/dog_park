@@ -9,10 +9,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
-import {
-  SortableElement,
-  SortableHandle,
-} from 'react-sortable-hoc';
+import { SortableElement, SortableHandle } from 'react-sortable-hoc';
 import debounce from 'lodash/debounce';
 
 const styles = theme => ({
@@ -30,15 +27,17 @@ const styles = theme => ({
   },
 });
 
-const DragHandle = SortableHandle (() =>
-   <span><MenuIcon/></span>
-)
+const DragHandle = SortableHandle(() => (
+  <span>
+    <MenuIcon />
+  </span>
+));
 
 class ProfileRow extends Component {
   constructor(props) {
     super(props);
 
-    let { data }  = props;
+    let { data } = props;
 
     this.state = {
       active: data.active,
@@ -49,7 +48,7 @@ class ProfileRow extends Component {
       log: data.log,
       logPrefix: data.logPrefix,
       comment: data.comment,
-    }
+    };
 
     this.activeFunction = debounce(this.props.handleActiveCheckbox, 500);
     this.intfFunction = debounce(this.props.handleIntfSelect, 500);
@@ -61,71 +60,102 @@ class ProfileRow extends Component {
     this.commentFunction = debounce(this.props.handleCommentInput, 500);
   }
 
-  componentDidUpdate = (prevProps) => {
+  componentDidUpdate = prevProps => {
     if (this.props !== prevProps) {
       const { data } = this.props;
-      this.setState({active: data.active});
-      this.setState({intf: data.interface});
-      this.setState({group: data.group});
-      this.setState({service: data.service});
-      this.setState({action: data.action});
-      this.setState({log: data.log});
-      this.setState({logPrefix: data.log_prefix});
-      this.setState({comment: data.comment});
+      this.setState({ active: data.active });
+      this.setState({ intf: data.interface });
+      this.setState({ group: data.group });
+      this.setState({ service: data.service });
+      this.setState({ action: data.action });
+      this.setState({ log: data.log });
+      this.setState({ logPrefix: data.log_prefix });
+      this.setState({ comment: data.comment });
     }
-  }
+  };
 
-  handleActiveCheckbox = (event) => {
-    this.setState({active: event.target.checked});
-    this.activeFunction(this.props.pIndex, event.target.checked, this.props.ruleType);
-  }
+  handleActiveCheckbox = event => {
+    this.setState({ active: event.target.checked });
+    this.activeFunction(
+      this.props.pIndex,
+      event.target.checked,
+      this.props.ruleType
+    );
+  };
 
-  handleIntfSelect = (event) => {
-    this.setState({intf: event.target.value});
-    this.intfFunction(this.props.pIndex, event.target.value, this.props.ruleType);
-  }
+  handleIntfSelect = event => {
+    this.setState({ intf: event.target.value });
+    this.intfFunction(
+      this.props.pIndex,
+      event.target.value,
+      this.props.ruleType
+    );
+  };
 
-  handleGroupSelect = (event) => {
-    this.setState({group: event.target.value});
-    this.groupFunction(this.props.pIndex, event.target.value, this.props.ruleType);
-  }
+  handleGroupSelect = event => {
+    this.setState({ group: event.target.value });
+    this.groupFunction(
+      this.props.pIndex,
+      event.target.value,
+      this.props.ruleType
+    );
+  };
 
-  handleServiceSelect = (event) => {
-    this.setState({service: event.target.value});
-    this.serviceFunction(this.props.pIndex, event.target.value, this.props.ruleType);
-  }
+  handleServiceSelect = event => {
+    this.setState({ service: event.target.value });
+    this.serviceFunction(
+      this.props.pIndex,
+      event.target.value,
+      this.props.ruleType
+    );
+  };
 
-  handleActionSelect = (event) => {
-    this.setState({action: event.target.value});
-    this.actionFunction(this.props.pIndex, event.target.value, this.props.ruleType);
-  }
+  handleActionSelect = event => {
+    this.setState({ action: event.target.value });
+    this.actionFunction(
+      this.props.pIndex,
+      event.target.value,
+      this.props.ruleType
+    );
+  };
 
-  handleLogCheckbox = (event) => {
-    this.setState({log: event.target.checked});
-    this.logFunction(this.props.pIndex, event.target.checked, this.props.ruleType);
-  }
+  handleLogCheckbox = event => {
+    this.setState({ log: event.target.checked });
+    this.logFunction(
+      this.props.pIndex,
+      event.target.checked,
+      this.props.ruleType
+    );
+  };
 
-  handleLogPrefixInput = (event) => {
-    this.setState({logPrefix: event.target.value});
-    this.logPrefixFunction(this.props.pIndex, event.target.value, this.props.ruleType);
-  }
+  handleLogPrefixInput = event => {
+    this.setState({ logPrefix: event.target.value });
+    this.logPrefixFunction(
+      this.props.pIndex,
+      event.target.value,
+      this.props.ruleType
+    );
+  };
 
-  handleCommentInput = (event) => {
-    this.setState({comment: event.target.value});
-    this.commentFunction(this.props.pIndex, event.target.value, this.props.ruleType);
-  }
+  handleCommentInput = event => {
+    this.setState({ comment: event.target.value });
+    this.commentFunction(
+      this.props.pIndex,
+      event.target.value,
+      this.props.ruleType
+    );
+  };
 
-  handleAddProfile = (event) => {
+  handleAddProfile = event => {
     this.props.handleAddProfile(this.props.ruleType);
-  }
+  };
 
-  handleRemoveProfile = (event) => {
+  handleRemoveProfile = event => {
     this.props.handleRemoveProfile(this.props.pIndex, this.props.ruleType);
-  }
+  };
 
   render() {
-
-    const { groups, services, classes} = this.props;
+    const { groups, services, classes } = this.props;
     const {
       active,
       intf,
@@ -134,62 +164,95 @@ class ProfileRow extends Component {
       action,
       log,
       logPrefix,
-      comment
+      comment,
     } = this.state;
 
     return (
-      <TableRow style={{zIndex: 10000000}}>
-        <TableCell><DragHandle/></TableCell>
-        <TableCell><Checkbox checked={active} onChange={this.handleActiveCheckbox}/></TableCell>
+      <TableRow style={{ zIndex: 10000000 }}>
         <TableCell>
-          <Select value={intf} onChange={this.handleIntfSelect} >
-            <MenuItem value={"lo"}>lo</MenuItem>
-            <MenuItem value={"any"}>any</MenuItem>
+          <DragHandle />
+        </TableCell>
+        <TableCell>
+          <Checkbox checked={active} onChange={this.handleActiveCheckbox} />
+        </TableCell>
+        <TableCell>
+          <Select value={intf} onChange={this.handleIntfSelect}>
+            <MenuItem value={'lo'}>lo</MenuItem>
+            <MenuItem value={'any'}>any</MenuItem>
           </Select>
         </TableCell>
         <TableCell>
           <Select value={group} onChange={this.handleGroupSelect}>
-            <MenuItem value={"any"}>any</MenuItem>
-            {groups.map((grp) => {
-              return <MenuItem key={'grp' + grp.id} value={grp.id}>{grp.name}</MenuItem>
+            <MenuItem value={'any'}>any</MenuItem>
+            {groups.map(grp => {
+              return (
+                <MenuItem key={'grp' + grp.id} value={grp.id}>
+                  {grp.name}
+                </MenuItem>
+              );
             })}
           </Select>
         </TableCell>
         <TableCell>
           <Select value={service} onChange={this.handleServiceSelect}>
-          {services.map((serv) => {
-            return <MenuItem key={'serv' + serv.id} value={serv.id}>{serv.name}</MenuItem>
-          })}
+            {services.map(serv => {
+              return (
+                <MenuItem key={'serv' + serv.id} value={serv.id}>
+                  {serv.name}
+                </MenuItem>
+              );
+            })}
           </Select>
         </TableCell>
         <TableCell>
           <Select value={action} onChange={this.handleActionSelect}>
-            <MenuItem value={"ACCEPT"}>ACCEPT</MenuItem>
-            <MenuItem value={"DROP"}>DROP</MenuItem>
-            <MenuItem value={"REJECT"}>REJECT</MenuItem>
+            <MenuItem value={'ACCEPT'}>ACCEPT</MenuItem>
+            <MenuItem value={'DROP'}>DROP</MenuItem>
+            <MenuItem value={'REJECT'}>REJECT</MenuItem>
           </Select>
         </TableCell>
-        <TableCell><Checkbox checked={log} onChange={this.handleLogCheckbox}/></TableCell>
-        <TableCell>{logPrefix}</TableCell>
         <TableCell>
-        <TextField
-          margin="dense"
-          id="comment"
-          value={comment}
-          onChange={this.handleCommentInput}
-        />
+          <Checkbox checked={log} onChange={this.handleLogCheckbox} />
         </TableCell>
         <TableCell>
-          <Button variant="fab" mini color="secondary" aria-label="Add" className={classes.button} onClick={this.handleAddProfile}>
+          <TextField
+            margin="dense"
+            id="logPrefix"
+            value={logPrefix}
+            onChange={this.handleLogPrefixInput}
+          />
+        </TableCell>
+        <TableCell>
+          <TextField
+            margin="dense"
+            id="comment"
+            value={comment}
+            onChange={this.handleCommentInput}
+          />
+        </TableCell>
+        <TableCell>
+          <Button
+            variant="fab"
+            mini
+            color="secondary"
+            aria-label="Add"
+            className={classes.button}
+            onClick={this.handleAddProfile}
+          >
             <AddIcon />
           </Button>
-          <Button variant="fab" mini  aria-label="Remove" className={classes.button} onClick={this.handleRemoveProfile}>
+          <Button
+            variant="fab"
+            mini
+            aria-label="Remove"
+            className={classes.button}
+            onClick={this.handleRemoveProfile}
+          >
             <RemoveIcon />
           </Button>
         </TableCell>
       </TableRow>
-    )
-
+    );
   }
 }
 

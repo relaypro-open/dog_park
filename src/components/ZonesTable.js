@@ -1,7 +1,14 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { withRouter } from 'react-router';
-import { Table, TableBody, TableCell, TableHead, TableRow, Paper } from '@material-ui/core';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Paper,
+} from '@material-ui/core';
 
 const styles = theme => ({
   root: {
@@ -14,7 +21,7 @@ const styles = theme => ({
   },
 });
 
-const ZonesTable = (props) => {
+const ZonesTable = props => {
   const { classes, zones } = props;
 
   return (
@@ -29,11 +36,13 @@ const ZonesTable = (props) => {
         <TableBody>
           {zones.map(zone => {
             return (
-              <TableRow key={zone.id}
+              <TableRow
+                key={zone.id}
                 hover
-                onClick={(event) => {
-                  props.history.push("/zone/" + zone.id);
-                }}>
+                onClick={event => {
+                  props.history.push('/zone/' + zone.id);
+                }}
+              >
                 <TableCell>{zone.name}</TableCell>
                 <TableCell>{zone.id}</TableCell>
               </TableRow>
@@ -43,8 +52,6 @@ const ZonesTable = (props) => {
       </Table>
     </Paper>
   );
-}
+};
 
-
-
-export default withRouter(withStyles(styles)(ZonesTable))
+export default withRouter(withStyles(styles)(ZonesTable));

@@ -1,7 +1,14 @@
 import React from 'react';
 import { withRouter } from 'react-router';
 import { withStyles } from '@material-ui/core/styles';
-import { Table, TableBody, TableCell, TableHead, TableRow, Paper } from '@material-ui/core';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Paper,
+} from '@material-ui/core';
 
 const styles = theme => ({
   root: {
@@ -14,7 +21,7 @@ const styles = theme => ({
   },
 });
 
-const ServicesTable = (props) => {
+const ServicesTable = props => {
   const { classes, services } = props;
 
   return (
@@ -30,12 +37,12 @@ const ServicesTable = (props) => {
           {services.map(service => {
             return (
               <TableRow
-                key={service.id}
+                key={'service' + service.id}
                 hover
-                onClick={(event) => {
-                  props.history.push("/service/" + service.id);
-                }}>
-
+                onClick={event => {
+                  props.history.push('/service/' + service.id);
+                }}
+              >
                 <TableCell>{service.name}</TableCell>
                 <TableCell>{service.id}</TableCell>
               </TableRow>
@@ -45,6 +52,6 @@ const ServicesTable = (props) => {
       </Table>
     </Paper>
   );
-}
+};
 
 export default withRouter(withStyles(styles)(ServicesTable));

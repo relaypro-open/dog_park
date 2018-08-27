@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { api } from '../api';
 import { groupsFetchData } from '../actions/groups';
 import Button from '@material-ui/core/Button';
-import CircularProgress from '@material-ui/core/CircularProgress'
+import CircularProgress from '@material-ui/core/CircularProgress';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -24,7 +24,7 @@ const styles = theme => ({
 });
 
 class CreateGroup extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
 
     this.state = {
@@ -37,37 +37,45 @@ class CreateGroup extends Component {
 
     this.handleGroupName = this.handleGroupName.bind(this);
     this.handleProfileSelect = this.handleProfileSelect.bind(this);
-    this.handleCreateGroup= this.handleCreateGroup.bind(this);
-    this.createGroup= this.createGroup.bind(this);
-    this.handleCancel= this.handleCancel.bind(this);
+    this.handleCreateGroup = this.handleCreateGroup.bind(this);
+    this.createGroup = this.createGroup.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
   }
 
-  handleGroupName (event) {
-    this.setState({groupName: event.target.value});
+  handleGroupName(event) {
+    this.setState({ groupName: event.target.value });
   }
 
-  handleProfileSelect (event) {
-    this.setState({selectedProfile: event.target.value});
+  handleProfileSelect(event) {
+    this.setState({ selectedProfile: event.target.value });
   }
 
-  handleCreateGroup () {
-    this.setState({createGroupProgress: <span>&nbsp;&nbsp;<CircularProgress size={20}/></span>});
+  handleCreateGroup() {
+    this.setState({
+      createGroupProgress: (
+        <span>
+          &nbsp;&nbsp;<CircularProgress size={20} />
+        </span>
+      ),
+    });
     if (this.state.groupName !== '' && this.state.selectedProfile !== '') {
       this.createGroup();
     }
   }
 
-  createGroup () {
-      this.setState({isLoading: true});
+  createGroup() {
+    this.setState({ isLoading: true });
 
-      api.post('group', {
-        "name": this.state.groupName,
-        "profile_name": this.props.profiles[this.state.selectedProfile],
-        "profile_version": "latest"
-      }).then((response) => {
+    api
+      .post('group', {
+        name: this.state.groupName,
+        profile_name: this.props.profiles[this.state.selectedProfile],
+        profile_version: 'latest',
+      })
+      .then(response => {
         if (response.status === 201) {
           let re = /\/api\/group\/(.+)/;
-          this.setState({isLoading: false});
+          this.setState({ isLoading: false });
           let groupId = response.headers.location;
           let newGroupId = groupId.replace(re, '$1');
           return newGroupId;
@@ -75,79 +83,93 @@ class CreateGroup extends Component {
           throw Error(response.statusText);
         }
       })
-      .then((groupId) => {
+      .then(groupId => {
         this.props.history.push('/group/' + groupId);
         this.props.fetchGroups();
       })
-      .catch(() => this.setState({hasErrored: true}));
+      .catch(() => this.setState({ hasErrored: true }));
   }
 
-  handleCancel () {
+  handleCancel() {
     this.props.history.push('/groups');
   }
 
   render() {
-
     const profiles = Object.keys(this.props.profiles).map(profile => {
       let profileName = this.props.profiles[profile];
-      return <MenuItem key={profile} value={profile}>{profileName}</MenuItem>
-    })
+      return (
+        <MenuItem key={profile} value={profile}>
+          {profileName}
+        </MenuItem>
+      );
+    });
 
     return (
       <div>
         <form autoComplete="off">
-            <Paper className={this.props.classes.root} elevation={1}>
-              <Typography variant="headline" component="h2">
-                Create a New Group
-              </Typography>
-              <Typography component='p'>
-                Enter in the name of the group and the profile that you want to attach it to.
-              </Typography>
-              <TextField
-                autoFocus
-                margin="dense"
-                id="groupName"
-                label="Group Name"
-                value={this.state.groupName}
-                onChange={this.handleGroupName}
-                required
+          <Paper className={this.props.classes.root} elevation={1}>
+            <Typography variant="headline" component="h2">
+              Create a New Group
+            </Typography>
+            <Typography component="p">
+              Enter in the name of the group and the profile that you want to
+              attach it to.
+            </Typography>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="groupName"
+              label="Group Name"
+              value={this.state.groupName}
+              onChange={this.handleGroupName}
+              required
+              fullWidth
+            />
+            <br />
+            <br />
+            <FormControl required fullWidth>
+              <InputLabel>Group Profile</InputLabel>
+              <Select
+                value={this.state.selectedProfile}
+                onChange={this.handleProfileSelect}
                 fullWidth
-              />
-              <br/>
-              <br/>
-              <FormControl required fullWidth>
-                <InputLabel>Group Profile</InputLabel>
-                <Select
-                  value={this.state.selectedProfile}
-                  onChange={this.handleProfileSelect}
-                  fullWidth
-                >
-                  {profiles}
-                </Select>
-              </FormControl>
-              <br/>
-              <br/>
-              <Button variant="contained" color="primary" size="large" onClick={this.handleCreateGroup}>Add Group{this.state.createGroupProgress}</Button>
-              <Button size="large" onClick={this.handleCancel}>Cancel</Button>
-            </Paper>
+              >
+                {profiles}
+              </Select>
+            </FormControl>
+            <br />
+            <br />
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={this.handleCreateGroup}
+            >
+              Add Group{this.state.createGroupProgress}
+            </Button>
+            <Button size="large" onClick={this.handleCancel}>
+              Cancel
+            </Button>
+          </Paper>
         </form>
       </div>
-
     );
-  };
+  }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     profiles: state.profiles,
   };
-}
-
-const mapDispatchToProps = (dispatch) => {
-    return {
-      fetchGroups: () => dispatch(groupsFetchData()),
-    };
 };
 
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchGroups: () => dispatch(groupsFetchData()),
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(withStyles(styles)(CreateGroup)));
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(withStyles(styles)(CreateGroup)));
