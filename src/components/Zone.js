@@ -25,8 +25,8 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DeleteIcon from '@material-ui/icons/Delete';
 import debounce from 'lodash/debounce';
-import ipRegex from 'ip-regex';
-import cidrRegex from 'cidr-regex';
+import ipRegex from '../libs/ip-regex';
+import cidrRegex from '../libs/cidr-regex';
 
 const styles = theme => ({
   root: {
@@ -72,7 +72,7 @@ export class ZoneAddress extends Component {
   handleAddressField = event => {
     if (
       ipRegex({ exact: true }).test(event.target.value) ||
-      cidrRegex({ exact: true }).test(event.target.value)
+      cidrRegex().test(event.target.value)
     ) {
       this.setState({ addressError: false });
       this.addressField(this.props.index, event.target.value, false);

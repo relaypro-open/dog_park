@@ -5,7 +5,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import './index.css';
 import App from './App';
 import configureStore from './store/configureStore';
-import unregister from './registerServiceWorker';
+//import unregister from './registerServiceWorker';
 
 const store = configureStore({});
 
@@ -17,5 +17,5 @@ ReactDOM.render(
   </Provider>,
   document.getElementById('root')
 );
-unregister();
+//unregister();
 //registerServiceWorker();

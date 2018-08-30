@@ -383,7 +383,7 @@ class Group extends Component {
           <DialogContent>
             <DialogContentText>
               Are you sure you want to change the profile to:{' '}
-              {this.props.profiles[this.state.groupProfileId]}?
+              {this.state.groupProfileName}?
             </DialogContentText>
           </DialogContent>
           <DialogActions>

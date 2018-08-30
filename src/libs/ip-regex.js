@@ -1,12 +1,6 @@
-'use strict';
+const v4 = '(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])){3}';
 
-const word = '[a-fA-F\\d:]';
-const b = `(?:(?<=\\s|^)(?=${word})|(?<=${word})(?=\\s|$))`;
-
-const v4 =
-  '(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)){3}';
-
-const v6seg = '[a-fA-F\\d]{1,4}';
+const v6seg = '[0-9a-fA-F]{1,4}';
 const v6 = `
 (
 (?:${v6seg}:){7}(?:${v6seg}|:)|                                // 1:2:3:4:5:6:7::  1:2:3:4:5:6:7:8
@@ -18,19 +12,13 @@ const v6 = `
 (?:${v6seg}:){1}(?:(:${v6seg}){0,4}:${v4}|(:${v6seg}){1,6}|:)| // 1::              1::3:4:5:6:7:8   1::8            1::3:4:5:6:7:1.2.3.4
 (?::((?::${v6seg}){0,5}:${v4}|(?::${v6seg}){1,7}|:))           // ::2:3:4:5:6:7:8  ::2:3:4:5:6:7:8  ::8             ::1.2.3.4
 )(%[0-9a-zA-Z]{1,})?                                           // %eth0            %1
-`
-  .replace(/\s*\/\/.*$/gm, '')
-  .replace(/\n/g, '')
-  .trim();
+`.replace(/\s*\/\/.*$/gm, '').replace(/\n/g, '').trim();
 
-const ip = opts =>
-  opts && opts.exact
-    ? new RegExp(`(?:^${v4}$)|(?:^${v6}$)`)
-    : new RegExp(`(?:${b}${v4}${b})|(?:${b}${v6}${b})`, 'g');
+const ipRegex = opts => opts && opts.exact ?
+	new RegExp(`(?:^${v4}$)|(?:^${v6}$)`) :
+	new RegExp(`(?:${v4})|(?:${v6})`, 'g');
 
-ip.v4 = opts =>
-  opts && opts.exact ? new RegExp(`^${v4}$`) : new RegExp(`${b}${v4}${b}`, 'g');
-ip.v6 = opts =>
-  opts && opts.exact ? new RegExp(`^${v6}$`) : new RegExp(`${b}${v6}${b}`, 'g');
+ipRegex.v4 = opts => opts && opts.exact ? new RegExp(`^${v4}$`) : new RegExp(v4, 'g');
+ipRegex.v6 = opts => opts && opts.exact ? new RegExp(`^${v6}$`) : new RegExp(v6, 'g');
 
 export default ipRegex;

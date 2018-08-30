@@ -1,0 +1,7 @@
+PACKAGE=bird_watcher
+
+all: install
+
+install:
+	 
+	cp -r ./build/* /usr/share/nginx/html
