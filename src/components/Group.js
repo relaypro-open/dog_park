@@ -62,8 +62,14 @@ class Group extends Component {
       deleteGroupStatus: '',
       deleteGroupOpen: false,
       saveButtonDisabled: true,
+      defaultProfileName: '',
       defaultProfileId: '',
       editGroupStatus: '',
+      isProfileDiff: false,
+      profileDiffOpen: false,
+      diff: '',
+      oldProfileDate: '',
+      newProfileDate: '',
     };
   }
 
@@ -81,8 +87,6 @@ class Group extends Component {
       this.setState({ isLoading: false });
       this.setState({ hasErrored: false });
       this.setState({ noExist: false });
-      this.fetchGroup(this.props.match.params.id);
-      this.fetchGroupHosts(this.props.match.params.id);
       this.setState({ isDeleting: false });
       this.setState({ deleteHasErrored: false });
       this.setState({ editGroupStatus: '' });
@@ -104,17 +108,16 @@ class Group extends Component {
           this.setState({ noExist: true });
           throw Error(response.statusText);
         } else {
-          console.log('here!!');
           throw Error(response.statusText);
         }
       })
       .then(group => {
-        console.log(group);
         this.setState(group);
         this.setState({ groupName: group.name });
         this.setState({ groupId: group.id });
         if ('profile_name' in group) {
           this.setState({ groupProfileName: group.profile_name });
+          this.setState({ defaultProfileName: group.profile_name });
         } else {
           this.setState({ groupProfileName: '' });
         }
@@ -133,6 +136,37 @@ class Group extends Component {
       .catch(() => this.setState({ hasErrored: true }));
   };
 
+  fetchDiff = (oldId, newId) => {
+    this.setState({ isLoading: true });
+
+    api
+      .get('profile/' + oldId + '?diff=' + newId, {
+        responseType: 'text',
+        headers: {
+          Accept: 'text/plain',
+          'Content-Type': 'text/plain',
+        },
+      })
+      .then(response => {
+        if (response.status === 200) {
+          console.log(response);
+          this.setState({ isLoading: false });
+          return response.data;
+        } else if (response.status === 404) {
+          this.setState({ noExist: true });
+          throw Error(response.statusText);
+        } else {
+          throw Error(response.statusText);
+        }
+      })
+      .then(diff => {
+        console.log(diff);
+        this.setState({ diff });
+        this.setState({ oldProfileDate: this.props.profiles });
+      })
+      .catch(() => this.setState({ hasErrored: true }));
+  };
+
   fetchGroupHosts = groupId => {
     this.setState({ isLoading: true });
 
@@ -146,12 +180,10 @@ class Group extends Component {
           this.setState({ noExist: true });
           throw Error(response.statusText);
         } else {
-          console.log('here!!');
           throw Error(response.statusText);
         }
       })
       .then(group => {
-        console.log(group);
         this.setState({ groupHosts: group });
       })
       .catch(() => this.setState({ hasErrored: true }));
@@ -199,26 +231,70 @@ class Group extends Component {
     api
       .put('/group/' + this.state.groupId, {
         name: this.state.groupName,
-        profile_name: this.props.profiles[this.state.groupProfileId],
-        profile_id: this.state.groupProfileId,
+        profile_name: this.state.groupProfileName,
+        profile_id: this.props.profiles[this.state.groupProfileName][0].id,
       })
       .then(response => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           this.setState({ editGroupStatus: '' });
-          this.setState({ defaultProfileId: this.state.groupProfileId });
+          this.setState({
+            defaultProfileId: this.props.profiles[
+              this.state.groupProfileName
+            ][0].id,
+          });
+          this.setState({ defaultProfileName: this.state.groupProfileName });
           this.setState({ saveButtonDisabled: true });
           this.handleCloseButton();
           this.fetchGroup(this.state.groupId);
-          //this.props.handleCloseButton();
+          this.props.fetchGroups();
           return response.data;
         } else {
           throw Error(response.statusText);
         }
       })
-      .then(group => {
-        console.log(group);
+      .then(group => {})
+      .catch(() => {
+        this.setState({ editGroupStatus: <div>An error has occurred!</div> });
+        this.setState({ hasErrored: true });
+      });
+  };
+
+  updateProfile = () => {
+    this.setState({ isLoading: true });
+    this.setState({
+      editGroupStatus: (
+        <div>
+          <CircularProgress className={this.props.classes.progress} />
+        </div>
+      ),
+    });
+    api
+      .put('/group/' + this.state.groupId, {
+        name: this.state.groupName,
+        profile_name: this.state.groupProfileName,
+        profile_id: this.props.profiles[this.state.groupProfileName][0].id,
       })
+      .then(response => {
+        if (response.status === 200) {
+          this.setState({ isLoading: false });
+          this.setState({ editGroupStatus: '' });
+          this.setState({
+            defaultProfileId: this.props.profiles[
+              this.state.groupProfileName
+            ][0].id,
+          });
+          this.setState({ defaultProfileName: this.state.groupProfileName });
+          this.setState({ saveButtonDisabled: true });
+          this.handleProfileDiffCloseButton();
+          this.fetchGroup(this.state.groupId);
+          this.props.fetchGroups();
+          return response.data;
+        } else {
+          throw Error(response.statusText);
+        }
+      })
+      .then(group => {})
       .catch(() => {
         this.setState({ editGroupStatus: <div>An error has occurred!</div> });
         this.setState({ hasErrored: true });
@@ -252,6 +328,15 @@ class Group extends Component {
       });
   };
 
+  checkProfileDiff = () => {
+    if (
+      this.state.defaultProfileId !==
+      this.props.profiles[this.state.groupProfileName][0].id
+    ) {
+      this.setState({ isProfileDiff: true });
+    }
+  };
+
   handleNameInput = event => {
     this.setState({ groupName: event.target.value });
   };
@@ -265,8 +350,8 @@ class Group extends Component {
   };
 
   handleProfileSelect = event => {
-    this.setState({ groupProfileId: event.target.value });
-    if (event.target.value !== this.state.defaultProfileId) {
+    this.setState({ groupProfileName: event.target.value });
+    if (event.target.value !== this.state.defaultProfileName) {
       this.setState({ saveButtonDisabled: false });
     } else {
       this.setState({ saveButtonDisabled: true });
@@ -297,6 +382,18 @@ class Group extends Component {
     this.setState({ deleteGroupOpen: false });
   };
 
+  handleProfileDiffButton = event => {
+    this.fetchDiff(
+      this.state.defaultProfileId,
+      this.props.profiles[this.state.groupProfileName][0].id
+    );
+    this.setState({ profileDiffOpen: !this.state.profileDiffOpen });
+  };
+
+  handleProfileDiffCloseButton = event => {
+    this.setState({ profileDiffOpen: false });
+  };
+
   render() {
     if (this.state.hasErrored && this.state.noExist) {
       return <p>This group no longer exists!</p>;
@@ -317,11 +414,36 @@ class Group extends Component {
     }
 
     const { classes } = this.props;
+    let isDiff = '';
 
     const profiles = Object.keys(this.props.profiles).map(profile => {
-      //let profileName = this.props.profiles[profile][0];
+      let newProfileDate;
+      let value = this.props.profiles[profile][0].id;
+      if (
+        this.state.groupProfileId !== value &&
+        profile === this.state.defaultProfileName
+      ) {
+        isDiff = (
+          <div>
+            <Typography variant="body1">
+              <strong>
+                The profile {this.state.groupProfileName} has been updated!
+              </strong>
+            </Typography>
+            <Button
+              onClick={this.handleProfileDiffButton}
+              variant="contained"
+              color="primary"
+            >
+              Review Changes
+            </Button>
+            <br />
+            <br />
+          </div>
+        );
+      }
       return (
-        <MenuItem key={profile} value={this.props.profiles[profile][0].id}>
+        <MenuItem key={profile} value={profile}>
           {profile}
         </MenuItem>
       );
@@ -344,11 +466,12 @@ class Group extends Component {
             </Typography>
             <HostsTable hosts={this.state.groupHosts} />
             <br />
+            {isDiff}
             <Typography variant="body1">
               <strong>Group Profile:</strong>
             </Typography>
             <Select
-              value={this.state.groupProfileId}
+              value={this.state.groupProfileName}
               onChange={this.handleProfileSelect}
               fullWidth
             >
@@ -400,6 +523,7 @@ class Group extends Component {
             &nbsp;&nbsp;{this.state.editGroupStatus}
           </DialogActions>
         </Dialog>
+
         <Dialog
           open={this.state.deleteGroupOpen}
           onClose={this.handleDeleteCloseButton}
@@ -426,6 +550,43 @@ class Group extends Component {
               <DeleteIcon className={classes.rightIcon} />
             </Button>
             &nbsp;&nbsp;{this.state.deleteGroupStatus}
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          maxWidth={'md'}
+          fullWidth={true}
+          open={this.state.profileDiffOpen}
+          onClose={this.handleProfileDiffCloseButton}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">
+            Do you want to update the profile {this.state.groupProfileName} to
+            the latest version?
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Please review the differences before updating:
+            </DialogContentText>
+            <pre>
+              From --> To
+              <br />
+              <br />
+              <code>{this.state.diff}</code>
+            </pre>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleProfileDiffCloseButton} color="primary">
+              Cancel
+            </Button>
+            <Button
+              onClick={this.updateProfile}
+              variant="contained"
+              color="primary"
+            >
+              Update
+            </Button>
+            &nbsp;&nbsp;{this.state.updateProfileStatus}
           </DialogActions>
         </Dialog>
       </div>

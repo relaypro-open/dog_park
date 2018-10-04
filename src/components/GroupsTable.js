@@ -31,10 +31,20 @@ const GroupsTable = props => {
           <TableRow>
             <TableCell>Group Name</TableCell>
             <TableCell>Group ID</TableCell>
+            <TableCell>Profile Status</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {groups.map(group => {
+            let profileStatus = '';
+            if (group.hasUpdated) {
+              profileStatus = (
+                <font color="red">
+                  The current profile does not match the most recent profile
+                  updated. Click to review changes.
+                </font>
+              );
+            }
             return (
               <TableRow
                 key={group.id}
@@ -45,6 +55,7 @@ const GroupsTable = props => {
               >
                 <TableCell>{group.name}</TableCell>
                 <TableCell>{group.id}</TableCell>
+                <TableCell>{profileStatus}</TableCell>
               </TableRow>
             );
           })}

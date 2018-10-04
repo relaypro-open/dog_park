@@ -147,7 +147,7 @@ class ProfileRow extends Component {
   };
 
   handleAddProfile = event => {
-    this.props.handleAddProfile(this.props.ruleType);
+    this.props.handleAddProfile(this.props.pIndex, this.props.ruleType);
   };
 
   handleRemoveProfile = event => {

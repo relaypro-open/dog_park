@@ -55,6 +55,7 @@ class Groups extends Component {
 
   componentDidMount() {
     this.props.handleSelectedTab(0);
+    //this.props.fetchGroups();
   }
 
   createGroup = () => {
@@ -63,7 +64,7 @@ class Groups extends Component {
     api
       .post('group', {
         name: this.state.createGroupName,
-        profile_name: this.props.profiles[this.state.createGroupProfile],
+        profile_name: this.state.createGroupProfile,
         profile_version: 'latest',
       })
       .then(response => {
@@ -104,10 +105,10 @@ class Groups extends Component {
   };
 
   render() {
-    if (this.props.hasErrored) {
+    if (this.props.hasErrored || this.props.profilesHasErrored) {
       return <p>Sorry! There was an error loading the items</p>;
     }
-    if (this.props.isLoading) {
+    if (this.props.isLoading || this.props.profilesIsLoading) {
       return (
         <div>
           {' '}
@@ -119,10 +120,10 @@ class Groups extends Component {
     const { classes } = this.props;
 
     const profiles = Object.keys(this.props.profiles).map(profile => {
-      let profileName = this.props.profiles[profile];
+      let profileId = this.props.profiles[profile][0].id;
       return (
-        <MenuItem key={profile} value={profile}>
-          {profileName}
+        <MenuItem key={profileId} value={profile}>
+          {profile}
         </MenuItem>
       );
     });

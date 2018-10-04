@@ -147,6 +147,12 @@ const styles = theme => ({
   logo_img: {
     height: '30px',
     width: 'auto',
+    paddingRight: '24px',
+  },
+  logo_img_open: {
+    height: '30px',
+    width: 'auto',
+    paddingRight: '0px',
   },
   flex: {
     flexGrow: 1,
@@ -170,8 +176,8 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchGroups();
     this.props.fetchProfiles();
+    //this.props.fetchGroups();
     this.props.fetchZones();
     this.props.fetchServices();
     this.props.fetchHosts();
@@ -329,8 +335,10 @@ class App extends Component {
                   {
                     <span>
                       <img
-                        alt="guard_dog"
-                        className={classes.logo_img}
+                        alt="republic_logo"
+                        className={classNames(classes.logo_img, {
+                          [classes.logo_img_open]: sideBarActive,
+                        })}
                         src={logo}
                       />
                     </span>

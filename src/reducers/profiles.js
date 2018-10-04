@@ -39,8 +39,8 @@ export const profiles = handleAction(
 
     Object.values(profiles).map(profile => {
       profile.sort((a, b) => {
-        let tsA = moment(Object.values(a)[0].created);
-        let tsB = moment(Object.values(b)[0].created);
+        let tsA = moment(a.created);
+        let tsB = moment(b.created);
 
         if (tsA.valueOf() < tsB.valueOf()) {
           return 1;

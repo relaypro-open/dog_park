@@ -16,6 +16,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import ProfileHistory from './ProfileHistory';
 import {
   Table,
   TableBody,
@@ -25,6 +26,7 @@ import {
 } from '@material-ui/core';
 import { SortableContainer, arrayMove } from 'react-sortable-hoc';
 import update from 'immutability-helper';
+import moment from 'moment';
 
 const styles = theme => ({
   root: {
@@ -216,6 +218,7 @@ class Profile extends Component {
         this.setState({ saveProfileOpen: false });
         this.setState({ saveProfileStatus: '' });
         this.props.fetchProfiles();
+        this.setState({ profileId: profile.id });
         this.props.history.push('/profile/' + profile.id);
       })
       .catch(() => this.setState({ hasErrored: true }));
@@ -398,13 +401,26 @@ class Profile extends Component {
     //this.setState({comment: event.target.value});
   };
 
-  handleAddProfile = ruleType => {
-    let newState = [];
+  handleAddProfile = (index, ruleType) => {
     if (ruleType === 'inbound') {
-      newState = update(this.state.inboundRules, {
+      let newState = this.state.inboundRules.splice(0);
+      newState.splice(index + 1, 0, {
+        order: 1,
+        active: false,
+        interface: '',
+        group: ' ',
+        group_type: 'ANY',
+        service: ' ',
+        action: 'ACCEPT',
+        log: false,
+        log_prefix: '',
+        comment: '',
+        type: 'BASIC',
+      });
+      /*newState = update(this.state.inboundRules, {
         $push: [
           {
-            order: 1,
+            order: index + 1,
             active: false,
             interface: '',
             group: ' ',
@@ -417,13 +433,27 @@ class Profile extends Component {
             type: 'BASIC',
           },
         ],
-      });
+      });*/
       this.setState({ inboundRules: newState });
     } else {
-      newState = update(this.state.outboundRules, {
+      let newState = this.state.outboundRules.splice(0);
+      newState.splice(index + 1, 0, {
+        order: 1,
+        active: false,
+        interface: '',
+        group: ' ',
+        group_type: 'ANY',
+        service: ' ',
+        action: 'ACCEPT',
+        log: false,
+        log_prefix: '',
+        comment: '',
+        type: 'BASIC',
+      });
+      /*newState = update(this.state.outboundRules, {
         $push: [
           {
-            order: 1,
+            order: index + 1,
             active: false,
             interface: '',
             group: ' ',
@@ -436,7 +466,7 @@ class Profile extends Component {
             type: 'BASIC',
           },
         ],
-      });
+      });*/
       this.setState({ outboundRules: newState });
     }
   };
@@ -493,7 +523,7 @@ class Profile extends Component {
     this.setState({ deleteProfileOpen: false });
   };
 
-  render(props) {
+  render() {
     const { classes } = this.props;
 
     if (this.state.hasErrored && this.state.noExist) {
@@ -501,14 +531,16 @@ class Profile extends Component {
     } else if (
       this.state.hasErrored ||
       this.props.servicesHasErrored ||
-      this.props.groupsHasErrored
+      this.props.groupsHasErrored ||
+      this.props.profilesHasErrored
     ) {
       return <p>Sorry! There was an error loading the items</p>;
     }
     if (
       this.state.isLoading ||
       this.props.servicesIsLoading ||
-      this.props.groupsIsLoading
+      this.props.groupsIsLoading ||
+      this.props.profilesIsLoading
     ) {
       return (
         <div>
@@ -614,6 +646,12 @@ class Profile extends Component {
           Delete
           <DeleteIcon className={classes.rightIcon} />
         </Button>
+        <br />
+        <br />
+        <Typography variant="title">Revision History</Typography>
+        <ProfileHistory
+          profiles={this.props.profiles[this.state.profileName]}
+        />
 
         <Dialog
           open={this.state.saveProfileOpen}
@@ -679,6 +717,9 @@ class Profile extends Component {
 const mapStateToProps = state => {
   return {
     services: state.services,
+    profiles: state.profiles,
+    profilesHasErrored: state.profilesHasErrored,
+    profilesIsLoading: state.profilesIsLoading,
     groups: state.groups,
     servicessHasErrored: state.servicesHasErrored,
     servicesIsLoading: state.servicesIsLoading,

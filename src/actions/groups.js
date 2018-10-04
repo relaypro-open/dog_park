@@ -6,15 +6,20 @@ export const {
   groupsHasErrored,
   groupsFetchDataSuccess,
 } = createActions(
-  {},
+  {
+    GROUPS_FETCH_DATA_SUCCESS: (groups, profiles) => {
+      return { groups: groups, profiles: profiles };
+    },
+  },
   'GROUPS_IS_LOADING',
-  'GROUPS_HAS_ERRORED',
-  'GROUPS_FETCH_DATA_SUCCESS'
+  'GROUPS_HAS_ERRORED'
 );
 
 export function groupsFetchData() {
-  return dispatch => {
+  return (dispatch, getState) => {
     dispatch(groupsIsLoading(true));
+
+    const { profiles } = getState();
 
     api
       .get('groups')
@@ -25,7 +30,7 @@ export function groupsFetchData() {
         dispatch(groupsIsLoading(false));
         return response.data;
       })
-      .then(groups => dispatch(groupsFetchDataSuccess(groups)))
+      .then(groups => dispatch(groupsFetchDataSuccess(groups, profiles)))
       .catch(() => dispatch(groupsHasErrored(true)));
   };
 }
