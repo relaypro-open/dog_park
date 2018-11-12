@@ -18,6 +18,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import HostsTable from './HostsTable';
+import GitDiff from './GitDiff';
 
 const styles = theme => ({
   root: {
@@ -67,9 +68,6 @@ class Group extends Component {
       editGroupStatus: '',
       isProfileDiff: false,
       profileDiffOpen: false,
-      diff: '',
-      oldProfileDate: '',
-      newProfileDate: '',
     };
   }
 
@@ -132,37 +130,6 @@ class Group extends Component {
         } else {
           this.setState({ groupProfileVersion: '' });
         }
-      })
-      .catch(() => this.setState({ hasErrored: true }));
-  };
-
-  fetchDiff = (oldId, newId) => {
-    this.setState({ isLoading: true });
-
-    api
-      .get('profile/' + oldId + '?diff=' + newId, {
-        responseType: 'text',
-        headers: {
-          Accept: 'text/plain',
-          'Content-Type': 'text/plain',
-        },
-      })
-      .then(response => {
-        if (response.status === 200) {
-          console.log(response);
-          this.setState({ isLoading: false });
-          return response.data;
-        } else if (response.status === 404) {
-          this.setState({ noExist: true });
-          throw Error(response.statusText);
-        } else {
-          throw Error(response.statusText);
-        }
-      })
-      .then(diff => {
-        console.log(diff);
-        this.setState({ diff });
-        this.setState({ oldProfileDate: this.props.profiles });
       })
       .catch(() => this.setState({ hasErrored: true }));
   };
@@ -383,10 +350,9 @@ class Group extends Component {
   };
 
   handleProfileDiffButton = event => {
-    this.fetchDiff(
-      this.state.defaultProfileId,
-      this.props.profiles[this.state.groupProfileName][0].id
-    );
+    const diffOutput = <GitDiff profile1={this.state.defaultProfileId} profile2={this.props.profiles[this.state.groupProfileName][0].id}/>;
+
+    this.setState({ diffOutput });
     this.setState({ profileDiffOpen: !this.state.profileDiffOpen });
   };
 
@@ -417,7 +383,6 @@ class Group extends Component {
     let isDiff = '';
 
     const profiles = Object.keys(this.props.profiles).map(profile => {
-      let newProfileDate;
       let value = this.props.profiles[profile][0].id;
       if (
         this.state.groupProfileId !== value &&
@@ -554,7 +519,7 @@ class Group extends Component {
         </Dialog>
 
         <Dialog
-          maxWidth={'md'}
+          maxWidth={false}
           fullWidth={true}
           open={this.state.profileDiffOpen}
           onClose={this.handleProfileDiffCloseButton}
@@ -568,12 +533,7 @@ class Group extends Component {
             <DialogContentText>
               Please review the differences before updating:
             </DialogContentText>
-            <pre>
-              From --> To
-              <br />
-              <br />
-              <code>{this.state.diff}</code>
-            </pre>
+            {this.state.diffOutput}
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleProfileDiffCloseButton} color="primary">
@@ -614,3 +574,10 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(withRouter(withStyles(styles)(Group)));
+
+/*<pre>
+              From --> To
+              <br />
+              <br />
+              <code>{this.state.diff}</code>
+            </pre>*/

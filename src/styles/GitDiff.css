@@ -1,0 +1,202 @@
+@media screen and (min-resolution: 2dppx) {
+    body {
+        -webkit-font-smoothing: antialiased;
+    }
+}
+
+.app {
+    font-size: 14px;
+}
+
+.config {
+    position: fixed;
+    padding-top: 10px;
+    height: 72px;
+    top: 0;
+    z-index: 1;
+    width: 100%;
+    background-color: #fff;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: start;
+}
+
+.config > div {
+    margin-left: 20px;
+}
+
+.diff {
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.diff-gutter-col {
+    width: 7ch;
+}
+
+.diff-gutter-omit {
+    height: 0;
+}
+
+.diff-gutter-omit:before {
+    content: " ";
+    display: block;
+    white-space: pre;
+    width: 2px;
+    height: 100%;
+    margin-left: 4.6ch;
+    overflow: hidden;
+    background-color: #cb2a1d;
+}
+
+.diff td {
+    vertical-align: top;
+}
+
+.preset {
+    font-weight: normal;
+}
+
+.diff-input {
+    margin-top: 72px;
+}
+
+.diff-input textarea {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    height: 10em;
+    border: 1px solid #e1e1e1;
+}
+
+.diff-hunk-header {
+    line-height: 2;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+
+.diff-hunk-header-gutter {
+    background-color: #deecfe;
+    position: relative;
+    cursor: pointer;
+}
+
+.diff-hunk-header-gutter:hover {
+    background-color: #4677d2;
+}
+
+.diff-hunk-header-content {
+    background-color: #f2f8ff;
+    padding-left: .5em;
+    color: #999;
+}
+
+.unfold {
+    position: absolute;
+    fill: #000;
+    width: 8px;
+    height: 12px;
+    top: 50%;
+    margin-top: -6px;
+    left: 50%;
+    margin-left: -4px;
+}
+
+.diff-hunk-header-gutter:hover .unfold {
+    fill: #fff;
+}
+
+.diff-file {
+    margin-top: 2em;
+    border: 1px solid #e1e1e1;
+}
+
+.diff-file-header {
+    background-color: #f7f7fa;
+    line-height: 3;
+    padding-left: 1em;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.filename {
+    margin-right: 1em;
+}
+
+.addition-count {
+    margin-right: 1em;
+    color: #88b149;
+}
+
+.deletion-count {
+    margin-right: 1em;
+    color: #ee5b60;
+}
+
+.diff-line {
+    line-height: 1.5;
+    font-family: Consolas, Courier, monospace;
+}
+
+.diff-gutter {
+    padding: 0 1ch;
+    text-align: right;
+    cursor: pointer;
+    user-select: none;
+}
+
+.diff-gutter:before {
+    content: attr(data-line-number);
+}
+
+.diff-gutter-insert {
+    background-color: #d6fedb;
+}
+
+.diff-gutter-delete {
+    background-color: #fadde0;
+}
+
+.diff-gutter-omit {
+    cursor: default;
+}
+
+.diff-gutter-selected {
+    background-color: #fef6b9;
+}
+
+.diff-code {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    word-break: break-all;
+    padding: 0;
+    padding-left: .5em;
+}
+
+.diff-code-insert {
+    background-color: #eaffee;
+}
+
+.diff-code-edit {
+    color: inherit;
+}
+
+.diff-code-insert .diff-code-edit {
+    background-color: #c0dc91;
+}
+
+.diff-code-delete {
+    background-color: #fdeff0;
+}
+
+.diff-code-delete .diff-code-edit {
+    background-color: #f39ea2;
+}
+
+.diff-code-selected {
+    background-color: #fffce0;
+}
+
+.diff-omit {
+    background-color: #fafbfc;
+}

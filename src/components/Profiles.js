@@ -51,6 +51,8 @@ class Profiles extends Component {
             {
               order: 1,
               active: false,
+              states: [],
+              environments: [],
               interface: '',
               group: ' ',
               group_type: 'ANY',
@@ -66,6 +68,8 @@ class Profiles extends Component {
             {
               order: 1,
               active: false,
+              states: [],
+              environments: [],
               interface: '',
               group: ' ',
               group_type: 'ANY',

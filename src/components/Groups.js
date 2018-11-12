@@ -6,6 +6,7 @@ import { profilesFetchData } from '../actions/profiles';
 import { groupsFetchData } from '../actions/groups';
 import { CircularProgress } from '@material-ui/core';
 import GroupsTable from './GroupsTable';
+import ProfileSelect from './ProfileSelect';
 import { handleSelectedTab } from '../actions/app';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
@@ -19,6 +20,8 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 
 const styles = theme => ({
   root: {
@@ -50,6 +53,9 @@ class Groups extends Component {
       createGroupName: '',
       createGroupProfile: '',
       createGroupOpen: false,
+      createGroupDisabled: true,
+      isUsingLatest: true,
+      groupErrorOpen: false,
     };
   }
 
@@ -59,13 +65,22 @@ class Groups extends Component {
   }
 
   createGroup = () => {
+    if (this.state.createGroupName === '' || this.state.createGroupProfile === '') {
+      this.setState({ groupErrorOpen: true });
+      return;
+    }
     this.setState({ isLoading: true });
+
+    let useLatest = 'latest';
+    if (this.state.isUsingLatest === false) {
+      useLatest = ' ';
+    };
 
     api
       .post('group', {
         name: this.state.createGroupName,
         profile_name: this.state.createGroupProfile,
-        profile_version: 'latest',
+        profile_version: useLatest,
       })
       .then(response => {
         if (response.status === 201) {
@@ -92,16 +107,44 @@ class Groups extends Component {
     this.setState({ createGroupOpen: true });
   };
 
+  handleCreateGroupButton = (enabled) => {
+    if (this.state.createGroupName !== '' && this.state.createGroupProfile !== '' && enabled) {
+      this.setState({createGroupDisabled: false});
+    } else {
+      this.setState({createGroupDisabled: true});
+    }
+  }
+
   handleCreateGroupClose = () => {
     this.setState({ createGroupOpen: false });
   };
 
   handleCreateGroupName = event => {
-    this.setState({ createGroupName: event.target.value });
+    const createGroupName = event.target.value;
+    if (createGroupName !== '' && this.state.createGroupProfile !== '') {
+      this.setState({createGroupDisabled: false});
+    } else if (createGroupName === ''){
+      this.setState({createGroupDisabled: true});
+    }
+    this.setState({ createGroupName });
   };
 
   handleCreateGroupProfile = event => {
+    const createGroupProfile = event.target.value;
+    if (this.state.createGroupName !== '' && createGroupProfile !== '') {
+      this.setState({createGroupDisabled: false});
+    } else if (createGroupProfile === ''){
+      this.setState({createGroupDisabled: true});
+    }
     this.setState({ createGroupProfile: event.target.value });
+  };
+
+  handleLatestCheckbox = () => {
+    this.setState({ isUsingLatest: !this.state.isUsingLatest });
+  };
+
+  handleGroupErrorButton = () => {
+    this.setState({ groupErrorOpen: false });
   };
 
   render() {
@@ -128,6 +171,12 @@ class Groups extends Component {
       );
     });
 
+    let profileVersions = "";
+    if (this.state.isUsingLatest === false) {
+      profileVersions = <ProfileSelect profiles={this.props.profiles[this.state.createGroupProfile]} handleCreateGroupButton={this.handleCreateGroupButton}/>;
+    };
+
+    console.log(this.props.profiles);
     return (
       <div>
         <GroupsTable groups={this.props.groups} />
@@ -142,6 +191,7 @@ class Groups extends Component {
         </Button>
 
         <Dialog
+          maxWidth={false}
           open={this.state.createGroupOpen}
           onClose={this.handleCreateGroupClose}
           aria-labelledby="form-dialog-title"
@@ -170,11 +220,26 @@ class Groups extends Component {
                 <Select
                   value={this.state.createGroupProfile}
                   onChange={this.handleCreateGroupProfile}
-                  fullWidth
+                  autoWidth
                 >
                   {profiles}
                 </Select>
               </FormControl>
+              <br/>
+              <br/>
+              <FormControlLabel
+                required
+                fullwidth
+                label="Always update to latest profile? (Useful for QA rules, not recommended for PRO rules)"
+                control={
+                  <Checkbox
+                    checked={this.state.isUsingLatest}
+                    onChange={this.handleLatestCheckbox}
+                  />}
+              />
+              <br/>
+              <br/>
+              {profileVersions}
             </form>
           </DialogContent>
           <DialogActions>
@@ -183,12 +248,32 @@ class Groups extends Component {
             </Button>
             <Button
               onClick={this.createGroup}
+              disabled={this.state.createGroupDisabled}
               variant="contained"
               color="primary"
             >
               Create Group
             </Button>
             &nbsp;&nbsp;{this.state.createGroupStatus}
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={this.state.groupErrorOpen}
+          onClose={this.handleGroupErrorButton}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">
+            Group Validation Errors
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              You have not entered a name or defined a profile to use. Please fix these before creating the group.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleGroupErrorButton} color="primary">
+              Ok
+            </Button>
           </DialogActions>
         </Dialog>
       </div>

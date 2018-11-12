@@ -50,9 +50,9 @@ const ProfileHistory = props => {
               <TableRow
                 key={'history' + profile.id}
                 hover
-                /*onClick={event => {
+                onClick={event => {
                   props.history.push('/profile/' + profile.id);
-                }}*/
+                }}
               >
                 <TableCell>{profile.name}</TableCell>
                 <TableCell>{profile.id}</TableCell>

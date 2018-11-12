@@ -292,12 +292,14 @@ class Service extends Component {
           this.fetchService(this.props.match.params.id);
           this.props.fetchServices();
         } else {
-          throw Error(response.statusText);
+          console.log(response.data);
+          let error_msg = response.data.error_msg + ":" + response.data.profiles;
+          throw Error(error_msg);
         }
       })
-      .catch(() => {
+      .catch((error) => {
         this.setState({
-          deleteServiceStatus: <div>An error has occurred!</div>,
+          deleteServiceStatus: <div style={{color:"red"}}><br/><br/>{error.message}</div>,
         });
         this.setState({ deleteHasErrored: true });
       });
@@ -308,6 +310,7 @@ class Service extends Component {
   };
 
   handleDeleteCloseButton = event => {
+    this.setState({deleteServiceStatus: ''});
     this.setState({ deleteServiceOpen: false });
   };
 
@@ -457,6 +460,7 @@ class Service extends Component {
           <DialogContent>
             <DialogContentText>
               Are you sure you want to delete: {this.state.serviceName}?
+              {this.state.deleteServiceStatus}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -471,7 +475,6 @@ class Service extends Component {
               Delete
               <DeleteIcon className={classes.rightIcon} />
             </Button>
-            &nbsp;&nbsp;{this.state.deleteServiceStatus}
           </DialogActions>
         </Dialog>
         <Dialog

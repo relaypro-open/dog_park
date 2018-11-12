@@ -133,6 +133,7 @@ class Profile extends Component {
   componentDidUpdate = prevProps => {
     if (this.props !== prevProps) {
       this.setState({ saveProfileOpen: false });
+      this.fetchProfile(this.props.match.params.id);
     }
   };
 
@@ -242,12 +243,14 @@ class Profile extends Component {
           this.fetchProfile(this.props.match.params.id);
           this.props.fetchProfiles();
         } else {
-          throw Error(response.statusText);
+          console.log(response.data);
+          let error_msg = response.data.error_msg + ":" + response.data.groups;
+          throw Error(error_msg);
         }
       })
-      .catch(() => {
+      .catch((error) => {
         this.setState({
-          deleteProfileStatus: <div>An error has occurred!</div>,
+          deleteProfileStatus: <div style={{color:"red"}}><br/><br/>{error.message}</div>,
         });
         this.setState({ deleteHasErrored: true });
       });
@@ -407,6 +410,8 @@ class Profile extends Component {
       newState.splice(index + 1, 0, {
         order: 1,
         active: false,
+        states: [],
+        environments: [],
         interface: '',
         group: ' ',
         group_type: 'ANY',
@@ -440,6 +445,8 @@ class Profile extends Component {
       newState.splice(index + 1, 0, {
         order: 1,
         active: false,
+        states: [],
+        environments: [],
         interface: '',
         group: ' ',
         group_type: 'ANY',
@@ -481,6 +488,8 @@ class Profile extends Component {
         newState.push({
           order: 1,
           active: false,
+          states: [],
+          environments: [],
           interface: '',
           group: ' ',
           group_type: 'ANY',
@@ -500,6 +509,8 @@ class Profile extends Component {
         newState.push({
           order: 1,
           active: false,
+          states: [],
+          environments: [],
           interface: '',
           group: ' ',
           group_type: 'ANY',
@@ -520,6 +531,7 @@ class Profile extends Component {
   };
 
   handleDeleteCloseButton = () => {
+    this.setState({deleteProfileStatus: ""});
     this.setState({ deleteProfileOpen: false });
   };
 
@@ -692,6 +704,7 @@ class Profile extends Component {
           <DialogContent>
             <DialogContentText>
               Are you sure you want to delete profile: {this.state.profileName}?
+              {this.state.deleteProfileStatus}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -706,7 +719,6 @@ class Profile extends Component {
               Delete
               <DeleteIcon className={classes.rightIcon} />
             </Button>
-            &nbsp;&nbsp;{this.state.deleteProfileStatus}
           </DialogActions>
         </Dialog>
       </div>

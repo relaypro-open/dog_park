@@ -31,6 +31,9 @@ const GroupsTable = props => {
           <TableRow>
             <TableCell>Group Name</TableCell>
             <TableCell>Group ID</TableCell>
+            <TableCell>Profile Name</TableCell>
+            <TableCell>Profile ID</TableCell>
+            <TableCell>Profile Version</TableCell>
             <TableCell>Profile Status</TableCell>
           </TableRow>
         </TableHead>
@@ -55,6 +58,9 @@ const GroupsTable = props => {
               >
                 <TableCell>{group.name}</TableCell>
                 <TableCell>{group.id}</TableCell>
+                <TableCell>{group.profile_name}</TableCell>
+                <TableCell>{group.profile_id}</TableCell>
+                <TableCell>{group.profile_version}</TableCell>
                 <TableCell>{profileStatus}</TableCell>
               </TableRow>
             );
