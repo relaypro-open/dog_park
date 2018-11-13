@@ -17,6 +17,9 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import ProfileHistory from './ProfileHistory';
+import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 import {
   Table,
   TableBody,
@@ -48,6 +51,9 @@ const styles = theme => ({
     bottom: theme.spacing.unit * 3,
     position: 'fixed',
     color: 'secondary',
+  },
+  close: {
+    padding: theme.spacing.unit / 2,
   },
 });
 
@@ -119,6 +125,7 @@ class Profile extends Component {
       deleteProfileStatus: '',
       isDeleting: false,
       deleteHasErrored: false,
+      snackBarMsg: '',
     };
   }
 
@@ -206,6 +213,10 @@ class Profile extends Component {
       .then(response => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
+          this.setState({
+            snackBarMsg:
+              this.state.profileName + ' has been modified successfully!',
+          });
           return response.data;
         } else if (response.status === 404) {
           this.setState({ noExist: true });
@@ -215,7 +226,7 @@ class Profile extends Component {
         }
       })
       .then(profile => {
-        console.log(profile);
+        this.setState({ snackBarOpen: true });
         this.setState({ saveProfileOpen: false });
         this.setState({ saveProfileStatus: '' });
         this.props.fetchProfiles();
@@ -535,6 +546,15 @@ class Profile extends Component {
     this.setState({ deleteProfileOpen: false });
   };
 
+  handleSnackBarOpen = () => {
+    this.setState({ snackBarOpen: true });
+  };
+
+  handleSnackBarClose = (event, reason) => {
+    this.setState({ snackBarOpen: false });
+  };
+
+
   render() {
     const { classes } = this.props;
 
@@ -721,6 +741,30 @@ class Profile extends Component {
             </Button>
           </DialogActions>
         </Dialog>
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          open={this.state.snackBarOpen}
+          autoHideDuration={6000}
+          onClose={this.handleSnackBarClose}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          message={<span id="message-id">{this.state.snackBarMsg}</span>}
+          action={[
+            <IconButton
+              key="close"
+              aria-label="Close"
+              color="inherit"
+              className={classes.close}
+              onClick={this.handleSnackBarClose}
+            >
+              <CloseIcon />
+            </IconButton>,
+          ]}
+        />
       </div>
     );
   }

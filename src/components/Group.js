@@ -19,6 +19,9 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import HostsTable from './HostsTable';
 import GitDiff from './GitDiff';
+import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 const styles = theme => ({
   root: {
@@ -39,6 +42,9 @@ const styles = theme => ({
     bottom: theme.spacing.unit * 3,
     position: 'fixed',
     color: 'secondary',
+  },
+  close: {
+    padding: theme.spacing.unit / 2,
   },
 });
 
@@ -68,6 +74,8 @@ class Group extends Component {
       editGroupStatus: '',
       isProfileDiff: false,
       profileDiffOpen: false,
+      snackBarOpen: false,
+      snackBarMsg: '',
     };
   }
 
@@ -156,36 +164,6 @@ class Group extends Component {
       .catch(() => this.setState({ hasErrored: true }));
   };
 
-  createGroup = () => {
-    this.setState({ isLoading: true });
-
-    api
-      .post('group', {
-        name: this.state.createGroupName,
-        profile_name: this.props.profiles[this.state.createGroupProfile],
-        profile_version: 'latest',
-      })
-      .then(response => {
-        if (response.status === 201) {
-          let re = /\/api\/group\/(.+)/;
-          this.setState({ isLoading: false });
-          let groupId = response.headers.location;
-          let newGroupId = groupId.replace(re, '$1');
-          return newGroupId;
-        } else {
-          throw Error(response.statusText);
-        }
-      })
-      .then(groupId => {
-        this.setState({ createGroupOpen: false });
-        this.setState({ createGroupName: '' });
-        this.setState({ createGroupProfile: '' });
-        this.props.history.push('/group/' + groupId);
-        this.props.fetchGroups();
-      })
-      .catch(() => this.setState({ hasErrored: true }));
-  };
-
   updateGroup = () => {
     this.setState({ isLoading: true });
     this.setState({
@@ -215,12 +193,18 @@ class Group extends Component {
           this.handleCloseButton();
           this.fetchGroup(this.state.groupId);
           this.props.fetchGroups();
+          this.setState({
+            snackBarMsg:
+              this.state.groupName + ' has been modified successfully!',
+          });
           return response.data;
         } else {
           throw Error(response.statusText);
         }
       })
-      .then(group => {})
+      .then(group => {
+        this.setState({ snackBarOpen: true });
+      })
       .catch(() => {
         this.setState({ editGroupStatus: <div>An error has occurred!</div> });
         this.setState({ hasErrored: true });
@@ -350,7 +334,12 @@ class Group extends Component {
   };
 
   handleProfileDiffButton = event => {
-    const diffOutput = <GitDiff profile1={this.state.defaultProfileId} profile2={this.props.profiles[this.state.groupProfileName][0].id}/>;
+    const diffOutput = (
+      <GitDiff
+        profile1={this.state.defaultProfileId}
+        profile2={this.props.profiles[this.state.groupProfileName][0].id}
+      />
+    );
 
     this.setState({ diffOutput });
     this.setState({ profileDiffOpen: !this.state.profileDiffOpen });
@@ -358,6 +347,14 @@ class Group extends Component {
 
   handleProfileDiffCloseButton = event => {
     this.setState({ profileDiffOpen: false });
+  };
+
+  handleSnackBarOpen = () => {
+    this.setState({ snackBarOpen: true });
+  };
+
+  handleSnackBarClose = (event, reason) => {
+    this.setState({ snackBarOpen: false });
   };
 
   render() {
@@ -549,6 +546,30 @@ class Group extends Component {
             &nbsp;&nbsp;{this.state.updateProfileStatus}
           </DialogActions>
         </Dialog>
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          open={this.state.snackBarOpen}
+          autoHideDuration={6000}
+          onClose={this.handleSnackBarClose}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          message={<span id="message-id">{this.state.snackBarMsg}</span>}
+          action={[
+            <IconButton
+              key="close"
+              aria-label="Close"
+              color="inherit"
+              className={classes.close}
+              onClick={this.handleSnackBarClose}
+            >
+              <CloseIcon />
+            </IconButton>,
+          ]}
+        />
       </div>
     );
   }

@@ -22,6 +22,9 @@ import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 const styles = theme => ({
   root: {
@@ -65,7 +68,10 @@ class Groups extends Component {
   }
 
   createGroup = () => {
-    if (this.state.createGroupName === '' || this.state.createGroupProfile === '') {
+    if (
+      this.state.createGroupName === '' ||
+      this.state.createGroupProfile === ''
+    ) {
       this.setState({ groupErrorOpen: true });
       return;
     }
@@ -74,7 +80,7 @@ class Groups extends Component {
     let useLatest = 'latest';
     if (this.state.isUsingLatest === false) {
       useLatest = ' ';
-    };
+    }
 
     api
       .post('group', {
@@ -107,13 +113,17 @@ class Groups extends Component {
     this.setState({ createGroupOpen: true });
   };
 
-  handleCreateGroupButton = (enabled) => {
-    if (this.state.createGroupName !== '' && this.state.createGroupProfile !== '' && enabled) {
-      this.setState({createGroupDisabled: false});
+  handleCreateGroupButton = enabled => {
+    if (
+      this.state.createGroupName !== '' &&
+      this.state.createGroupProfile !== '' &&
+      enabled
+    ) {
+      this.setState({ createGroupDisabled: false });
     } else {
-      this.setState({createGroupDisabled: true});
+      this.setState({ createGroupDisabled: true });
     }
-  }
+  };
 
   handleCreateGroupClose = () => {
     this.setState({ createGroupOpen: false });
@@ -122,9 +132,9 @@ class Groups extends Component {
   handleCreateGroupName = event => {
     const createGroupName = event.target.value;
     if (createGroupName !== '' && this.state.createGroupProfile !== '') {
-      this.setState({createGroupDisabled: false});
-    } else if (createGroupName === ''){
-      this.setState({createGroupDisabled: true});
+      this.setState({ createGroupDisabled: false });
+    } else if (createGroupName === '') {
+      this.setState({ createGroupDisabled: true });
     }
     this.setState({ createGroupName });
   };
@@ -132,9 +142,9 @@ class Groups extends Component {
   handleCreateGroupProfile = event => {
     const createGroupProfile = event.target.value;
     if (this.state.createGroupName !== '' && createGroupProfile !== '') {
-      this.setState({createGroupDisabled: false});
-    } else if (createGroupProfile === ''){
-      this.setState({createGroupDisabled: true});
+      this.setState({ createGroupDisabled: false });
+    } else if (createGroupProfile === '') {
+      this.setState({ createGroupDisabled: true });
     }
     this.setState({ createGroupProfile: event.target.value });
   };
@@ -171,10 +181,15 @@ class Groups extends Component {
       );
     });
 
-    let profileVersions = "";
+    let profileVersions = '';
     if (this.state.isUsingLatest === false) {
-      profileVersions = <ProfileSelect profiles={this.props.profiles[this.state.createGroupProfile]} handleCreateGroupButton={this.handleCreateGroupButton}/>;
-    };
+      profileVersions = (
+        <ProfileSelect
+          profiles={this.props.profiles[this.state.createGroupProfile]}
+          handleCreateGroupButton={this.handleCreateGroupButton}
+        />
+      );
+    }
 
     console.log(this.props.profiles);
     return (
@@ -225,8 +240,8 @@ class Groups extends Component {
                   {profiles}
                 </Select>
               </FormControl>
-              <br/>
-              <br/>
+              <br />
+              <br />
               <FormControlLabel
                 required
                 fullwidth
@@ -235,10 +250,11 @@ class Groups extends Component {
                   <Checkbox
                     checked={this.state.isUsingLatest}
                     onChange={this.handleLatestCheckbox}
-                  />}
+                  />
+                }
               />
-              <br/>
-              <br/>
+              <br />
+              <br />
               {profileVersions}
             </form>
           </DialogContent>
@@ -267,7 +283,8 @@ class Groups extends Component {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
-              You have not entered a name or defined a profile to use. Please fix these before creating the group.
+              You have not entered a name or defined a profile to use. Please
+              fix these before creating the group.
             </DialogContentText>
           </DialogContent>
           <DialogActions>

@@ -17,6 +17,10 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
+
 
 const styles = theme => ({
   root: {
@@ -37,6 +41,9 @@ const styles = theme => ({
     bottom: theme.spacing.unit * 3,
     position: 'fixed',
     color: 'secondary',
+  },
+  close: {
+    padding: theme.spacing.unit / 2,
   },
 });
 
@@ -68,6 +75,7 @@ class Host extends Component {
       saveButtonDisabled: true,
       defaultGroupId: '',
       editHostStatus: '',
+      snackBarMsg: '',
     };
   }
 
@@ -182,14 +190,17 @@ class Host extends Component {
           this.setState({ saveButtonDisabled: true });
           this.handleCloseButton();
           this.fetchHost(this.state.hostId);
-          //this.props.handleCloseButton();
+          this.setState({
+            snackBarMsg:
+              this.state.hostname + ' has been modified successfully!',
+          });
           return response.data;
         } else {
           throw Error(response.statusText);
         }
       })
       .then(host => {
-        console.log(host);
+        this.setState({ snackBarOpen: true });
       })
       .catch(() => {
         this.setState({ editHostStatus: <div>An error has occurred!</div> });
@@ -267,6 +278,14 @@ class Host extends Component {
 
   handleDeleteCloseButton = event => {
     this.setState({ deleteHostOpen: false });
+  };
+
+  handleSnackBarOpen = () => {
+    this.setState({ snackBarOpen: true });
+  };
+
+  handleSnackBarClose = (event, reason) => {
+    this.setState({ snackBarOpen: false });
   };
 
   render() {
@@ -419,6 +438,30 @@ class Host extends Component {
             &nbsp;&nbsp;{this.state.deleteHostStatus}
           </DialogActions>
         </Dialog>
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          open={this.state.snackBarOpen}
+          autoHideDuration={6000}
+          onClose={this.handleSnackBarClose}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          message={<span id="message-id">{this.state.snackBarMsg}</span>}
+          action={[
+            <IconButton
+              key="close"
+              aria-label="Close"
+              color="inherit"
+              className={classes.close}
+              onClick={this.handleSnackBarClose}
+            >
+              <CloseIcon />
+            </IconButton>,
+          ]}
+        />
       </div>
     );
   }

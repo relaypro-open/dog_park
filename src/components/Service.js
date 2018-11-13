@@ -29,6 +29,10 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import update from 'immutability-helper';
 import debounce from 'lodash/debounce';
 import validator from 'validator';
+import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
+
 
 const styles = theme => ({
   root: {
@@ -45,6 +49,9 @@ const styles = theme => ({
   },
   rightIcon: {
     marginLeft: theme.spacing.unit,
+  },
+  close: {
+    padding: theme.spacing.unit / 2,
   },
 });
 
@@ -192,6 +199,7 @@ class Service extends Component {
       updateServiceStatus: '',
       updateServiceOpen: false,
       serviceErrorOpen: false,
+      snackBarMsg: '',
     };
   }
 
@@ -260,12 +268,18 @@ class Service extends Component {
           this.setState({ updateServiceStatus: '' });
           this.handleUpdateCloseButton();
           this.fetchService(this.state.serviceId);
+          this.setState({
+            snackBarMsg:
+              this.state.serviceName + ' has been modified successfully!',
+          });
           return response.data;
         } else {
           throw Error(response.statusText);
         }
       })
-      .then(service => {})
+      .then(service => {
+        this.setState({ snackBarOpen: true });
+      })
       .catch(() => {
         this.setState({
           updateServiceStatus: <div>An error has occurred!</div>,
@@ -381,6 +395,14 @@ class Service extends Component {
     } else {
       this.setState({ updateServiceOpen: true });
     }
+  };
+
+  handleSnackBarOpen = () => {
+    this.setState({ snackBarOpen: true });
+  };
+
+  handleSnackBarClose = (event, reason) => {
+    this.setState({ snackBarOpen: false });
   };
 
   render() {
@@ -525,6 +547,30 @@ class Service extends Component {
             </Button>
           </DialogActions>
         </Dialog>
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          open={this.state.snackBarOpen}
+          autoHideDuration={6000}
+          onClose={this.handleSnackBarClose}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          message={<span id="message-id">{this.state.snackBarMsg}</span>}
+          action={[
+            <IconButton
+              key="close"
+              aria-label="Close"
+              color="inherit"
+              className={classes.close}
+              onClick={this.handleSnackBarClose}
+            >
+              <CloseIcon />
+            </IconButton>,
+          ]}
+        />
       </div>
     );
   }
