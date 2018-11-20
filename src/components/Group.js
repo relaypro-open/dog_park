@@ -90,6 +90,9 @@ class Group extends Component {
 
   componentDidUpdate = prevProps => {
     if (this.props !== prevProps) {
+      this.fetchGroup(this.props.match.params.id);
+      this.fetchGroupHosts(this.props.match.params.id);
+      this.props.handleSelectedTab(0);
       this.setState({ isLoading: false });
       this.setState({ hasErrored: false });
       this.setState({ noExist: false });

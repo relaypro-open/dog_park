@@ -42,6 +42,7 @@ class ProfileRow extends Component {
     this.state = {
       active: data.active,
       intf: data.interface,
+      group_type: data.group_type,
       group: data.group,
       service: data.service,
       action: data.action,
@@ -52,6 +53,7 @@ class ProfileRow extends Component {
 
     this.activeFunction = debounce(this.props.handleActiveCheckbox, 500);
     this.intfFunction = debounce(this.props.handleIntfSelect, 500);
+    this.groupTypeFunction = debounce(this.props.handleGroupTypeSelect, 500);
     this.groupFunction = debounce(this.props.handleGroupSelect, 500);
     this.serviceFunction = debounce(this.props.handleServiceSelect, 500);
     this.actionFunction = debounce(this.props.handleActionSelect, 500);
@@ -86,6 +88,15 @@ class ProfileRow extends Component {
   handleIntfSelect = event => {
     this.setState({ intf: event.target.value });
     this.intfFunction(
+      this.props.pIndex,
+      event.target.value,
+      this.props.ruleType
+    );
+  };
+
+  handleGroupTypeSelect = event => {
+    this.setState({ group_type: event.target.value });
+    this.groupTypeFunction(
       this.props.pIndex,
       event.target.value,
       this.props.ruleType
@@ -155,17 +166,44 @@ class ProfileRow extends Component {
   };
 
   render() {
-    const { groups, services, classes } = this.props;
+    const { groups, zones, services, classes } = this.props;
     const {
       active,
       intf,
       group,
+      group_type,
       service,
       action,
       log,
       logPrefix,
       comment,
     } = this.state;
+
+    let sourceSelect = '';
+
+    switch (group_type) {
+      case 'ANY':
+        sourceSelect = <MenuItem value={'any'}>any</MenuItem>;
+        break;
+      case 'ROLE':
+        sourceSelect = groups.map(grp => {
+            return (
+              <MenuItem key={'grp' + grp.id} value={grp.id}>
+                {grp.name}
+              </MenuItem>
+            );
+          });
+        break;
+      case 'ZONE':
+        sourceSelect = zones.map(grp => {
+            return (
+              <MenuItem key={'grp' + grp.id} value={grp.id}>
+                {grp.name}
+              </MenuItem>
+            );
+          });
+        break;
+      }
 
     return (
       <TableRow style={{ zIndex: 10000000 }}>
@@ -178,19 +216,19 @@ class ProfileRow extends Component {
         <TableCell>
           <Select value={intf} onChange={this.handleIntfSelect}>
             <MenuItem value={'lo'}>lo</MenuItem>
-            <MenuItem value={'any'}>any</MenuItem>
+            <MenuItem value={'ANY'}>ANY</MenuItem>
+          </Select>
+        </TableCell>
+        <TableCell>
+          <Select value={group_type} onChange={this.handleGroupTypeSelect}>
+            <MenuItem value={'ANY'}>any</MenuItem>
+            <MenuItem value={'ROLE'}>group</MenuItem>
+            <MenuItem value={'ZONE'}>zone</MenuItem>
           </Select>
         </TableCell>
         <TableCell>
           <Select value={group} onChange={this.handleGroupSelect}>
-            <MenuItem value={'any'}>any</MenuItem>
-            {groups.map(grp => {
-              return (
-                <MenuItem key={'grp' + grp.id} value={grp.id}>
-                  {grp.name}
-                </MenuItem>
-              );
-            })}
+            {sourceSelect}
           </Select>
         </TableCell>
         <TableCell>

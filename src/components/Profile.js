@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { api } from '../api';
 import { profilesFetchData } from '../actions/profiles';
 import { servicesFetchData } from '../actions/services';
+import { zonesFetchData } from '../actions/zones';
 import { handleSelectedTab } from '../actions/app';
 import ProfileRow from './ProfileRow';
 import { connect } from 'react-redux';
@@ -63,9 +64,11 @@ const TableBodySortable = SortableContainer(
     ruleType,
     groups,
     services,
+    zones,
     handleActiveCheckbox,
     handleIntfSelect,
     handleGroupSelect,
+    handleGroupTypeSelect,
     handleServiceSelect,
     handleActionSelect,
     handleLogCheckbox,
@@ -85,10 +88,12 @@ const TableBodySortable = SortableContainer(
               ruleType={ruleType}
               data={row}
               groups={groups}
+              zones={zones}
               services={services}
               handleActiveCheckbox={handleActiveCheckbox}
               handleIntfSelect={handleIntfSelect}
               handleGroupSelect={handleGroupSelect}
+              handleGroupTypeSelect={handleGroupTypeSelect}
               handleServiceSelect={handleServiceSelect}
               handleActionSelect={handleActionSelect}
               handleLogCheckbox={handleLogCheckbox}
@@ -315,7 +320,21 @@ class Profile extends Component {
       });
       this.setState({ outboundRules: newState });
     }
-    //this.setState({intf: event.target.value});
+  };
+
+  handleGroupTypeSelect = (index, value, ruleType) => {
+    let newState = [];
+    if (ruleType === 'inbound') {
+      newState = update(this.state.inboundRules, {
+        [index]: { group_type: { $set: value } },
+      });
+      this.setState({ inboundRules: newState });
+    } else {
+      newState = update(this.state.outboundRules, {
+        [index]: { group_type: { $set: value } },
+      });
+      this.setState({ outboundRules: newState });
+    }
   };
 
   handleGroupSelect = (index, value, ruleType) => {
@@ -331,7 +350,6 @@ class Profile extends Component {
       });
       this.setState({ outboundRules: newState });
     }
-    //this.setState({group: event.target.value});
   };
 
   handleServiceSelect = (index, value, ruleType) => {
@@ -347,7 +365,6 @@ class Profile extends Component {
       });
       this.setState({ outboundRules: newState });
     }
-    //this.setState({service: event.target.value});
   };
 
   handleActionSelect = (index, value, ruleType) => {
@@ -363,7 +380,6 @@ class Profile extends Component {
       });
       this.setState({ outboundRules: newState });
     }
-    //this.setState({action: event.target.value});
   };
 
   handleLogCheckbox = (index, value, ruleType) => {
@@ -379,7 +395,6 @@ class Profile extends Component {
       });
       this.setState({ outboundRules: newState });
     }
-    //this.setState({log: event.target.checked});
   };
 
   handleLogPrefixInput = (index, value, ruleType) => {
@@ -395,7 +410,6 @@ class Profile extends Component {
       });
       this.setState({ outboundRules: newState });
     }
-    //this.setState({logPrefix: event.target.value});
   };
 
   handleCommentInput = (index, value, ruleType) => {
@@ -412,7 +426,6 @@ class Profile extends Component {
       });
       this.setState({ outboundRules: newState });
     }
-    //this.setState({comment: event.target.value});
   };
 
   handleAddProfile = (index, ruleType) => {
@@ -423,33 +436,16 @@ class Profile extends Component {
         active: false,
         states: [],
         environments: [],
-        interface: '',
-        group: ' ',
+        interface: 'ANY',
+        group: 'ANY',
         group_type: 'ANY',
-        service: ' ',
+        service: 'ANY',
         action: 'ACCEPT',
         log: false,
         log_prefix: '',
         comment: '',
         type: 'BASIC',
       });
-      /*newState = update(this.state.inboundRules, {
-        $push: [
-          {
-            order: index + 1,
-            active: false,
-            interface: '',
-            group: ' ',
-            group_type: 'ANY',
-            service: ' ',
-            action: 'ACCEPT',
-            log: false,
-            log_prefix: '',
-            comment: '',
-            type: 'BASIC',
-          },
-        ],
-      });*/
       this.setState({ inboundRules: newState });
     } else {
       let newState = this.state.outboundRules.splice(0);
@@ -458,33 +454,16 @@ class Profile extends Component {
         active: false,
         states: [],
         environments: [],
-        interface: '',
-        group: ' ',
+        interface: 'ANY',
+        group: 'ANY',
         group_type: 'ANY',
-        service: ' ',
+        service: 'ANY',
         action: 'ACCEPT',
         log: false,
         log_prefix: '',
         comment: '',
         type: 'BASIC',
       });
-      /*newState = update(this.state.outboundRules, {
-        $push: [
-          {
-            order: index + 1,
-            active: false,
-            interface: '',
-            group: ' ',
-            group_type: 'ANY',
-            service: ' ',
-            action: 'ACCEPT',
-            log: false,
-            log_prefix: '',
-            comment: '',
-            type: 'BASIC',
-          },
-        ],
-      });*/
       this.setState({ outboundRules: newState });
     }
   };
@@ -501,10 +480,10 @@ class Profile extends Component {
           active: false,
           states: [],
           environments: [],
-          interface: '',
-          group: ' ',
+          interface: 'ANY',
+          group: 'ANY',
           group_type: 'ANY',
-          service: ' ',
+          service: 'ANY',
           action: 'ACCEPT',
           log: false,
           log_prefix: '',
@@ -522,10 +501,10 @@ class Profile extends Component {
           active: false,
           states: [],
           environments: [],
-          interface: '',
-          group: ' ',
+          interface: 'ANY',
+          group: 'ANY',
           group_type: 'ANY',
-          service: ' ',
+          service: 'ANY',
           action: 'ACCEPT',
           log: false,
           log_prefix: '',
@@ -564,7 +543,8 @@ class Profile extends Component {
       this.state.hasErrored ||
       this.props.servicesHasErrored ||
       this.props.groupsHasErrored ||
-      this.props.profilesHasErrored
+      this.props.profilesHasErrored ||
+      this.props.zonesHasErrored
     ) {
       return <p>Sorry! There was an error loading the items</p>;
     }
@@ -572,7 +552,8 @@ class Profile extends Component {
       this.state.isLoading ||
       this.props.servicesIsLoading ||
       this.props.groupsIsLoading ||
-      this.props.profilesIsLoading
+      this.props.profilesIsLoading ||
+      this.props.zonesIsLoading
     ) {
       return (
         <div>
@@ -597,6 +578,7 @@ class Profile extends Component {
                 <TableCell />
                 <TableCell>Active</TableCell>
                 <TableCell>Interface</TableCell>
+                <TableCell>Source Type</TableCell>
                 <TableCell>Source</TableCell>
                 <TableCell>Service</TableCell>
                 <TableCell>Action</TableCell>
@@ -611,11 +593,13 @@ class Profile extends Component {
               ruleType={'inbound'}
               onSortEnd={this.onSortEndInbound}
               groups={this.props.groups}
+              zones={this.props.zones}
               services={this.props.services}
               useDragHandle
               handleActiveCheckbox={this.handleActiveCheckbox}
               handleIntfSelect={this.handleIntfSelect}
               handleGroupSelect={this.handleGroupSelect}
+              handleGroupTypeSelect={this.handleGroupTypeSelect}
               handleServiceSelect={this.handleServiceSelect}
               handleActionSelect={this.handleActionSelect}
               handleLogCheckbox={this.handleLogCheckbox}
@@ -637,6 +621,7 @@ class Profile extends Component {
                 <TableCell>Active</TableCell>
                 <TableCell>Interface</TableCell>
                 <TableCell>Source</TableCell>
+                <TableCell>Source Type</TableCell>
                 <TableCell>Service</TableCell>
                 <TableCell>Action</TableCell>
                 <TableCell>Log</TableCell>
@@ -650,11 +635,13 @@ class Profile extends Component {
               ruleType={'outbound'}
               onSortEnd={this.onSortEndOutbound}
               groups={this.props.groups}
+              zones={this.props.zones}
               services={this.props.services}
               useDragHandle
               handleActiveCheckbox={this.handleActiveCheckbox}
               handleIntfSelect={this.handleIntfSelect}
               handleGroupSelect={this.handleGroupSelect}
+              handleGroupTypeSelect={this.handleGroupTypeSelect}
               handleServiceSelect={this.handleServiceSelect}
               handleActionSelect={this.handleActionSelect}
               handleLogCheckbox={this.handleLogCheckbox}
@@ -781,6 +768,9 @@ const mapStateToProps = state => {
     servicesIsLoading: state.servicesIsLoading,
     groupsHasErrored: state.groupssHasErrored,
     groupsIsLoading: state.groupsIsLoading,
+    zones: state.zones,
+    zonesHasErrored: state.zonesHasErrored,
+    zonesIsLoading: state.zonesIsLoading
   };
 };
 
@@ -788,6 +778,7 @@ const mapDispatchToProps = dispatch => {
   return {
     fetchServices: () => dispatch(servicesFetchData()),
     fetchProfiles: () => dispatch(profilesFetchData()),
+    fetchZones: () => dispatch(zonesFetchData()),
     handleSelectedTab: value => dispatch(handleSelectedTab(value)),
   };
 };
