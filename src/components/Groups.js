@@ -191,7 +191,6 @@ class Groups extends Component {
       );
     }
 
-    console.log(this.props.profiles);
     return (
       <div>
         <GroupsTable groups={this.props.groups} />

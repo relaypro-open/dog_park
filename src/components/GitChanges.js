@@ -29,31 +29,30 @@ const styles = theme => ({
 });
 
 
-class GitDiff extends Component {
+class GitChanges extends Component {
   constructor(props){
     super(props);
 
     this.state = {
-      diff: '',
+      adds: '',
+      subs: '',
       hasErrored: false,
       isLoading: false,
     }
-
   }
 
   componentDidMount = () => {
-    this.fetchDiff(this.props.profile1, this.props.profile2);
+    this.fetchChanges(this.props.profile1, this.props.profile2);
   }
 
-  fetchDiff = (oldId, newId) => {
+  fetchChanges = (oldId, newId) => {
     this.setState({ isLoading: true });
 
     api
-      .get('profile/' + oldId + '/iptablesv4?git_diff=' + newId, {
-        responseType: 'text',
+      .get('profile/' + oldId + '/iptablesv4?git_changes=' + newId, {
         headers: {
-          Accept: 'text/plain',
-          'Content-Type': 'text/plain',
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
         },
       })
       .then(response => {
@@ -68,29 +67,12 @@ class GitDiff extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(diff => {
-        console.log(diff);
-        this.setState({ diff });
+      .then(changes => {
+        console.log(changes);
+        this.setState({ adds: changes[0]});
+        this.setState({ subs: changes[1]});
       })
       .catch(() => this.setState({ hasErrored: true }));
-  };
-
-
-  renderFile = ({ oldRevision, newRevision, type, hunks }) => {
-    const changeCount = sumBy(hunks, ({ changes }) => changes.length);
-    const markEdits = markCharacterEdits({threshold: 30, markLongDistanceDiff: true});
-    return (
-      <Diff
-        key={oldRevision + '-' + newRevision}
-        viewType='split'
-        diffType={type}
-        gutterType='default'
-        markEdits={changeCount <= 200 ? markEdits : undefined}
-        //onRenderCode={changeCount <= 500 ? highlight : noop}
-      >
-        {hunks.map(hunk => <Hunk key={hunk.content} hunk={hunk} />)}
-      </Diff>
-    );
   };
 
   render() {
@@ -110,10 +92,9 @@ class GitDiff extends Component {
       );
     }
 
-    const files = parseDiff(this.state.diff);
-    return <div>{files.map(this.renderFile)}</div>;
+    return <span><font color="green">{'+' + this.state.adds}</font><font color="red">{' -' + this.state.subs}</font></span>;
   }
 
 };
 
-export default withStyles(styles)(GitDiff);
+export default withStyles(styles)(GitChanges);

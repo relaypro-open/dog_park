@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
+import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Checkbox from '@material-ui/core/Checkbox';
 import MenuIcon from '@material-ui/icons/Menu';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 import { TableCell, TableRow } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
@@ -39,6 +41,24 @@ class ProfileRow extends Component {
 
     let { data } = props;
 
+    let checkedNew: false;
+    let checkedEstablished: false;
+    let checkedRelated: false;
+
+    data.states.map(state =>{
+      switch (state) {
+        case 'NEW':
+          checkedNew = true;
+          break;
+        case 'ESTABLISHED':
+          checkedEstablished = true;
+          break;
+        case 'RELATED':
+          checkedRelated = true;
+          break;
+      }
+    })
+
     this.state = {
       active: data.active,
       intf: data.interface,
@@ -49,6 +69,11 @@ class ProfileRow extends Component {
       log: data.log,
       logPrefix: data.logPrefix,
       comment: data.comment,
+      states: data.states,
+      anchorEl: null,
+      checkedNew,
+      checkedEstablished,
+      checkedRelated,
     };
 
     this.activeFunction = debounce(this.props.handleActiveCheckbox, 500);
@@ -56,6 +81,7 @@ class ProfileRow extends Component {
     this.groupTypeFunction = debounce(this.props.handleGroupTypeSelect, 500);
     this.groupFunction = debounce(this.props.handleGroupSelect, 500);
     this.serviceFunction = debounce(this.props.handleServiceSelect, 500);
+    this.statesFunction = debounce(this.props.handleStatesSelection, 500);
     this.actionFunction = debounce(this.props.handleActionSelect, 500);
     this.logFunction = debounce(this.props.handleLogCheckbox, 500);
     this.logPrefixFunction = debounce(this.props.handleLogPrefixInput, 500);
@@ -69,10 +95,33 @@ class ProfileRow extends Component {
       this.setState({ intf: data.interface });
       this.setState({ group: data.group });
       this.setState({ service: data.service });
+      this.setState({ states: data.states});
       this.setState({ action: data.action });
       this.setState({ log: data.log });
       this.setState({ logPrefix: data.log_prefix });
       this.setState({ comment: data.comment });
+
+      let checkedNew: false;
+      let checkedEstablished: false;
+      let checkedRelated: false;
+
+      data.states.map(state =>{
+        switch (state) {
+          case 'NEW':
+            checkedNew = true;
+            break;
+          case 'ESTABLISHED':
+            checkedEstablished = true;
+            break;
+          case 'RELATED':
+            checkedRelated = true;
+            break;
+        }
+      })
+
+      this.setState({checkedNew});
+      this.setState({checkedEstablished});
+      this.setState({checkedRelated});
     }
   };
 
@@ -165,6 +214,49 @@ class ProfileRow extends Component {
     this.props.handleRemoveProfile(this.props.pIndex, this.props.ruleType);
   };
 
+  handleStateButton = event => {
+    this.setState({anchorEl: event.currentTarget});
+  };
+
+  handleStateButtonClose = () => {
+    this.setState({anchorEl: null});
+  };
+
+  handleStateChange = name => event => {
+    let checkedNew = this.state.checkedNew;
+    let checkedEstablished = this.state.checkedEstablished;
+    let checkedRelated = this.state.checkedRelated;
+    let states = [];
+
+    switch (name) {
+      case 'checkedNew':
+        checkedNew = event.target.checked;
+        break;
+      case 'checkedEstablished':
+        checkedEstablished = event.target.checked
+        break;
+      case 'checkedRelated':
+        checkedRelated = event.target.checked;
+        break;
+    }
+    if (checkedNew) {
+      states.push('NEW');
+    }
+    if (checkedEstablished) {
+      states.push('ESTABLISHED');
+    }
+    if (checkedRelated) {
+      states.push('RELATED');
+    }
+
+    this.statesFunction(
+      this.props.pIndex,
+      states,
+      this.props.ruleType
+    );
+    this.setState({ [name]: event.target.checked });
+  }
+
   render() {
     const { groups, zones, services, classes } = this.props;
     const {
@@ -177,6 +269,11 @@ class ProfileRow extends Component {
       log,
       logPrefix,
       comment,
+      states,
+      anchorEl,
+      checkedNew,
+      checkedEstablished,
+      checkedRelated,
     } = this.state;
 
     let sourceSelect = '';
@@ -203,7 +300,13 @@ class ProfileRow extends Component {
             );
           });
         break;
-      }
+    }
+
+    let stateText = 'ANY';
+
+    if (states.length) {
+      stateText = states.toString();
+    }
 
     return (
       <TableRow style={{ zIndex: 10000000 }}>
@@ -241,6 +344,59 @@ class ProfileRow extends Component {
               );
             })}
           </Select>
+        </TableCell>
+        <TableCell>
+          <Button
+            onClick={this.handleStateButton}
+          >
+            {stateText}
+          </Button>
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={this.handleStateButtonClose}
+          >
+            <MenuItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={checkedNew}
+                    onChange={this.handleStateChange('checkedNew')}
+                    value="checkedNew"
+                    color="primary"
+                  />
+                }
+                label="NEW"
+               />
+            </MenuItem>
+            <MenuItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={checkedEstablished}
+                    onChange={this.handleStateChange('checkedEstablished')}
+                    value="checkedEstablished"
+                    color="primary"
+                  />
+                }
+                label="ESTABLISHED"
+               />
+            </MenuItem>
+            <MenuItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={checkedRelated}
+                    onChange={this.handleStateChange('checkedRelated')}
+                    value="checkedRelated"
+                    color="primary"
+                  />
+                }
+                label="RELATED"
+               />
+            </MenuItem>
+          </Menu>
         </TableCell>
         <TableCell>
           <Select value={action} onChange={this.handleActionSelect}>

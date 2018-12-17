@@ -9,6 +9,7 @@ import {
   TableRow,
   Paper,
 } from '@material-ui/core';
+import GitChanges from './GitChanges';
 
 const styles = theme => ({
   root: {
@@ -35,11 +36,13 @@ const GroupsTable = props => {
             <TableCell>Profile ID</TableCell>
             <TableCell>Profile Version</TableCell>
             <TableCell>Profile Status</TableCell>
+            <TableCell>Changes</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {groups.map(group => {
             let profileStatus = '';
+            let gitChanges = '';
             if (group.hasUpdated) {
               profileStatus = (
                 <font color="red">
@@ -47,6 +50,9 @@ const GroupsTable = props => {
                   updated. Click to review changes.
                 </font>
               );
+              gitChanges = (
+                <GitChanges profile1={group.currentProfileId} profile2={group.profile_id} />
+              )
             }
             return (
               <TableRow
@@ -62,6 +68,7 @@ const GroupsTable = props => {
                 <TableCell>{group.profile_id}</TableCell>
                 <TableCell>{group.profile_version}</TableCell>
                 <TableCell>{profileStatus}</TableCell>
+                <TableCell>{gitChanges}</TableCell>
               </TableRow>
             );
           })}

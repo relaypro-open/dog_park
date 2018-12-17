@@ -21,6 +21,7 @@ import ProfileHistory from './ProfileHistory';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import IptablesView from './IptablesView';
 import {
   Table,
   TableBody,
@@ -56,6 +57,10 @@ const styles = theme => ({
   close: {
     padding: theme.spacing.unit / 2,
   },
+  wrapper: {
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
 });
 
 const TableBodySortable = SortableContainer(
@@ -76,6 +81,7 @@ const TableBodySortable = SortableContainer(
     handleCommentInput,
     handleAddProfile,
     handleRemoveProfile,
+    handleStatesSelection,
   }) => {
     return (
       <TableBody>
@@ -101,6 +107,7 @@ const TableBodySortable = SortableContainer(
               handleCommentInput={handleCommentInput}
               handleAddProfile={handleAddProfile}
               handleRemoveProfile={handleRemoveProfile}
+              handleStatesSelection={handleStatesSelection}
             />
           );
         })}
@@ -131,6 +138,8 @@ class Profile extends Component {
       isDeleting: false,
       deleteHasErrored: false,
       snackBarMsg: '',
+      iptablesOutput: '',
+      iptablesViewOpen: false,
     };
   }
 
@@ -428,6 +437,21 @@ class Profile extends Component {
     }
   };
 
+  handleStatesSelection = (index, value, ruleType) => {
+    let newState = [];
+    if (ruleType === 'inbound') {
+      newState = update(this.state.inboundRules, {
+        [index]: { states: { $set: value } },
+      });
+      this.setState({ inboundRules: newState });
+    } else {
+      newState = update(this.state.outboundRules, {
+        [index]: { states: { $set: value } },
+      });
+      this.setState({ outboundRules: newState });
+    }
+  };
+
   handleAddProfile = (index, ruleType) => {
     if (ruleType === 'inbound') {
       let newState = this.state.inboundRules.splice(0);
@@ -533,6 +557,21 @@ class Profile extends Component {
     this.setState({ snackBarOpen: false });
   };
 
+  handleIptablesViewButton = event => {
+    const iptablesOutput = (
+      <IptablesView
+        id={this.state.profileId}
+        version={"ipv4"}
+      />
+    );
+
+    this.setState({ iptablesOutput });
+    this.setState({ iptablesViewOpen: !this.state.iptablesViewOpen });
+  };
+
+  handleIptablesViewCloseButton = event => {
+    this.setState({ iptablesViewOpen: false });
+  };
 
   render() {
     const { classes } = this.props;
@@ -570,7 +609,16 @@ class Profile extends Component {
         </Typography>
         <br />
         <br />
+        <span className={classes.wrapper}>
         <Typography variant="title">Inbound Rules</Typography>
+        <Button
+          onClick={this.handleIptablesViewButton}
+          variant="contained"
+          color="primary"
+        >
+          View Iptables Rules
+        </Button>
+        </span>
         <Paper className={classes.root}>
           <Table className={classes.table}>
             <TableHead>
@@ -581,6 +629,7 @@ class Profile extends Component {
                 <TableCell>Source Type</TableCell>
                 <TableCell>Source</TableCell>
                 <TableCell>Service</TableCell>
+                <TableCell>Conn. State(s)</TableCell>
                 <TableCell>Action</TableCell>
                 <TableCell>Log</TableCell>
                 <TableCell>Log Prefix</TableCell>
@@ -607,6 +656,7 @@ class Profile extends Component {
               handleCommentInput={this.handleCommentInput}
               handleAddProfile={this.handleAddProfile}
               handleRemoveProfile={this.handleRemoveProfile}
+              handleStatesSelection={this.handleStatesSelection}
             />
           </Table>
         </Paper>
@@ -623,6 +673,7 @@ class Profile extends Component {
                 <TableCell>Source</TableCell>
                 <TableCell>Source Type</TableCell>
                 <TableCell>Service</TableCell>
+                <TableCell>Conn. State(s)</TableCell>
                 <TableCell>Action</TableCell>
                 <TableCell>Log</TableCell>
                 <TableCell>Log Prefix</TableCell>
@@ -649,6 +700,7 @@ class Profile extends Component {
               handleCommentInput={this.handleCommentInput}
               handleAddProfile={this.handleAddProfile}
               handleRemoveProfile={this.handleRemoveProfile}
+              handleStatesSelection={this.handleStatesSelection}
             />
           </Table>
         </Paper>
@@ -725,6 +777,28 @@ class Profile extends Component {
             >
               Delete
               <DeleteIcon className={classes.rightIcon} />
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          maxWidth={false}
+          fullWidth={false}
+          open={this.state.iptablesViewOpen}
+          onClose={this.handleiptablesViewCloseButton}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">
+            Iptables output for profile {this.state.profileName}:
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              iptables {this.props.version}:
+            </DialogContentText>
+            {this.state.iptablesOutput}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleIptablesViewCloseButton} color="primary">
+              Close
             </Button>
           </DialogActions>
         </Dialog>

@@ -17,17 +17,16 @@ export const groupsHasErrored = handleAction(
 export const groups = handleAction(
   'GROUPS_FETCH_DATA_SUCCESS',
   (state, action) => {
-    let output = [];
     if (action.payload.profiles !== {}) {
       action.payload.groups.map(group => {
         if (
           action.payload.profiles[group.profile_name][0].id !== group.profile_id
         ) {
           group['hasUpdated'] = true;
-          //output.push(group.profile_name);
+          group['currentProfileId'] = action.payload.profiles[group.profile_name][0].id;
         } else {
           group['hasUpdated'] = false;
-          //output.push(group.profile_name);
+          group['currentProfileId'] = group.profile_id;
         }
         return true;
       });

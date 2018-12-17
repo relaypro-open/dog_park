@@ -43,7 +43,7 @@ const HostsTable = props => {
                   props.history.push('/host/' + host.id);
                 }}
               >
-                <TableCell>{host.hostname}</TableCell>
+                <TableCell>{host.name}</TableCell>
                 <TableCell>{host.id}</TableCell>
               </TableRow>
             );

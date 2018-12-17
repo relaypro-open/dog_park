@@ -19,6 +19,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import HostsTable from './HostsTable';
 import GitDiff from './GitDiff';
+import GitChanges from './GitChanges';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
@@ -344,7 +345,15 @@ class Group extends Component {
       />
     );
 
+    const diffChanges = (
+      <GitChanges
+        profile1={this.state.defaultProfileId}
+        profile2={this.props.profiles[this.state.groupProfileName][0].id}
+      />
+    );
+
     this.setState({ diffOutput });
+    this.setState({ diffChanges });
     this.setState({ profileDiffOpen: !this.state.profileDiffOpen });
   };
 
@@ -531,7 +540,7 @@ class Group extends Component {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Please review the differences before updating:
+              <span styles="in">Please review the differences before updating: {this.state.diffChanges}</span>
             </DialogContentText>
             {this.state.diffOutput}
           </DialogContent>

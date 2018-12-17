@@ -121,7 +121,7 @@ class Host extends Component {
       .then(host => {
         console.log(host);
         this.setState(host);
-        this.setState({ hostName: host.hostname });
+        this.setState({ hostName: host.name });
         this.setState({ hostId: host.id });
         this.setState({ hostEnv: host.environment });
         this.setState({ hostIntf: host.interfaces });
@@ -179,7 +179,7 @@ class Host extends Component {
     });
     api
       .put('/host/' + this.state.hostId, {
-        hostname: this.state.hostName,
+        name: this.state.hostName,
         group: this.state.hostGroupName,
       })
       .then(response => {
@@ -192,7 +192,7 @@ class Host extends Component {
           this.fetchHost(this.state.hostId);
           this.setState({
             snackBarMsg:
-              this.state.hostname + ' has been modified successfully!',
+              this.state.hostName + ' has been modified successfully!',
           });
           return response.data;
         } else {

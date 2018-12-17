@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-import { parseDiff, Diff, Hunk, markCharacterEdits } from 'react-diff-view';
 import { withStyles } from '@material-ui/core/styles';
 import { CircularProgress, Button } from '@material-ui/core';
-import { sumBy, noop } from 'lodash';
-import '../styles/GitDiff.css';
 import { api } from '../api';
 
 const styles = theme => ({
@@ -29,12 +26,12 @@ const styles = theme => ({
 });
 
 
-class GitDiff extends Component {
+class IptablesView extends Component {
   constructor(props){
     super(props);
 
     this.state = {
-      diff: '',
+      iptables: '',
       hasErrored: false,
       isLoading: false,
     }
@@ -42,17 +39,21 @@ class GitDiff extends Component {
   }
 
   componentDidMount = () => {
-    this.fetchDiff(this.props.profile1, this.props.profile2);
+    this.fetchIptables(this.props.id, this.props.version);
   }
 
-  fetchDiff = (oldId, newId) => {
+  fetchIptables = (id, version) => {
     this.setState({ isLoading: true });
 
+    let path = "/iptablesv4";
+    if (version === "ipv6") {
+      path = "/iptablesv6"
+    }
     api
-      .get('profile/' + oldId + '/iptablesv4?git_diff=' + newId, {
+      .get('profile/' + id + path, {
         responseType: 'text',
         headers: {
-          Accept: 'text/plain',
+          'Accept': 'text/plain',
           'Content-Type': 'text/plain',
         },
       })
@@ -68,15 +69,13 @@ class GitDiff extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(diff => {
-        console.log(diff);
-        this.setState({ diff });
+      .then(iptables => {
+        this.setState({ iptables });
       })
       .catch(() => this.setState({ hasErrored: true }));
   };
 
-
-  renderFile = ({ oldRevision, newRevision, type, hunks }) => {
+  /*renderFile = ({ oldRevision, newRevision, type, hunks }) => {
     const changeCount = sumBy(hunks, ({ changes }) => changes.length);
     const markEdits = markCharacterEdits({threshold: 30, markLongDistanceDiff: true});
     return (
@@ -91,7 +90,7 @@ class GitDiff extends Component {
         {hunks.map(hunk => <Hunk key={hunk.content} hunk={hunk} />)}
       </Diff>
     );
-  };
+  };*/
 
   render() {
 
@@ -110,10 +109,10 @@ class GitDiff extends Component {
       );
     }
 
-    const files = parseDiff(this.state.diff);
-    return <div>{files.map(this.renderFile)}</div>;
+    //const files = parseDiff(this.state.diff);
+    return <div><pre><code>{this.state.iptables}</code></pre></div>;
   }
 
 };
 
-export default withStyles(styles)(GitDiff);
+export default withStyles(styles)(IptablesView);
