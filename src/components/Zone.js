@@ -53,7 +53,7 @@ const styles = theme => ({
   },
 });
 
-export class ZoneAddress extends Component {
+export class V4ZoneAddress extends Component {
   constructor(props) {
     super(props);
 
@@ -78,8 +78,8 @@ export class ZoneAddress extends Component {
 
   handleAddressField = event => {
     if (
-      ipRegex({ exact: true }).test(event.target.value) ||
-      cidrRegex().test(event.target.value)
+      ipRegex.v4({ exact: true }).test(event.target.value) ||
+      cidrRegex.v4().test(event.target.value)
     ) {
       this.setState({ addressError: false });
       this.addressField(this.props.index, event.target.value, false);
@@ -139,6 +139,93 @@ export class ZoneAddress extends Component {
   }
 }
 
+export class V6ZoneAddress extends Component {
+  constructor(props) {
+    super(props);
+
+    let addressError = false;
+    if (props.address === '') {
+      addressError = true;
+    }
+
+    this.state = {
+      zoneAddress: props.address,
+      addressError,
+    };
+
+    this.addressField = debounce(this.props.updateAddresses, 500);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props !== prevProps) {
+      this.setState({ zoneAddress: this.props.address });
+    }
+  }
+
+  handleAddressField = event => {
+    if (
+      ipRegex.v6({ exact: true }).test(event.target.value) ||
+      cidrRegex.v6().test(event.target.value)
+    ) {
+      this.setState({ addressError: false });
+      this.addressField(this.props.index, event.target.value, false);
+    } else {
+      this.setState({ addressError: true });
+      this.addressField(this.props.index, event.target.value, true);
+    }
+    this.setState({ zoneAddress: event.target.value });
+  };
+
+  render() {
+    const {
+      classes,
+      index,
+      handleRemoveAddress,
+      handleAddAddress,
+    } = this.props;
+
+    return (
+      <TableRow>
+        <TableCell>
+          <TextField
+            error={this.state.addressError}
+            key={'field-' + index}
+            fullWidth
+            value={this.state.zoneAddress}
+            margin="dense"
+            onChange={this.handleAddressField}
+          />
+        </TableCell>
+        <TableCell>
+          <Button
+            key={'add-' + index}
+            variant="fab"
+            mini
+            color="secondary"
+            aria-label="Add"
+            className={classes.button}
+            onClick={handleAddAddress}
+          >
+            <AddIcon />
+          </Button>
+          <Button
+            id={index}
+            key={'remove-' + index}
+            variant="fab"
+            mini
+            aria-label="Remove"
+            className={classes.button}
+            onClick={handleRemoveAddress}
+          >
+            <RemoveIcon id={index} />
+          </Button>
+        </TableCell>
+      </TableRow>
+    );
+  }
+}
+
+
 class Zone extends Component {
   constructor(props) {
     super(props);
@@ -146,7 +233,8 @@ class Zone extends Component {
     this.state = {
       zoneId: '',
       zoneName: '',
-      zoneAddresses: [],
+      v4ZoneAddresses: [],
+      v6ZoneAddresses: [],
       noExist: false,
       isLoading: false,
       hasErrored: false,
@@ -157,7 +245,8 @@ class Zone extends Component {
       updateZoneStatus: '',
       updateZoneOpen: false,
       addressErrorOpen: false,
-      areAddressesErrored: [],
+      areV4AddressesErrored: [],
+      areV6AddressesErrored: [],
       snackBarMsg: '',
     };
   }
@@ -185,21 +274,37 @@ class Zone extends Component {
       .then(zone => {
         this.setState({ zoneName: zone.name });
         this.setState({ zoneId: zone.id });
-        if ('addresses' in zone) {
-          if (zone.addresses.length === 0) {
-            this.setState({ zoneAddresses: [''] });
-            this.setState({ areAddressesErrored: [true] });
+        if ('ipv4_addresses' in zone) {
+          if (zone.ipv4_addresses.length === 0) {
+            this.setState({ v4ZoneAddresses: [''] });
+            this.setState({ areV4AddressesErrored: [true] });
           } else {
-            this.setState({ zoneAddresses: zone.addresses });
-            const areAddressesErrored = [];
-            zone.addresses.map(() => {
-              areAddressesErrored.push(false);
+            this.setState({ v4ZoneAddresses: zone.ipv4_addresses });
+            const areV4AddressesErrored = [];
+            zone.ipv4_addresses.map(() => {
+              areV4AddressesErrored.push(false);
               return true;
             });
-            this.setState({ areAddressesErrored });
+            this.setState({ areV4AddressesErrored });
           }
         } else {
-          this.setState({ zoneAddresses: [''] });
+          this.setState({ v4ZoneAddresses: [''] });
+        }
+        if ('ipv6_addresses' in zone) {
+          if (zone.ipv6_addresses.length === 0) {
+            this.setState({ v6ZoneAddresses: [''] });
+            this.setState({ areV6AddressesErrored: [true] });
+          } else {
+            this.setState({ v6ZoneAddresses: zone.ipv6_addresses });
+            const areV6AddressesErrored = [];
+            zone.ipv6_addresses.map(() => {
+              areV6AddressesErrored.push(false);
+              return true;
+            });
+            this.setState({ areV6AddressesErrored });
+          }
+        } else {
+          this.setState({ v6ZoneAddresses: [''] });
         }
       })
       .catch(() => this.setState({ hasErrored: true }));
@@ -217,7 +322,8 @@ class Zone extends Component {
     api
       .put('/zone/' + this.state.zoneId, {
         name: this.state.zoneName,
-        addresses: this.state.zoneAddresses,
+        ipv4_addresses: this.state.v4ZoneAddresses,
+        ipv6_addresses: this.state.v6ZoneAddresses,
       })
       .then(response => {
         if (response.status === 200) {
@@ -278,42 +384,81 @@ class Zone extends Component {
     this.setState({ deleteZoneOpen: false });
   };
 
-  updateAddresses = (index, value, isErrored) => {
-    const zoneAddresses = [...this.state.zoneAddresses];
-    const areAddressesErrored = [...this.state.areAddressesErrored];
-    zoneAddresses[index] = value;
-    areAddressesErrored[index] = isErrored;
-    this.setState({ zoneAddresses });
-    this.setState({ areAddressesErrored });
+  updateV4Addresses = (index, value, isErrored) => {
+    const v4ZoneAddresses = [...this.state.v4ZoneAddresses];
+    const areV4AddressesErrored = [...this.state.areV4AddressesErrored];
+    v4ZoneAddresses[index] = value;
+    areV4AddressesErrored[index] = isErrored;
+    this.setState({ v4ZoneAddresses });
+    this.setState({ areV4AddressesErrored });
   };
 
-  handleRemoveAddress = event => {
-    const zoneAddresses = [
-      ...this.state.zoneAddresses.slice(0, event.target.id),
-      ...this.state.zoneAddresses.slice(
+  updateV6Addresses = (index, value, isErrored) => {
+    const v6ZoneAddresses = [...this.state.v6ZoneAddresses];
+    const areV6AddressesErrored = [...this.state.areV6AddressesErrored];
+    v6ZoneAddresses[index] = value;
+    areV6AddressesErrored[index] = isErrored;
+    this.setState({ v6ZoneAddresses });
+    this.setState({ areV6AddressesErrored });
+  };
+
+  handleRemoveV4Address = event => {
+    const v4ZoneAddresses = [
+      ...this.state.v4ZoneAddresses.slice(0, event.target.id),
+      ...this.state.v4ZoneAddresses.slice(
         parseInt(event.target.id, 10) + 1,
-        this.state.zoneAddresses.length
+        this.state.v4ZoneAddresses.length
       ),
     ];
-    const areAddressesErrored = [
-      ...this.state.areAddressesErrored.slice(0, event.target.id),
-      ...this.state.areAddressesErrored.slice(
+    const areV4AddressesErrored = [
+      ...this.state.areV4AddressesErrored.slice(0, event.target.id),
+      ...this.state.areV4AddressesErrored.slice(
         parseInt(event.target.id, 10) + 1,
-        this.state.areAddressesErrored.length
+        this.state.areV4AddressesErrored.length
       ),
     ];
-    if (zoneAddresses.length === 0) {
-      zoneAddresses.push('');
-      areAddressesErrored.push(true);
+    if (v4ZoneAddresses.length === 0) {
+      v4ZoneAddresses.push('');
+      areV4AddressesErrored.push(true);
     }
-    this.setState({ zoneAddresses });
-    this.setState({ areAddressesErrored });
+    this.setState({ v4ZoneAddresses });
+    this.setState({ areV4AddressesErrored });
   };
 
-  handleAddAddress = event => {
-    this.setState({ zoneAddresses: [...this.state.zoneAddresses, ''] });
+  handleRemoveV6Address = event => {
+    const v6ZoneAddresses = [
+      ...this.state.v6ZoneAddresses.slice(0, event.target.id),
+      ...this.state.v6ZoneAddresses.slice(
+        parseInt(event.target.id, 10) + 1,
+        this.state.v6ZoneAddresses.length
+      ),
+    ];
+    const areV6AddressesErrored = [
+      ...this.state.areV6AddressesErrored.slice(0, event.target.id),
+      ...this.state.areV6AddressesErrored.slice(
+        parseInt(event.target.id, 10) + 1,
+        this.state.areV6AddressesErrored.length
+      ),
+    ];
+    if (v6ZoneAddresses.length === 0) {
+      v6ZoneAddresses.push('');
+      areV6AddressesErrored.push(true);
+    }
+    this.setState({ v6ZoneAddresses });
+    this.setState({ areV6AddressesErrored });
+  };
+
+  handleAddV4Address = event => {
+    this.setState({ v4ZoneAddresses: [...this.state.v4ZoneAddresses, ''] });
     this.setState({
-      areAddressesErrored: [...this.state.areAddressesErrored, false],
+      areV4AddressesErrored: [...this.state.areV4AddressesErrored, false],
+    });
+  };
+
+  handleAddV6Address = event => {
+    this.setState({ v6ZoneAddresses: [...this.state.v6ZoneAddresses, ''] });
+    this.setState({
+      areV6AddressesErrored: [...this.state.areV6AddressesErrored, false],
     });
   };
 
@@ -321,7 +466,7 @@ class Zone extends Component {
     this.setState({ updateZoneOpen: false });
   };
 
-  handleaddressErrorButton = () => {
+  handleAddressErrorButton = () => {
     this.setState({ addressErrorOpen: false });
   };
 
@@ -333,9 +478,24 @@ class Zone extends Component {
         return acc;
       }
     };
-    const isErrored = this.state.areAddressesErrored.reduce(reducer);
-    if (isErrored) {
+    const v4IsErrored = this.state.areV4AddressesErrored.reduce(reducer);
+    const v6IsErrored = this.state.areV6AddressesErrored.reduce(reducer);
+    if(v4IsErrored && v6IsErrored) {
       this.setState({ addressErrorOpen: true });
+    }
+    else if (v4IsErrored && !v6IsErrored) {
+      if(this.state.v4ZoneAddresses.length === 1 && this.state.v4ZoneAddresses[0] === '') {
+        this.setState({ updateZoneOpen: true });
+      } else {
+        this.setState({ addressErrorOpen: true });
+      }
+    } else if (v6IsErrored && !v4IsErrored) {
+      console.log(this.state.v6ZoneAddresses);
+      if(this.state.v6ZoneAddresses.length === 1 && this.state.v6ZoneAddresses[0] === '') {
+        this.setState({ updateZoneOpen: true });
+      } else {
+        this.setState({ addressErrorOpen: true });
+      }
     } else {
       this.setState({ updateZoneOpen: true });
     }
@@ -371,6 +531,7 @@ class Zone extends Component {
         <Typography variant="title">Zone {this.state.zoneName}</Typography>
         <br />
         <form>
+          <Typography variant="h4">IPv4 Addresses</Typography>
           <Paper className={classes.root}>
             <Table>
               <TableHead>
@@ -380,15 +541,42 @@ class Zone extends Component {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {this.state.zoneAddresses.map((address, index) => {
+                {this.state.v4ZoneAddresses.map((address, index) => {
                   return (
-                    <ZoneAddress
+                    <V4ZoneAddress
                       classes={classes}
                       index={index}
                       address={address}
-                      handleRemoveAddress={this.handleRemoveAddress}
-                      handleAddAddress={this.handleAddAddress}
-                      updateAddresses={this.updateAddresses}
+                      handleRemoveAddress={this.handleRemoveV4Address}
+                      handleAddAddress={this.handleAddV4Address}
+                      updateAddresses={this.updateV4Addresses}
+                    />
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </Paper>
+          <br/>
+          <br/>
+          <Typography variant="h4">IPv6 Addresses</Typography>
+          <Paper className={classes.root}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Address</TableCell>
+                  <TableCell>Add or Remove</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {this.state.v6ZoneAddresses.map((address, index) => {
+                  return (
+                    <V6ZoneAddress
+                      classes={classes}
+                      index={index}
+                      address={address}
+                      handleRemoveAddress={this.handleRemoveV6Address}
+                      handleAddAddress={this.handleAddV6Address}
+                      updateAddresses={this.updateV6Addresses}
                     />
                   );
                 })}
@@ -467,7 +655,7 @@ class Zone extends Component {
         </Dialog>
         <Dialog
           open={this.state.addressErrorOpen}
-          onClose={this.handleaddressErrorButton}
+          onClose={this.handleAddressErrorButton}
           aria-labelledby="form-dialog-title"
         >
           <DialogTitle id="form-dialog-title">
@@ -480,7 +668,7 @@ class Zone extends Component {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.handleaddressErrorButton} color="primary">
+            <Button onClick={this.handleAddressErrorButton} color="primary">
               Ok
             </Button>
           </DialogActions>

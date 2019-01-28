@@ -61,7 +61,8 @@ class Zones extends Component {
     api
       .post('zone', {
         name: this.state.createZoneName,
-        addresses: [],
+        ipv4_addresses: [],
+        ipv6_addresses: [],
       })
       .then(response => {
         if (response.status === 201) {
