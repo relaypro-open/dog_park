@@ -101,6 +101,7 @@ const styles = theme => ({
   drawerPaper: {
     position: 'relative',
     width: drawerWidth,
+    height: '100vh',
   },
   drawerHeader: {
     display: 'flex',

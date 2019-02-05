@@ -545,6 +545,7 @@ class Zone extends Component {
                   return (
                     <V4ZoneAddress
                       classes={classes}
+                      key={'v4Address' + index}
                       index={index}
                       address={address}
                       handleRemoveAddress={this.handleRemoveV4Address}
@@ -572,6 +573,7 @@ class Zone extends Component {
                   return (
                     <V6ZoneAddress
                       classes={classes}
+                      key={'v6Address' + index}
                       index={index}
                       address={address}
                       handleRemoveAddress={this.handleRemoveV6Address}

@@ -30,7 +30,6 @@ const styles = theme => ({
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
     maxWidth: 700,
-    height: 'auto',
   },
   rightIcon: {
     marginLeft: theme.spacing.unit,
