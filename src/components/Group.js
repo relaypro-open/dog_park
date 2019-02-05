@@ -30,6 +30,7 @@ const styles = theme => ({
     paddingTop: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 2,
     maxWidth: 700,
+    height: 'auto',
   },
   rightIcon: {
     marginLeft: theme.spacing.unit,
@@ -391,7 +392,7 @@ class Group extends Component {
     const { classes } = this.props;
     let isDiff = '';
 
-    const profiles = Object.keys(this.props.profiles).map(profile => {
+    const profiles = Object.keys(this.props.profiles).sort().map(profile => {
       let value = this.props.profiles[profile][0].id;
       if (
         this.state.groupProfileId !== value &&

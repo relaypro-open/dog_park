@@ -35,7 +35,7 @@ const ProfilesTable = props => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {Object.keys(profiles).map(profile => {
+          {Object.keys(profiles).sort().map(profile => {
             return (
               <TableRow
                 key={profile}

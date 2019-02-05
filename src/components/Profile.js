@@ -29,7 +29,8 @@ import {
   TableHead,
   TableRow,
 } from '@material-ui/core';
-import { SortableContainer, arrayMove } from 'react-sortable-hoc';
+import { SortableContainer} from 'react-sortable-hoc';
+import arrayMove from 'array-move';
 import update from 'immutability-helper';
 import moment from 'moment';
 
@@ -61,6 +62,9 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
   },
+  cellWidth: {
+    width: '50px',
+  }
 });
 
 const TableBodySortable = SortableContainer(
@@ -152,7 +156,7 @@ class Profile extends Component {
   };
 
   componentDidUpdate = prevProps => {
-    if (this.props !== prevProps) {
+    if (this.props.location !== prevProps.location) {
       this.setState({ saveProfileOpen: false });
       this.fetchProfile(this.props.match.params.id);
     }
@@ -175,20 +179,30 @@ class Profile extends Component {
         }
       })
       .then(profile => {
-        this.setState({ profileName: profile.name });
-        this.setState({ profileId: profile.id });
-        if ('rules' in profile) {
-          this.setState({ inboundRules: profile.rules.inbound });
-          this.setState({ outboundRules: profile.rules.outbound });
-        } else {
-          this.setState({ inboundRules: [] });
-          this.setState({ outboundRules: [] });
-        }
-        if ('version' in profile) {
-          this.setState({ profileVersion: profile.version });
-        } else {
-          this.setState({ profileVersion: '' });
-        }
+        this.setState((state,props) => {
+          let inboundRules, outboundRules;
+          let profileVersion;
+          if ('rules' in profile) {
+            inboundRules = profile.rules.inbound;
+            outboundRules = profile.rules.outbound;
+          } else {
+            inboundRules = [];
+            outboundRules = [];
+          }
+          if ('version' in profile) {
+            profileVersion = profile.version;
+          } else {
+            profileVersion = '';
+          }
+
+          return {
+            profileName: profile.name,
+            profileId: profile.id,
+            inboundRules,
+            outboundRules,
+            profileVersion,
+          }
+        });
       })
       .catch(() => this.setState({ hasErrored: true }));
   };
@@ -268,7 +282,6 @@ class Profile extends Component {
           this.fetchProfile(this.props.match.params.id);
           this.props.fetchProfiles();
         } else {
-          console.log(response.data);
           let error_msg = response.data.error_msg + ":" + response.data.groups;
           throw Error(error_msg);
         }
@@ -422,7 +435,6 @@ class Profile extends Component {
   };
 
   handleCommentInput = (index, value, ruleType) => {
-    console.log('here');
     let newState = [];
     if (ruleType === 'inbound') {
       newState = update(this.state.inboundRules, {
@@ -497,7 +509,6 @@ class Profile extends Component {
     if (ruleType === 'inbound') {
       newState = update(this.state.inboundRules, { $unset: [index] });
       newState.splice(index, 1);
-      console.log(newState);
       if (newState.length === 0) {
         newState.push({
           order: 1,
@@ -574,8 +585,12 @@ class Profile extends Component {
   };
 
   render() {
-    const { classes } = this.props;
-
+    console.log(
+      this.state.isLoading + ' ' +
+      this.props.servicesIsLoading + ' ' +
+      this.props.groupsIsLoading + ' ' +
+      this.props.profilesIsLoading + ' ' +
+      this.props.zonesIsLoading);
     if (this.state.hasErrored && this.state.noExist) {
       return <p>This profile no longer exists!</p>;
     } else if (
@@ -592,7 +607,8 @@ class Profile extends Component {
       this.props.servicesIsLoading ||
       this.props.groupsIsLoading ||
       this.props.profilesIsLoading ||
-      this.props.zonesIsLoading
+      this.props.zonesIsLoading ||
+      this.props.groups === []
     ) {
       return (
         <div>
@@ -600,7 +616,8 @@ class Profile extends Component {
           <CircularProgress />
         </div>
       );
-    }
+    } else {
+    const { classes } = this.props;
 
     return (
       <div>
@@ -624,17 +641,17 @@ class Profile extends Component {
             <TableHead>
               <TableRow>
                 <TableCell />
-                <TableCell>Active</TableCell>
-                <TableCell>Interface</TableCell>
-                <TableCell>Source Type</TableCell>
-                <TableCell>Source</TableCell>
-                <TableCell>Service</TableCell>
-                <TableCell>Conn. State(s)</TableCell>
-                <TableCell>Action</TableCell>
-                <TableCell>Log</TableCell>
+                <TableCell padding='none'>Active</TableCell>
+                <TableCell padding='none'>Interface</TableCell>
+                <TableCell padding='none'>Source Type</TableCell>
+                <TableCell padding='none'>Source</TableCell>
+                <TableCell padding='none'>Service</TableCell>
+                <TableCell padding='none'>Conn. State(s)</TableCell>
+                <TableCell padding='none'>Action</TableCell>
+                <TableCell padding='none'>Log</TableCell>
                 <TableCell>Log Prefix</TableCell>
                 <TableCell>Comment</TableCell>
-                <TableCell>Add or Remove</TableCell>
+                <TableCell padding='none'>Add or Remove</TableCell>
               </TableRow>
             </TableHead>
             <TableBodySortable
@@ -668,17 +685,17 @@ class Profile extends Component {
             <TableHead>
               <TableRow>
                 <TableCell />
-                <TableCell>Active</TableCell>
-                <TableCell>Interface</TableCell>
-                <TableCell>Source</TableCell>
-                <TableCell>Source Type</TableCell>
-                <TableCell>Service</TableCell>
-                <TableCell>Conn. State(s)</TableCell>
-                <TableCell>Action</TableCell>
-                <TableCell>Log</TableCell>
+                <TableCell padding='none'>Active</TableCell>
+                <TableCell padding='none'>Interface</TableCell>
+                <TableCell padding='none'>Source</TableCell>
+                <TableCell padding='none'>Source Type</TableCell>
+                <TableCell padding='none'>Service</TableCell>
+                <TableCell padding='none'>Conn. State(s)</TableCell>
+                <TableCell padding='none'>Action</TableCell>
+                <TableCell padding='none'>Log</TableCell>
                 <TableCell>Log Prefix</TableCell>
                 <TableCell>Comment</TableCell>
-                <TableCell>Add or Remove</TableCell>
+                <TableCell padding='none'>Add or Remove</TableCell>
               </TableRow>
             </TableHead>
             <TableBodySortable
@@ -827,7 +844,7 @@ class Profile extends Component {
           ]}
         />
       </div>
-    );
+    );}
   }
 }
 

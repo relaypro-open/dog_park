@@ -1,5 +1,6 @@
 import { api } from '../api';
 import { createActions } from 'redux-actions';
+import { profilesIsLoading } from './profiles';
 
 export const {
   groupsIsLoading,
@@ -12,7 +13,7 @@ export const {
     },
   },
   'GROUPS_IS_LOADING',
-  'GROUPS_HAS_ERRORED'
+  'GROUPS_HAS_ERRORED',
 );
 
 export function groupsFetchData() {
@@ -27,6 +28,7 @@ export function groupsFetchData() {
         if (response.status !== 200) {
           throw Error(response.statusText);
         }
+        dispatch(profilesIsLoading(false));
         dispatch(groupsIsLoading(false));
         return response.data;
       })

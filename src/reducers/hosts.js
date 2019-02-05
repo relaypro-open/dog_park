@@ -19,7 +19,16 @@ export const hostsIsLoading = handleAction(
 export const hosts = handleAction(
   'HOSTS_FETCH_DATA_SUCCESS',
   (state, action) => {
-    return action.payload;
+    const hosts = action.payload.sort((x, y) => {
+      if(x.name.toLowerCase() < y.name.toLowerCase()) {
+        return -1;
+      } else if (x.name.toLowerCase() > y.name.toLowerCase()){
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    return hosts;
   },
   []
 );

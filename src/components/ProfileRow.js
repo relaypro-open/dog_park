@@ -27,6 +27,9 @@ const styles = theme => ({
   form: {
     width: '100%',
   },
+  cellWidth: {
+    width: '50px',
+  }
 });
 
 const DragHandle = SortableHandle(() => (
@@ -89,39 +92,42 @@ class ProfileRow extends Component {
   }
 
   componentDidUpdate = prevProps => {
-    if (this.props !== prevProps) {
-      const { data } = this.props;
-      this.setState({ active: data.active });
-      this.setState({ intf: data.interface });
-      this.setState({ group: data.group });
-      this.setState({ service: data.service });
-      this.setState({ states: data.states});
-      this.setState({ action: data.action });
-      this.setState({ log: data.log });
-      this.setState({ logPrefix: data.log_prefix });
-      this.setState({ comment: data.comment });
+    if (this.props.data !== prevProps.data) {
+      this.setState((state, props) => {
+        const { data } = props;
+        let checkedNew: false;
+        let checkedEstablished: false;
+        let checkedRelated: false;
 
-      let checkedNew: false;
-      let checkedEstablished: false;
-      let checkedRelated: false;
-
-      data.states.map(state =>{
-        switch (state) {
-          case 'NEW':
-            checkedNew = true;
-            break;
-          case 'ESTABLISHED':
-            checkedEstablished = true;
-            break;
-          case 'RELATED':
-            checkedRelated = true;
-            break;
-        }
+        data.states.map(state =>{
+          switch (state) {
+            case 'NEW':
+              checkedNew = true;
+              break;
+            case 'ESTABLISHED':
+              checkedEstablished = true;
+              break;
+            case 'RELATED':
+              checkedRelated = true;
+              break;
+          }
+        })
+        return {
+          active: data.active,
+          intf: data.interface,
+          group: data.group,
+          group_type: data.group_type,
+          service: data.service,
+          states: data.states,
+          action: data.action,
+          log: data.log,
+          logPrefix: data.log_prefix,
+          comment: data.comment,
+          checkedNew,
+          checkedEstablished,
+          checkedRelated,
+        };
       })
-
-      this.setState({checkedNew});
-      this.setState({checkedEstablished});
-      this.setState({checkedRelated});
     }
   };
 
@@ -258,7 +264,12 @@ class ProfileRow extends Component {
   }
 
   render() {
+    //add logic to prevent rerendering while loading
+
     const { groups, zones, services, classes } = this.props;
+    if ( groups === [] || zones === [] || services === []) {
+      return "";
+    }
     const {
       active,
       intf,
@@ -313,28 +324,28 @@ class ProfileRow extends Component {
         <TableCell>
           <DragHandle />
         </TableCell>
-        <TableCell>
+        <TableCell padding='none'>
           <Checkbox checked={active} onChange={this.handleActiveCheckbox} />
         </TableCell>
-        <TableCell>
+        <TableCell padding='none'>
           <Select value={intf} onChange={this.handleIntfSelect}>
             <MenuItem value={'lo'}>lo</MenuItem>
-            <MenuItem value={'ANY'}>ANY</MenuItem>
+            <MenuItem value={'ANY'}>any</MenuItem>
           </Select>
         </TableCell>
-        <TableCell>
+        <TableCell padding='none'>
           <Select value={group_type} onChange={this.handleGroupTypeSelect}>
             <MenuItem value={'ANY'}>any</MenuItem>
             <MenuItem value={'ROLE'}>group</MenuItem>
             <MenuItem value={'ZONE'}>zone</MenuItem>
           </Select>
         </TableCell>
-        <TableCell>
+        <TableCell padding='none'>
           <Select value={group} onChange={this.handleGroupSelect}>
             {sourceSelect}
           </Select>
         </TableCell>
-        <TableCell>
+        <TableCell padding='none'>
           <Select value={service} onChange={this.handleServiceSelect}>
             {services.map(serv => {
               return (
@@ -345,7 +356,7 @@ class ProfileRow extends Component {
             })}
           </Select>
         </TableCell>
-        <TableCell>
+        <TableCell padding='none'>
           <Button
             onClick={this.handleStateButton}
           >
@@ -398,14 +409,14 @@ class ProfileRow extends Component {
             </MenuItem>
           </Menu>
         </TableCell>
-        <TableCell>
+        <TableCell padding='none'>
           <Select value={action} onChange={this.handleActionSelect}>
             <MenuItem value={'ACCEPT'}>ACCEPT</MenuItem>
             <MenuItem value={'DROP'}>DROP</MenuItem>
             <MenuItem value={'REJECT'}>REJECT</MenuItem>
           </Select>
         </TableCell>
-        <TableCell>
+        <TableCell padding='none'>
           <Checkbox checked={log} onChange={this.handleLogCheckbox} />
         </TableCell>
         <TableCell>
@@ -424,7 +435,7 @@ class ProfileRow extends Component {
             onChange={this.handleCommentInput}
           />
         </TableCell>
-        <TableCell>
+        <TableCell padding='none'>
           <Button
             variant="fab"
             mini

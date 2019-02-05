@@ -19,7 +19,16 @@ export const zonesIsLoading = handleAction(
 export const zones = handleAction(
   'ZONES_FETCH_DATA_SUCCESS',
   (state, action) => {
-    return action.payload;
+    const zones = action.payload.sort((x, y) => {
+      if(x.name.toLowerCase() < y.name.toLowerCase()) {
+        return -1;
+      } else if (x.name.toLowerCase() > y.name.toLowerCase()){
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    return zones;
   },
   []
 );
