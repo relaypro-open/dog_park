@@ -73,19 +73,19 @@ export class ServiceRow extends Component {
     this.portsField = debounce(this.props.updateServicePorts, 500);
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props !== prevProps) {
-      this.setState({ servicePorts: this.props.ports });
-      this.setState({ serviceProtocol: this.props.protocol });
-    }
-  }
+  //componentDidUpdate(prevProps) {
+  //  if (this.props.ports !== prevProps.ports || this.props.protocol !== prevProps.protocol) {
+  //    this.setState({ servicePorts: this.props.ports });
+  //    this.setState({ serviceProtocol: this.props.protocol });
+  //  }
+  //}
 
   handlePortsField = event => {
     const ports = event.target.value;
     const portList = ports.split(',');
     const isValid = portList
       .map(portString => {
-        const range = portString.split('-');
+        const range = portString.split(':');
         if (range !== portString && range.length === 2) {
           return (
             validator.isPort(range[0]) &&
@@ -209,7 +209,7 @@ class Service extends Component {
   }
 
   componentDidUpdate = prevProps => {
-    if (this.props !== prevProps) {
+    if (this.props.location !== prevProps.location) {
       this.setState({ saveServiceOpen: false });
     }
   };
@@ -329,10 +329,11 @@ class Service extends Component {
   };
 
   updateServicePorts = (index, value, isErrored) => {
-    let serviceServices = update(this.state.serviceServices, {
-      [index]: { ports: [{ $set: value }] },
+    const ports = value.split(',');
+    const serviceServices = update(this.state.serviceServices, {
+      [index]: { ports: { $set: ports } },
     });
-    let serviceErrors = update(this.state.serviceErrors, {
+    const serviceErrors = update(this.state.serviceErrors, {
       [index]: { $set: isErrored },
     });
     this.setState({ serviceServices });
