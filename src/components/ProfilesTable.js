@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 import { withStyles } from '@material-ui/core/styles';
 import { withRouter } from 'react-router';
 import {
@@ -46,7 +47,7 @@ const ProfilesTable = props => {
               >
                 <TableCell>{profile}</TableCell>
                 <TableCell>{profiles[profile][0].id}</TableCell>
-                <TableCell>{profiles[profile][0].created}</TableCell>
+                <TableCell>{moment(profiles[profile][0].created * 1000).format()}</TableCell>
               </TableRow>
             );
           })}

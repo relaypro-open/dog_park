@@ -4,6 +4,7 @@ import { profilesFetchData } from '../actions/profiles';
 import { servicesFetchData } from '../actions/services';
 import { zonesFetchData } from '../actions/zones';
 import { handleSelectedTab } from '../actions/app';
+import { createProfile } from './Profiles';
 import ProfileRow from './ProfileRow';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
@@ -22,6 +23,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import IptablesView from './IptablesView';
+import TextField from '@material-ui/core/TextField';
 import {
   Table,
   TableBody,
@@ -61,6 +63,9 @@ const styles = theme => ({
   wrapper: {
     display: 'flex',
     justifyContent: 'space-between',
+  },
+  button: {
+    marginRight: theme.spacing.unit,
   },
   cellWidth: {
     width: '50px',
@@ -135,6 +140,9 @@ class Profile extends Component {
       profileVersion: '',
       inboundRules: [],
       outboundRules: [],
+      cloneProfileName: '',
+      cloneProfileOpen: false,
+      cloneProfileStatus: '',
       saveProfileOpen: false,
       saveProfileStatus: '',
       deleteProfileOpen: false,
@@ -158,8 +166,41 @@ class Profile extends Component {
   componentDidUpdate = prevProps => {
     if (this.props.location !== prevProps.location) {
       this.setState({ saveProfileOpen: false });
+      this.setState({ deleteProfileOpen: false });
+      this.setState({ cloneProfileOpen: false });
       this.fetchProfile(this.props.match.params.id);
     }
+  };
+
+  cloneProfile = () => {
+    this.setState({ isLoading: true });
+
+    api
+      .post('profile', {
+        name: this.state.cloneProfileName,
+        rules: {
+          inbound: this.state.inboundRules,
+          outbound: this.state.outboundRules
+        },
+      })
+      .then(response => {
+        if (response.status === 201) {
+          let re = /\/api\/profile\/(.+)/;
+          this.setState({ isLoading: false });
+          let profileId = response.headers.location;
+          let newProfileId = profileId.replace(re, '$1');
+          return newProfileId;
+        } else {
+          throw Error(response.statusText);
+        }
+      })
+      .then(profileId => {
+        this.setState({ cloneProfileOpen: false });
+        this.setState({ cloneProfileName: '' });
+        this.props.history.push('/profile/' + profileId);
+        this.props.fetchProfiles();
+      })
+      .catch(() => this.setState({ hasErrored: true }));
   };
 
   fetchProfile = profileId => {
@@ -277,10 +318,14 @@ class Profile extends Component {
       .delete('/profile/' + this.props.match.params.id)
       .then(response => {
         if (response.status === 204) {
-          this.setState({ isDeleting: false });
-          this.setState({ deleteProfileStatus: <div>Deleted!</div> });
-          this.fetchProfile(this.props.match.params.id);
-          this.props.fetchProfiles();
+          this.setState((state,props) => {
+            props.fetchProfiles();
+            return {
+              isDeleting: false,
+              deleteProfileStatus: <div>Deleted!</div>,
+            }
+          });
+          this.props.history.push('/profiles');
         } else {
           let error_msg = response.data.error_msg + ":" + response.data.groups;
           throw Error(error_msg);
@@ -580,9 +625,26 @@ class Profile extends Component {
     this.setState({ iptablesViewOpen: !this.state.iptablesViewOpen });
   };
 
+
+  handleCloneButton = event => {
+    this.setState({ cloneProfileName: this.state.profileName + '_clone'});
+    this.setState({ cloneProfileOpen: !this.state.cloneProfileOpen });
+  };
+
+  handleCloneProfileName = event => {
+    this.setState({ cloneProfileName: event.target.value });
+  };
+
+  handleCloneProfileClose = event => {
+    this.setState({ cloneProfileOpen: false });
+  }
+
   handleIptablesViewCloseButton = event => {
     this.setState({ iptablesViewOpen: false });
   };
+
+
+
 
   render() {
     console.log(
@@ -628,6 +690,15 @@ class Profile extends Component {
         <br />
         <span className={classes.wrapper}>
         <Typography variant="title">Inbound Rules</Typography>
+        <Button
+          className={classes.button}
+          style={{marginLeft:'auto'}}
+          onClick={this.handleCloneButton}
+          variant="contained"
+          color="primary"
+        >
+          Clone Profile
+        </Button>
         <Button
           onClick={this.handleIptablesViewButton}
           variant="contained"
@@ -817,6 +888,42 @@ class Profile extends Component {
             <Button onClick={this.handleIptablesViewCloseButton} color="primary">
               Close
             </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={this.state.cloneProfileOpen}
+          onClose={this.handleCloneProfileClose}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">Clone Profile</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Please enter the name of the profile:
+            </DialogContentText>
+            <form>
+              <TextField
+                margin="dense"
+                id="profileName"
+                label="Profile Name"
+                value={this.state.cloneProfileName}
+                onChange={this.handleCloneProfileName}
+                required
+                fullWidth
+              />
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleCloneProfileClose} color="primary">
+              Cancel
+            </Button>
+            <Button
+              onClick={this.cloneProfile}
+              variant="contained"
+              color="primary"
+            >
+              Create Profile
+            </Button>
+            &nbsp;&nbsp;{this.state.cloneProfileStatus}
           </DialogActions>
         </Dialog>
         <Snackbar

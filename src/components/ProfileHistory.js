@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 import { withStyles } from '@material-ui/core/styles';
 import { withRouter } from 'react-router';
 import {
@@ -46,6 +47,7 @@ const ProfileHistory = props => {
         </TableHead>
         <TableBody>
           {profiles.map(profile => {
+            const createdTime = moment(profile.created * 1000).format('llll');
             return (
               <TableRow
                 key={'history' + profile.id}
@@ -56,7 +58,7 @@ const ProfileHistory = props => {
               >
                 <TableCell>{profile.name}</TableCell>
                 <TableCell>{profile.id}</TableCell>
-                <TableCell>{profile.created}</TableCell>
+                <TableCell>{createdTime}</TableCell>
               </TableRow>
             );
           })}

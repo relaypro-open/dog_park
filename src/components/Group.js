@@ -10,6 +10,7 @@ import { CircularProgress, Button } from '@material-ui/core';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
+import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Dialog from '@material-ui/core/Dialog';
@@ -60,6 +61,7 @@ class Group extends Component {
       noExist: false,
       groupName: '',
       groupId: '',
+      groupCreated: '',
       groupProfileName: '',
       groupProfileId: '',
       groupProfileVersion: '',
@@ -70,6 +72,7 @@ class Group extends Component {
       deleteGroupStatus: '',
       deleteGroupOpen: false,
       saveButtonDisabled: true,
+      defaultGroupName: '',
       defaultProfileName: '',
       defaultProfileId: '',
       editGroupStatus: '',
@@ -90,7 +93,7 @@ class Group extends Component {
   };
 
   componentDidUpdate = prevProps => {
-    if (this.props !== prevProps) {
+    if (this.props.match.params.id !== prevProps.match.params.id) {
       this.fetchGroup(this.props.match.params.id);
       this.fetchGroupHosts(this.props.match.params.id);
       this.props.handleSelectedTab(0);
@@ -124,7 +127,9 @@ class Group extends Component {
       .then(group => {
         this.setState(group);
         this.setState({ groupName: group.name });
+        this.setState({ defaultGroupName: group.name });
         this.setState({ groupId: group.id });
+        this.setState({ groupCreated: group.created });
         if ('profile_name' in group) {
           this.setState({ groupProfileName: group.profile_name });
           this.setState({ defaultProfileName: group.profile_name });
@@ -369,6 +374,15 @@ class Group extends Component {
     this.setState({ snackBarOpen: false });
   };
 
+  handleNameInput = event => {
+    this.setState({groupName: event.target.value});
+    if (event.target.value !== this.state.defaultGroupName) {
+      this.setState({ saveButtonDisabled: false });
+    } else {
+      this.setState({ saveButtonDisabled: true });
+    }
+  }
+
   render() {
     if (this.state.hasErrored && this.state.noExist) {
       return <p>This group no longer exists!</p>;
@@ -428,11 +442,17 @@ class Group extends Component {
         <form autoComplete="off">
           <Paper className={this.props.classes.root} elevation={1}>
             <Typography variant="title">
-              <strong>Group:</strong> {this.state.groupName}
+              <strong>Group:</strong>&nbsp;&nbsp;
+              <TextField
+                margin="dense"
+                id="comment"
+                value={this.state.groupName}
+                onChange={this.handleNameInput}
+              />
             </Typography>
             <br />
             <Typography variant="body1">
-              <strong>Group ID:</strong> {this.state.groupId}
+              <strong>Group ID:</strong> {this.state.groupId}    <strong>Created:</strong>  {this.state.groupCreated}
             </Typography>
             <br />
             <Typography variant="body1">
