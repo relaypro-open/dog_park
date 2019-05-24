@@ -872,7 +872,7 @@ class Profile extends Component {
           maxWidth={false}
           fullWidth={false}
           open={this.state.iptablesViewOpen}
-          onClose={this.handleiptablesViewCloseButton}
+          onClose={this.handleIptablesViewCloseButton}
           aria-labelledby="form-dialog-title"
         >
           <DialogTitle id="form-dialog-title">
