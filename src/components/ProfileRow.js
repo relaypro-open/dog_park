@@ -52,7 +52,7 @@ class ProfileRow extends Component {
     let checkedEstablished: false;
     let checkedRelated: false;
 
-    data.states.map(state =>{
+    data.states.map(state => {
       switch (state) {
         case 'NEW':
           checkedNew = true;
@@ -64,6 +64,7 @@ class ProfileRow extends Component {
           checkedRelated = true;
           break;
       }
+      return true;
     })
 
     this.state = {
@@ -116,7 +117,6 @@ class ProfileRow extends Component {
               break;
           }
         })
-
         return {
           active: data.active,
           intf: data.interface,
@@ -338,8 +338,8 @@ class ProfileRow extends Component {
     //add logic to prevent rerendering while loading
 
     const { groups, zones, services, classes } = this.props;
-    if ( groups.length === 0 || zones.length === 0 || services.length === 0 ) {
-      return "";
+    if ( groups === [] || zones === [] || services === [] ) {
+      return '';
     }
     const {
       active,
@@ -358,7 +358,7 @@ class ProfileRow extends Component {
       checkedRelated,
     } = this.state;
 
-    let sourceSelect = [];
+    let sourceSelect = null;
     let objects = {};
 
     switch (group_type) {
@@ -372,11 +372,9 @@ class ProfileRow extends Component {
         sourceSelect = groups.map(grp => {
             //var obj = {id: grp.id, label: grp.name};
             //objects[grp.id] = grp.name;
+            console.log(grp.name);
             return (
-                //obj
-                <MenuItem value={grp.id}>
-                  {grp.name}
-                </MenuItem>
+                <MenuItem key={'grp' + grp.id} value={grp.id}>{grp.name}</MenuItem>
             );
           });
         break;
@@ -384,11 +382,9 @@ class ProfileRow extends Component {
         sourceSelect = zones.map(grp => {
             //var obj = {id: grp.id, label: grp.name};
             //objects[grp.id] = grp.name;
+            console.log(grp.name);
             return (
-                //obj
-                <MenuItem value={grp.id}>
-                  {grp.name}
-                </MenuItem>
+                <MenuItem key={'grp' + grp.id} value={grp.id}>{grp.name}</MenuItem>
             );
           });
         break;
@@ -444,9 +440,7 @@ class ProfileRow extends Component {
             </MenuItem>
             {services.map(serv => {
               return (
-                <MenuItem key={'serv' + serv.id} value={serv.id}>
-                  {serv.name}
-                </MenuItem>
+                <MenuItem key={'serv' + serv.id} value={serv.id}>{serv.name}</MenuItem>
               );
             })}
           </Select>
