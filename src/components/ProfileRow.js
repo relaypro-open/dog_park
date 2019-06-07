@@ -8,11 +8,15 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 import { TableCell, TableRow } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
+import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import { SortableElement, SortableHandle } from 'react-sortable-hoc';
 import debounce from 'lodash/debounce';
+import deburr from 'lodash/deburr';
+import Downshift from 'downshift';
+import PropTypes from 'prop-types';
 
 const styles = theme => ({
   root: {
@@ -29,7 +33,7 @@ const styles = theme => ({
   },
   cellWidth: {
     width: '50px',
-  }
+  },
 });
 
 const DragHandle = SortableHandle(() => (
@@ -112,6 +116,7 @@ class ProfileRow extends Component {
               break;
           }
         })
+
         return {
           active: data.active,
           intf: data.interface,
@@ -165,6 +170,72 @@ class ProfileRow extends Component {
       event.target.value,
       this.props.ruleType
     );
+  };
+
+  renderGroupInput = inputProps => {
+    const { InputProps, classes, ref, ...other } = inputProps;
+
+    return (
+      <TextField
+        InputProps={{
+          inputRef: ref,
+          classes: {
+            root: classes.inputRoot,
+            input: classes.inputInput,
+          },
+          ...InputProps,
+        }}
+        {...other}
+      />
+    );
+  };
+
+  renderGroupSuggestion = suggestionProps => {
+    const { suggestion, index, itemProps, highlightedIndex, selectedItem } = suggestionProps;
+    const isHighlighted = highlightedIndex === index;
+    const isSelected = (selectedItem || '').indexOf(suggestion.label) > -1;
+
+    return (
+      <MenuItem
+        {...itemProps}
+        key={suggestion.label}
+        selected={isHighlighted}
+        component="div"
+        style={{
+          fontWeight: isSelected ? 500 : 400,
+        }}
+        value={suggestion.id}
+        >
+        {suggestion.label}
+        </MenuItem>
+    );
+  };
+
+  /*renderGroupSuggestion.propTypes = {
+    highlightedIndex: PropTypes.number,
+    index: PropTypes.number,
+    itemProps: PropTypes.object,
+    selectedItem: PropTypes.string,
+    suggestion: PropTypes.shape({ label: PropTypes.string }).isRequired,
+  };*/
+
+  getSuggestions = (groups, value, { showEmpty = false } = {}) => {
+    const inputValue = deburr(value.trim()).toLowerCase();
+    const inputLength = inputValue.length;
+    let count = 0;
+
+    return inputLength === 0 && !showEmpty
+      ? []
+      : groups.filter(suggestion => {
+          const keep =
+            count < 10 && suggestion.label.slice(0, inputLength).toLowerCase() === inputValue;
+
+          if (keep) {
+            count += 1;
+          }
+
+          return keep;
+        });
   };
 
   handleServiceSelect = event => {
@@ -267,7 +338,7 @@ class ProfileRow extends Component {
     //add logic to prevent rerendering while loading
 
     const { groups, zones, services, classes } = this.props;
-    if ( groups === [] || zones === [] || services === []) {
+    if ( groups.length === 0 || zones.length === 0 || services.length === 0 ) {
       return "";
     }
     const {
@@ -287,30 +358,51 @@ class ProfileRow extends Component {
       checkedRelated,
     } = this.state;
 
-    let sourceSelect = '';
+    let sourceSelect = [];
+    let objects = {};
 
     switch (group_type) {
       case 'ANY':
+        //var obj = {id: 'any', label: 'any'};
+        //objects['any'] = 'any';
         sourceSelect = <MenuItem value={'any'}>any</MenuItem>;
+        //sourceSelect = [obj];
         break;
       case 'ROLE':
         sourceSelect = groups.map(grp => {
+            //var obj = {id: grp.id, label: grp.name};
+            //objects[grp.id] = grp.name;
             return (
-              <MenuItem key={'grp' + grp.id} value={grp.id}>
-                {grp.name}
-              </MenuItem>
+                //obj
+                <MenuItem value={grp.id}>
+                  {grp.name}
+                </MenuItem>
             );
           });
         break;
       case 'ZONE':
         sourceSelect = zones.map(grp => {
+            //var obj = {id: grp.id, label: grp.name};
+            //objects[grp.id] = grp.name;
             return (
-              <MenuItem key={'grp' + grp.id} value={grp.id}>
-                {grp.name}
-              </MenuItem>
+                //obj
+                <MenuItem value={grp.id}>
+                  {grp.name}
+                </MenuItem>
             );
           });
         break;
+    }
+
+    //<Select value={group} onChange={this.handleGroupSelect}>
+     // {sourceSelect}
+    //</Select>
+
+
+    let interf = intf;
+
+    if (intf === '') {
+      interf = 'ANY';
     }
 
     let stateText = 'ANY';
@@ -328,25 +420,28 @@ class ProfileRow extends Component {
           <Checkbox checked={active} onChange={this.handleActiveCheckbox} />
         </TableCell>
         <TableCell padding='none'>
-          <Select value={intf} onChange={this.handleIntfSelect}>
+          <Select value={interf} onChange={this.handleIntfSelect} disabled={!active}>
             <MenuItem value={'lo'}>lo</MenuItem>
             <MenuItem value={'ANY'}>any</MenuItem>
           </Select>
         </TableCell>
         <TableCell padding='none'>
-          <Select value={group_type} onChange={this.handleGroupTypeSelect}>
+          <Select value={group_type} onChange={this.handleGroupTypeSelect} disabled={!active}>
             <MenuItem value={'ANY'}>any</MenuItem>
             <MenuItem value={'ROLE'}>group</MenuItem>
             <MenuItem value={'ZONE'}>zone</MenuItem>
           </Select>
         </TableCell>
         <TableCell padding='none'>
-          <Select value={group} onChange={this.handleGroupSelect}>
+          <Select value={group} onChange={this.handleGroupSelect} disabled={!active}>
             {sourceSelect}
           </Select>
         </TableCell>
-        <TableCell padding='none'>
-          <Select value={service} onChange={this.handleServiceSelect}>
+        <TableCell padding='checkbox'>
+          <Select value={service} onChange={this.handleServiceSelect} disabled={!active}>
+            <MenuItem key={'serv_any'} value='any'>
+              any
+            </MenuItem>
             {services.map(serv => {
               return (
                 <MenuItem key={'serv' + serv.id} value={serv.id}>
@@ -359,6 +454,7 @@ class ProfileRow extends Component {
         <TableCell padding='none'>
           <Button
             onClick={this.handleStateButton}
+            disabled={!active}
           >
             {stateText}
           </Button>
@@ -410,29 +506,31 @@ class ProfileRow extends Component {
           </Menu>
         </TableCell>
         <TableCell padding='none'>
-          <Select value={action} onChange={this.handleActionSelect}>
+          <Select value={action} onChange={this.handleActionSelect} disabled={!active}>
             <MenuItem value={'ACCEPT'}>ACCEPT</MenuItem>
             <MenuItem value={'DROP'}>DROP</MenuItem>
             <MenuItem value={'REJECT'}>REJECT</MenuItem>
           </Select>
         </TableCell>
         <TableCell padding='none'>
-          <Checkbox checked={log} onChange={this.handleLogCheckbox} />
+          <Checkbox checked={log} onChange={this.handleLogCheckbox} disabled={!active} />
         </TableCell>
-        <TableCell>
+        <TableCell padding='checkbox'>
           <TextField
-            margin="dense"
+            margin="none"
             id="logPrefix"
             value={logPrefix}
             onChange={this.handleLogPrefixInput}
+            disabled={!active}
           />
         </TableCell>
-        <TableCell>
+        <TableCell padding='checkbox'>
           <TextField
-            margin="dense"
+            margin="none"
             id="comment"
             value={comment}
             onChange={this.handleCommentInput}
+            disabled={!active}
           />
         </TableCell>
         <TableCell padding='none'>
@@ -462,3 +560,51 @@ class ProfileRow extends Component {
 }
 
 export default SortableElement(withStyles(styles)(ProfileRow));
+
+//<Downshift id="downshift-simple"
+//           initialSelectedItem={objects[group]}
+//           selectedItemChange={this.handleGroupSelect}>
+//  {({
+//    getInputProps,
+//    getItemProps,
+//    getLabelProps,
+//    getMenuProps,
+//    highlightedIndex,
+//    inputValue,
+//    isOpen,
+//    selectedItem,
+//    openMenu,
+//  }) => {
+//    const { onBlur, onFocus, ...inputProps } = getInputProps({
+//      placeholder: 'Group or Zone',
+//    });
+//
+//    return (
+//      <div className={classes.container}>
+//        {this.renderGroupInput({
+//          fullWidth: true,
+//          classes,
+//          InputLabelProps: getLabelProps({ shrink: true }),
+//          InputProps: { onBlur, onFocus: openMenu },
+//          inputProps,
+//        })}
+//
+//        <div {...getMenuProps()}>
+//          {isOpen ? (
+//            <Paper className={classes.paper} square>
+//              {this.getSuggestions(sourceSelect, inputValue).map((suggestion, index) =>
+//                this.renderGroupSuggestion({
+//                  suggestion,
+//                  index,
+//                  itemProps: getItemProps({ item: suggestion.label }),
+//                  highlightedIndex,
+//                  selectedItem,
+//                }),
+//              )}
+//            </Paper>
+//          ) : null}
+//        </div>
+//      </div>
+//    );
+//  }}
+//</Downshift>
