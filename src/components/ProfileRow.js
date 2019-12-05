@@ -372,7 +372,6 @@ class ProfileRow extends Component {
         sourceSelect = groups.map(grp => {
             //var obj = {id: grp.id, label: grp.name};
             //objects[grp.id] = grp.name;
-            console.log(grp.name);
             return (
                 <MenuItem key={'grp' + grp.id} value={grp.id}>{grp.name}</MenuItem>
             );
@@ -382,7 +381,6 @@ class ProfileRow extends Component {
         sourceSelect = zones.map(grp => {
             //var obj = {id: grp.id, label: grp.name};
             //objects[grp.id] = grp.name;
-            console.log(grp.name);
             return (
                 <MenuItem key={'grp' + grp.id} value={grp.id}>{grp.name}</MenuItem>
             );

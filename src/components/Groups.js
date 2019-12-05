@@ -172,7 +172,7 @@ class Groups extends Component {
 
     const { classes } = this.props;
 
-    const profiles = Object.keys(this.props.profiles).map(profile => {
+    const profiles = Object.keys(this.props.profiles).sort().map(profile => {
       let profileId = this.props.profiles[profile][0].id;
       return (
         <MenuItem key={profileId} value={profile}>
