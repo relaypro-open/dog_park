@@ -12,12 +12,13 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 
 const styles = theme => ({
   speedDialButton: {
-    right: theme.spacing.unit * 3,
-    bottom: theme.spacing.unit * 3,
+    right: theme.spacing(3),
+    bottom: theme.spacing(3),
     position: 'fixed',
     color: 'secondary',
   },
@@ -172,15 +173,14 @@ class Profiles extends Component {
             &nbsp;&nbsp;{this.state.createProfileStatus}
           </DialogActions>
         </Dialog>
-        <Button
-          variant="fab"
+        <Fab
           color="secondary"
           aria-label="Add"
           className={classes.speedDialButton}
           onClick={this.handleCreateProfileOpen}
         >
           <AddIcon />
-        </Button>
+        </Fab>
       </div>
     );
   }

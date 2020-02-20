@@ -6,6 +6,8 @@ import logo from './republic_logo_white.png';
 import './App.css';
 import { withRouter, Link, Route } from 'react-router-dom';
 import { MuiThemeProvider, withStyles } from '@material-ui/core/styles';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import MomentUtils from '@date-io/moment';
 import { dogTheme } from './styles/muiTheme';
 import {
   AppBar,
@@ -42,9 +44,11 @@ import Service from './components/Service';
 import Hosts from './components/Hosts';
 import Services from './components/Services';
 import Host from './components/Host';
+import FlanScan from './components/FlanScan';
 
 //redux store
 import { groupsFetchData } from './actions/groups';
+import { flanIpsFetchData } from './actions/flan_ips';
 import { profilesFetchData } from './actions/profiles';
 import { zonesFetchData } from './actions/zones';
 import { hostsFetchData } from './actions/hosts';
@@ -86,8 +90,8 @@ const styles = theme => ({
     marginRight: drawerWidth,
   },
   speedDialButton: {
-    right: theme.spacing.unit * 3,
-    bottom: theme.spacing.unit * 3,
+    right: theme.spacing(3),
+    bottom: theme.spacing(3),
     position: 'fixed',
     color: 'secondary',
   },
@@ -114,7 +118,7 @@ const styles = theme => ({
   content: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
-    padding: theme.spacing.unit * 3,
+    padding: theme.spacing(3),
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -139,7 +143,7 @@ const styles = theme => ({
     marginRight: 0,
   },
   nested: {
-    paddingLeft: theme.spacing.unit * 4,
+    paddingLeft: theme.spacing(4),
   },
   icon_img: {
     height: '30px',
@@ -178,6 +182,7 @@ class App extends Component {
 
   componentDidMount() {
     this.props.fetchProfiles();
+    //this.props.fetchFlanIps();
     //this.props.fetchGroups();
     this.props.fetchZones();
     this.props.fetchServices();
@@ -208,6 +213,9 @@ class App extends Component {
         break;
       case 4:
         this.props.history.push('/zones');
+        break;
+      case 5:
+        this.props.history.push('/flanscans');
         break;
       default:
         this.props.history.push('/groups');
@@ -252,7 +260,7 @@ class App extends Component {
               <ChevronLeftIcon />
             )}
           </IconButton>
-          <Typography variant="subheading" color="inherit">
+          <Typography variant="subtitle1" color="inherit">
             Groups
           </Typography>
           <Tooltip id="tooltip-fab" title="Add Group">
@@ -291,6 +299,7 @@ class App extends Component {
       <div className="App">
         <div>
           <MuiThemeProvider theme={dogTheme}>
+          <MuiPickersUtilsProvider utils={MomentUtils} theme={dogTheme}>
             <div className={classes.appFrame}>
               <AppBar
                 className={classNames(classes.appBar, {
@@ -310,7 +319,7 @@ class App extends Component {
                   >
                     <MenuIcon />
                   </IconButton>
-                  <Typography variant="title" color="inherit">
+                  <Typography variant="h5" color="inherit">
                     Dog Park
                   </Typography>
                   {
@@ -326,12 +335,15 @@ class App extends Component {
                     className={classes.flex}
                     value={this.props.selectedTab}
                     onChange={this.handleTabChange}
+                    variant='scrollable'
+                    scrollButtons='auto'
                   >
                     <Tab label="Groups" />
                     <Tab label="Profiles" />
                     <Tab label="Services" />
                     <Tab label="Hosts" />
                     <Tab label="Zones" />
+                    <Tab label="Flan Scans" />
                   </Tabs>
                   {
                     <span>
@@ -374,8 +386,10 @@ class App extends Component {
                 <Route path="/host/:id" component={Host} />
                 <Route exact={true} path="/services" component={Services} />
                 <Route path="/service/:id" component={Service} />
+                <Route exact={true} path="/flanscans" component={FlanScan} />
               </main>
             </div>
+          </MuiPickersUtilsProvider>
           </MuiThemeProvider>
         </div>
       </div>
@@ -394,6 +408,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     fetchGroups: () => dispatch(groupsFetchData()),
+    fetchFlanIps: () => dispatch(flanIpsFetchData()),
     fetchProfiles: () => dispatch(profilesFetchData()),
     fetchZones: () => dispatch(zonesFetchData()),
     fetchHosts: () => dispatch(hostsFetchData()),

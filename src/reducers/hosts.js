@@ -28,7 +28,33 @@ export const hosts = handleAction(
         return 0;
       }
     });
-    return hosts;
+
+    let hostsObject = {};
+
+    hosts.forEach(h => {
+      hostsObject[h.name] = h;
+    });
+    //added temporarily may be removed
+    /*hosts.forEach(h => {
+      api
+      .get('host/' + h.id)
+      .then(response => {
+        if (response.status === 200) {
+          return response.data;
+        } else if (response.status === 404) {
+          throw Error(response.statusText);
+        } else {
+          throw Error(response.statusText);
+        }
+      })
+      .then(host => {
+        if ('group' in host) {
+          h['group'] = host.group;
+        }
+      })
+      .catch(error => console.log(error));*/
+
+    return [hosts, hostsObject];
   },
   []
 );

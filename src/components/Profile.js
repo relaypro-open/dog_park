@@ -4,7 +4,6 @@ import { profilesFetchData } from '../actions/profiles';
 import { servicesFetchData } from '../actions/services';
 import { zonesFetchData } from '../actions/zones';
 import { handleSelectedTab } from '../actions/app';
-import { createProfile } from './Profiles';
 import ProfileRow from './ProfileRow';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
@@ -34,12 +33,11 @@ import {
 import { SortableContainer} from 'react-sortable-hoc';
 import arrayMove from 'array-move';
 import update from 'immutability-helper';
-import moment from 'moment';
 
 const styles = theme => ({
   root: {
     width: '100%',
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing(3),
     overflowX: 'auto',
   },
   table: {
@@ -49,23 +47,23 @@ const styles = theme => ({
     zIndex: 100000000000000,
   },
   rightIcon: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   },
   speedDialButton: {
-    right: theme.spacing.unit * 3,
-    bottom: theme.spacing.unit * 3,
+    right: theme.spacing(3),
+    bottom: theme.spacing(3),
     position: 'fixed',
     color: 'secondary',
   },
   close: {
-    padding: theme.spacing.unit / 2,
+    padding: theme.spacing(0.5),
   },
   wrapper: {
     display: 'flex',
     justifyContent: 'space-between',
   },
   button: {
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
   },
   cellWidth: {
     width: '50px',

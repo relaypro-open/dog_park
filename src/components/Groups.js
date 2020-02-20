@@ -9,6 +9,7 @@ import GroupsTable from './GroupsTable';
 import ProfileSelect from './ProfileSelect';
 import { handleSelectedTab } from '../actions/app';
 import Button from '@material-ui/core/Button';
+import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -22,27 +23,24 @@ import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import Snackbar from '@material-ui/core/Snackbar';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
 
 const styles = theme => ({
   root: {
     ...theme.mixins.gutters(),
-    paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
     maxWidth: 700,
   },
   rightIcon: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   },
   progress: {
     margin: 'auto',
     width: '50%',
   },
   speedDialButton: {
-    right: theme.spacing.unit * 3,
-    bottom: theme.spacing.unit * 3,
+    right: theme.spacing(3),
+    bottom: theme.spacing(3),
     position: 'fixed',
     color: 'secondary',
   },
@@ -158,10 +156,12 @@ class Groups extends Component {
   };
 
   render() {
-    if (this.props.hasErrored || this.props.profilesHasErrored) {
+    if (this.props.hasErrored || this.props.profilesHasErrored ||
+        this.props.flanIpsHasErrored || this.props.hostsHasErrored) {
       return <p>Sorry! There was an error loading the items</p>;
     }
-    if (this.props.isLoading || this.props.profilesIsLoading) {
+    if (this.props.isLoading || this.props.profilesIsLoading ||
+        this.props.flanIpsIsLoading || this.props.flanIps.length === 0) {
       return (
         <div>
           {' '}
@@ -193,16 +193,15 @@ class Groups extends Component {
 
     return (
       <div>
-        <GroupsTable groups={this.props.groups} />
-        <Button
-          variant="fab"
+        <GroupsTable groups={this.props.groups} flanIps={this.props.flanIps}/>
+        <Fab
           color="secondary"
           aria-label="Add"
           className={classes.speedDialButton}
           onClick={this.handleCreateGroupOpen}
         >
           <AddIcon />
-        </Button>
+        </Fab>
 
         <Dialog
           maxWidth={false}
@@ -243,7 +242,7 @@ class Groups extends Component {
               <br />
               <FormControlLabel
                 required
-                fullwidth
+                fullwidth="true"
                 label="Always update to latest profile? (Useful for QA rules, not recommended for PRO rules)"
                 control={
                   <Checkbox
@@ -305,6 +304,11 @@ const mapStateToProps = state => {
     profiles: state.profiles,
     profilesHasErrored: state.profilesHasErrored,
     profilesIsLoading: state.profilesIsLoading,
+    flanIps: state.flanIps,
+    flanIpsHasErrored: state.flanIpsHasErrored,
+    flanIpsIsLoading: state.flanIpsIsLoading,
+    hostsHasErrored: state.hostsHasErrored,
+    hostsIsLoading: state.hostsIsLoading,
   };
 };
 

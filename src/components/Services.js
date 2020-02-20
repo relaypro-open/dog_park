@@ -17,25 +17,26 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Fab from '@material-ui/core/Fab';
 import validator from 'validator';
 
 const styles = theme => ({
   root: {
     ...theme.mixins.gutters(),
-    paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
     maxWidth: 700,
   },
   rightIcon: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   },
   progress: {
     margin: 'auto',
     width: '50%',
   },
   speedDialButton: {
-    right: theme.spacing.unit * 3,
-    bottom: theme.spacing.unit * 3,
+    right: theme.spacing(3),
+    bottom: theme.spacing(3),
     position: 'fixed',
     color: 'secondary',
   },
@@ -163,15 +164,14 @@ class Services extends Component {
       <div>
         <ServicesTable services={this.props.services} />
 
-        <Button
-          variant="fab"
+        <Fab
           color="secondary"
           aria-label="Add"
           className={classes.speedDialButton}
           onClick={this.handleCreateServiceButton}
         >
           <AddIcon />
-        </Button>
+        </Fab>
 
         <Dialog
           open={this.state.createServiceOpen}

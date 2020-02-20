@@ -1,25 +1,25 @@
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import { CircularProgress, Button } from '@material-ui/core';
+import { CircularProgress } from '@material-ui/core';
 import { api } from '../api';
 
 const styles = theme => ({
   root: {
     ...theme.mixins.gutters(),
-    paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
     maxWidth: 700,
   },
   rightIcon: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   },
   progress: {
     margin: 'auto',
     width: '50%',
   },
   speedDialButton: {
-    right: theme.spacing.unit * 3,
-    bottom: theme.spacing.unit * 3,
+    right: theme.spacing(3),
+    bottom: theme.spacing(3),
     position: 'fixed',
     color: 'secondary',
   },

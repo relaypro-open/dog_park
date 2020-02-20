@@ -28,25 +28,25 @@ import CloseIcon from '@material-ui/icons/Close';
 const styles = theme => ({
   root: {
     ...theme.mixins.gutters(),
-    paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
     maxWidth: 700,
   },
   rightIcon: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   },
   progress: {
     margin: 'auto',
     width: '50%',
   },
   speedDialButton: {
-    right: theme.spacing.unit * 3,
-    bottom: theme.spacing.unit * 3,
+    right: theme.spacing(3),
+    bottom: theme.spacing(3),
     position: 'fixed',
     color: 'secondary',
   },
   close: {
-    padding: theme.spacing.unit / 2,
+    padding: theme.spacing(0.5),
   },
 });
 
@@ -158,7 +158,7 @@ class Group extends Component {
       .get('group/' + groupId + '/hosts')
       .then(response => {
         if (response.status === 200) {
-          this.setState({ isLoading: false });
+          //this.setState({ isLoading: false });
           return response.data;
         } else if (response.status === 404) {
           this.setState({ noExist: true });
@@ -169,8 +169,31 @@ class Group extends Component {
       })
       .then(group => {
         this.setState({ groupHosts: group });
+        //group.forEach(host => {
+        //  this.fetchHostGroup(host.id)
+        //  .then(response => {
+        //    if (response.status === 200) {
+        //      this.setState({ isLoading: false });
+        //      return response.data;
+        //    } else if (response.status === 404) {
+        //      this.setState({ noExist: true });
+        //      throw Error(response.statusText);
+        //    } else {
+        //      console.log('here!!');
+        //      throw Error(response.statusText);
+        //    }
+        //  })
+        //  .then(h => {
+        //    host['group'] = h.group;
+        //    this.setState({ groupHosts: group });
+        //  })
+        //})
       })
       .catch(() => this.setState({ hasErrored: true }));
+  };
+
+  fetchHostGroup = hostId => {
+    return api.get('host/' + hostId)
   };
 
   updateGroup = () => {
@@ -386,13 +409,18 @@ class Group extends Component {
   render() {
     if (this.state.hasErrored && this.state.noExist) {
       return <p>This group no longer exists!</p>;
-    } else if (this.state.hasErrored || this.props.profilesHasErrored) {
+    } else if (this.state.hasErrored || this.props.profilesHasErrored ||
+               this.props.hostsHasErrored ||
+               this.props.flanIpsHasErrored) {
       return <p>Sorry! There was an error loading the items</p>;
     }
     if (
       this.state.isLoading ||
       this.props.profilesIsLoading ||
-      this.state.isDeleting
+      this.state.isDeleting ||
+      this.props.hostsIsLoading ||
+      this.props.flanIpsIsLoading ||
+      this.props.flanIps.length === 0
     ) {
       return (
         <div>
@@ -402,8 +430,18 @@ class Group extends Component {
       );
     }
 
-    const { classes } = this.props;
+
+    const { classes, hosts, flanIps } = this.props;
     let isDiff = '';
+
+    let groupHosts = [];
+
+    this.state.groupHosts.forEach(host => {
+      console.log(host)
+      groupHosts.push(hosts[1][host.name]);
+    });
+
+    console.log(groupHosts);
 
     const profiles = Object.keys(this.props.profiles).sort().map(profile => {
       let value = this.props.profiles[profile][0].id;
@@ -458,7 +496,7 @@ class Group extends Component {
             <Typography variant="body1">
               <strong>Group Hosts:</strong>
             </Typography>
-            <HostsTable hosts={this.state.groupHosts} />
+            <HostsTable hosts={groupHosts} flanIps={flanIps} />
             <br />
             {isDiff}
             <Typography variant="body1">
@@ -612,6 +650,12 @@ const mapStateToProps = state => {
     profiles: state.profiles,
     profilesHasErrored: state.profilesHasErrored,
     profilesIsLoading: state.profilesIsLoading,
+    hosts: state.hosts,
+    hostsHasErrored: state.hostsHasErrored,
+    hostsIsLoading: state.hostsIsLoading,
+    flanIps: state.flanIps,
+    flanIpsHasErrored: state.flanIpsHasErrored,
+    flanIpsIsLoading: state.flanIpsIsLoading,
   };
 };
 

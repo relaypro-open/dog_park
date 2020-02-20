@@ -3,6 +3,7 @@ import { api } from '../api';
 import { groupsFetchData } from '../actions/groups';
 import { hostsFetchData } from '../actions/hosts';
 import { handleSelectedTab } from '../actions/app';
+import FlanApp from './FlanApp';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
@@ -25,25 +26,25 @@ import CloseIcon from '@material-ui/icons/Close';
 const styles = theme => ({
   root: {
     ...theme.mixins.gutters(),
-    paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
     maxWidth: 700,
   },
   rightIcon: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   },
   progress: {
     margin: 'auto',
     width: '50%',
   },
   speedDialButton: {
-    right: theme.spacing.unit * 3,
-    bottom: theme.spacing.unit * 3,
+    right: theme.spacing(3),
+    bottom: theme.spacing(3),
     position: 'fixed',
     color: 'secondary',
   },
   close: {
-    padding: theme.spacing.unit / 2,
+    padding: theme.spacing(1) / 2,
   },
 });
 
@@ -88,16 +89,18 @@ class Host extends Component {
   };
 
   componentDidUpdate = prevProps => {
-    if (this.props !== prevProps) {
-      this.setState({ isLoading: false });
-      this.setState({ hasErrored: false });
-      this.setState({ noExist: false });
+    if(this.props.match.params.id !== prevProps.match.params.id) {
       this.fetchHost(this.props.match.params.id);
-      this.setState({ isDeleting: false });
-      this.setState({ deleteHasErrored: false });
-      this.setState({ editHostStatus: '' });
-      this.setState({ deleteHostStatus: '' });
-      this.setState({ saveButtonDisabled: true });
+    }
+    if (this.props !== prevProps) {
+      this.setState({ isLoading: false,
+                      hasErrored: false,
+                      noExist: false,
+                      isDeleting: false,
+                      deleteHasErrored: false,
+                      editHostStatus: '',
+                      deleteHostStatus: '',
+                      saveButtonDisabled: true });
     }
   };
 
@@ -119,16 +122,15 @@ class Host extends Component {
         }
       })
       .then(host => {
-        console.log(host);
         this.setState(host);
-        this.setState({ hostName: host.name });
-        this.setState({ hostId: host.id });
-        this.setState({ hostEnv: host.environment });
-        this.setState({ hostIntf: host.interfaces });
-        this.setState({ hostLocation: host.location });
-        this.setState({ hostProvider: host.provider });
-        this.setState({ hostUpdateType: host.updatetype });
-        this.setState({ hostVersion: host.version });
+        this.setState({ hostName: host.name,
+                        hostId: host.id,
+                        hostEnv: host.environment,
+                        hostIntf: host.interfaces,
+                        hostLocation: host.location,
+                        hostProvider: host.provider,
+                        hostUpdateType: host.updatetype,
+                        hostVersion: host.version });
         if ('group' in host) {
           this.setState({ hostGroupName: host.group });
         } else {
@@ -291,13 +293,16 @@ class Host extends Component {
   render() {
     if (this.state.hasErrored && this.state.noExist) {
       return <p>This host no longer exists!</p>;
-    } else if (this.state.hasErrored || this.props.groupsHasErrored) {
+    } else if (this.state.hasErrored || this.props.groupsHasErrored ||
+               this.props.flanIpsHasErrored) {
       return <p>Sorry! There was an error loading the items</p>;
     }
     if (
       this.state.isLoading ||
       this.props.groupsIsLoading ||
-      this.state.isDeleting
+      this.state.isDeleting ||
+      this.props.flanIpsIsLoading ||
+      this.props.flanIps.length === 0
     ) {
       return (
         <div>
@@ -307,7 +312,7 @@ class Host extends Component {
       );
     }
 
-    const { classes } = this.props;
+    const { classes, flanIps } = this.props;
 
     const groups = this.props.groups.map(group => {
       //let profileName = this.props.groups[profile][0];
@@ -317,6 +322,20 @@ class Host extends Component {
         </MenuItem>
       );
     });
+
+    let flanApps = [];
+    let hostName = this.state.hostName;
+
+    if(!(hostName.includes(".phonebooth.net")) && !(hostName.includes(".phoneboothdev.info"))) {
+      if (hostName.includes("-qa-")) {
+        hostName = hostName + ".phoneboothdev.info";
+      } else {
+        hostName = hostName + ".phonebooth.net";
+      }
+    }
+    if (hostName in flanIps[0]) {
+      flanApps = flanIps[0][hostName];
+    }
 
     return (
       <div>
@@ -462,6 +481,20 @@ class Host extends Component {
             </IconButton>,
           ]}
         />
+        <br/>
+        <br/>
+        <Typography variant="title">
+          <strong>Flan Discovered Apps</strong>
+        </Typography>
+        <br/>
+        <br/>
+
+        {flanApps.map(a => (
+            <div>
+            <FlanApp key={'appkey_' + a.app} app={a.app} ip={a.ip} port={a.port} vulns={a.vulns} />
+            <br/>
+            </div>
+          ))}
       </div>
     );
   }
@@ -472,6 +505,9 @@ const mapStateToProps = state => {
     groups: state.groups,
     groupsHasErrored: state.groupsHasErrored,
     groupsIsLoading: state.groupsIsLoading,
+    flanIps: state.flanIps,
+    flanIpsHasErrored: state.flanIpsHasErrored,
+    flanIpsIsLoading: state.flanIpsIsLoading,
   };
 };
 

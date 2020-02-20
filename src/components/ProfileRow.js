@@ -6,27 +6,25 @@ import Checkbox from '@material-ui/core/Checkbox';
 import MenuIcon from '@material-ui/icons/Menu';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
+import Fab from '@material-ui/core/Fab';
 import { TableCell, TableRow } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
-import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import { SortableElement, SortableHandle } from 'react-sortable-hoc';
 import debounce from 'lodash/debounce';
 import deburr from 'lodash/deburr';
-import Downshift from 'downshift';
-import PropTypes from 'prop-types';
 
 const styles = theme => ({
   root: {
     ...theme.mixins.gutters(),
-    paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
     maxWidth: '100%',
   },
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   form: {
     width: '100%',
@@ -63,6 +61,7 @@ class ProfileRow extends Component {
         case 'RELATED':
           checkedRelated = true;
           break;
+        default:
       }
       return true;
     })
@@ -115,7 +114,9 @@ class ProfileRow extends Component {
             case 'RELATED':
               checkedRelated = true;
               break;
+            default:
           }
+          return true;
         })
         return {
           active: data.active,
@@ -315,6 +316,7 @@ class ProfileRow extends Component {
       case 'checkedRelated':
         checkedRelated = event.target.checked;
         break;
+      default:
     }
     if (checkedNew) {
       states.push('NEW');
@@ -359,7 +361,6 @@ class ProfileRow extends Component {
     } = this.state;
 
     let sourceSelect = null;
-    let objects = {};
 
     switch (group_type) {
       case 'ANY':
@@ -386,6 +387,7 @@ class ProfileRow extends Component {
             );
           });
         break;
+      default:
     }
 
     //<Select value={group} onChange={this.handleGroupSelect}>
@@ -526,25 +528,21 @@ class ProfileRow extends Component {
           />
         </TableCell>
         <TableCell padding='none'>
-          <Button
-            variant="fab"
-            mini
+          <Fab
+            size="small"
             color="secondary"
             aria-label="Add"
             className={classes.button}
-            onClick={this.handleAddProfile}
-          >
+            onClick={this.handleAddProfile}>
             <AddIcon />
-          </Button>
-          <Button
-            variant="fab"
-            mini
+          </Fab>
+          <Fab
+            size="small"
             aria-label="Remove"
             className={classes.button}
-            onClick={this.handleRemoveProfile}
-          >
+            onClick={this.handleRemoveProfile}>
             <RemoveIcon />
-          </Button>
+          </Fab>
         </TableCell>
       </TableRow>
     );

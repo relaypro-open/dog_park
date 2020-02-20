@@ -23,8 +23,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 const styles = theme => ({
   root: {
     ...theme.mixins.gutters(),
-    paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
     maxWidth: 700,
   },
 });
@@ -103,7 +103,7 @@ class CreateGroup extends Component {
   }
 
   render() {
-    const profiles = Object.keys(this.props.profiles).map(profile => {
+    const profiles = Object.keys(this.props.profiles).sort().map(profile => {
       let profileName = this.props.profiles[profile];
       return (
         <MenuItem key={profile} value={profile}>

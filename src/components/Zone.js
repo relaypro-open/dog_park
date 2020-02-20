@@ -4,7 +4,7 @@ import { zonesFetchData } from '../actions/zones';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRouter } from 'react-router-dom';
-import { CircularProgress, Button } from '@material-ui/core';
+import { CircularProgress, Button, Fab } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -35,21 +35,21 @@ import CloseIcon from '@material-ui/icons/Close';
 const styles = theme => ({
   root: {
     ...theme.mixins.gutters(),
-    paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
     maxWidth: 700,
   },
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   form: {
     width: 700,
   },
   rightIcon: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   },
   close: {
-    padding: theme.spacing.unit / 2,
+    padding: theme.spacing(0.5),
   },
 });
 
@@ -111,28 +111,26 @@ export class V4ZoneAddress extends Component {
           />
         </TableCell>
         <TableCell>
-          <Button
+          <Fab
             key={'add-' + index}
-            variant="fab"
-            mini
+            size="small"
             color="secondary"
             aria-label="Add"
             className={classes.button}
             onClick={handleAddAddress}
           >
             <AddIcon />
-          </Button>
-          <Button
+          </Fab>
+          <Fab
             id={index}
             key={'remove-' + index}
-            variant="fab"
-            mini
+            size="small"
             aria-label="Remove"
             className={classes.button}
             onClick={handleRemoveAddress}
           >
             <RemoveIcon id={index} />
-          </Button>
+          </Fab>
         </TableCell>
       </TableRow>
     );
@@ -197,28 +195,26 @@ export class V6ZoneAddress extends Component {
           />
         </TableCell>
         <TableCell>
-          <Button
+          <Fab
             key={'add-' + index}
-            variant="fab"
-            mini
+            size="small"
             color="secondary"
             aria-label="Add"
             className={classes.button}
             onClick={handleAddAddress}
           >
             <AddIcon />
-          </Button>
-          <Button
+          </Fab>
+          <Fab
             id={index}
             key={'remove-' + index}
-            variant="fab"
-            mini
+            size="small"
             aria-label="Remove"
             className={classes.button}
             onClick={handleRemoveAddress}
           >
             <RemoveIcon id={index} />
-          </Button>
+          </Fab>
         </TableCell>
       </TableRow>
     );
