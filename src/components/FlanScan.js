@@ -79,7 +79,8 @@ class FlanScan extends Component {
       })
       .then(scan => {
         this.setState({scan: scan});
-      });
+      })
+      .catch(() => this.setState({ hasErrored: true }));
   }
 
   render() {
@@ -108,13 +109,9 @@ class FlanScan extends Component {
 
     const { hosts, flanIps } = this.props;
 
-
-    console.log(hosts);
-
     let output = [];
     Object.keys(scan).forEach(key => {
       let application = scan[key];
-      console.log(application);
       if ('locations' in application ) {
         application['hosts'] = [];
         Object.keys(application['locations']).forEach(h => {
@@ -126,7 +123,6 @@ class FlanScan extends Component {
         output.push(application);
       }
     });
-    console.log(output);
 
     return (
     <div>

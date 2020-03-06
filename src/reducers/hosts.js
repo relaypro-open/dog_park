@@ -32,6 +32,13 @@ export const hosts = handleAction(
     let hostsObject = {};
 
     hosts.forEach(h => {
+      if(!(h.name.includes(".phonebooth.net")) && !(h.name.includes(".phoneboothdev.info"))) {
+        if (h.name.includes("-qa-")) {
+          h.name = h.name + ".phoneboothdev.info";
+        } else {
+          h.name = h.name + ".phonebooth.net";
+        }
+      }
       hostsObject[h.name] = h;
     });
     //added temporarily may be removed
