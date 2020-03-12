@@ -438,6 +438,13 @@ class Group extends Component {
 
     this.state.groupHosts.forEach(host => {
       console.log(host)
+      if(!(host.name.includes(".phonebooth.net")) && !(host.name.includes(".phoneboothdev.info"))) {
+        if (host.name.includes("-qa-")) {
+          host.name = host.name + ".phoneboothdev.info";
+        } else {
+          host.name = host.name + ".phonebooth.net";
+        }
+      }
       groupHosts.push(hosts[1][host.name]);
     });
 
