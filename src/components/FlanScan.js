@@ -115,7 +115,9 @@ class FlanScan extends Component {
       if ('locations' in application ) {
         application['hosts'] = [];
         Object.keys(application['locations']).forEach(h => {
-          application['hosts'].push(hosts[1][h])
+          if (h in hosts[1]) {
+            application['hosts'].push(hosts[1][h]);
+          }
         });
       }
       application['name'] = key;

@@ -35,7 +35,7 @@ export const hosts = handleAction(
       if(!(h.name.includes(".phonebooth.net")) && !(h.name.includes(".phoneboothdev.info"))) {
         if (h.name.includes("-qa-")) {
           h.name = h.name + ".phoneboothdev.info";
-        } else {
+        } else if (h.name.includes("-pro-")) {
           h.name = h.name + ".phonebooth.net";
         }
       }

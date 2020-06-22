@@ -441,7 +441,7 @@ class Group extends Component {
       if(!(host.name.includes(".phonebooth.net")) && !(host.name.includes(".phoneboothdev.info"))) {
         if (host.name.includes("-qa-")) {
           host.name = host.name + ".phoneboothdev.info";
-        } else {
+        } else if (host.name.includes("-pro-")) {
           host.name = host.name + ".phonebooth.net";
         }
       }

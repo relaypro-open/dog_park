@@ -329,7 +329,7 @@ class Host extends Component {
     if(!(hostName.includes(".phonebooth.net")) && !(hostName.includes(".phoneboothdev.info"))) {
       if (hostName.includes("-qa-")) {
         hostName = hostName + ".phoneboothdev.info";
-      } else {
+      } else if (hostName.includes("-pro-")) {
         hostName = hostName + ".phonebooth.net";
       }
     }
