@@ -11,6 +11,7 @@ import {
   Avatar
 } from '@material-ui/core';
 import GitChanges from './GitChanges';
+import { pure } from 'recompose';
 
 const styles = theme => ({
   root: {
@@ -22,17 +23,17 @@ const styles = theme => ({
     width: '100%',
   },
   high: {
-    backgroundColor: '#FD6864' ,
+    backgroundColor: '#FD6864',
   },
   medium: {
-    backgroundColor: '#F8A102' ,
+    backgroundColor: '#F8A102',
   },
   low: {
-    backgroundColor: '#34CDF9' ,
+    backgroundColor: '#34CDF9',
   }
 });
 
-const GroupsTable = props => {
+const GroupsTable = pure(props => {
   const { classes, groups, flanIps } = props;
 
   return (
@@ -90,13 +91,14 @@ const GroupsTable = props => {
               <TableRow
                 key={group.id}
                 hover
+                title={"Click to view group: " + group.name}
                 onClick={event => {
                   props.history.push('/group/' + group.id);
                 }}
               >
                 <TableCell>{group.name}</TableCell>
                 <TableCell>{group.id}</TableCell>
-                <TableCell>{group.profile_name}</TableCell>
+                <TableCell title={"Click to view profile: " + group.profile_name} Style="text-decoration:underline; cursor: pointer;" onClick={event => {event.stopPropagation(); props.history.push('/profile/' + group.profile_id)}}>{group.profile_name}</TableCell>
                 <TableCell>{group.profile_id}</TableCell>
                 <TableCell>{group.profile_version}</TableCell>
                 <TableCell>{profileStatus}</TableCell>
@@ -111,6 +113,6 @@ const GroupsTable = props => {
       </Table>
     </Paper>
   );
-};
+});
 
 export default withRouter(withStyles(styles)(GroupsTable));

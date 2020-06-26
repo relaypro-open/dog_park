@@ -9,6 +9,7 @@ import {
   TableRow,
   Paper,
 } from '@material-ui/core';
+import { pure } from 'recompose';
 
 const styles = theme => ({
   root: {
@@ -21,7 +22,7 @@ const styles = theme => ({
   },
 });
 
-const ServicesTable = props => {
+const ServicesTable = pure(props => {
   const { classes, services } = props;
 
   return (
@@ -52,6 +53,6 @@ const ServicesTable = props => {
       </Table>
     </Paper>
   );
-};
+});
 
 export default withRouter(withStyles(styles)(ServicesTable));

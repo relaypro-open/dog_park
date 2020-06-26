@@ -131,8 +131,6 @@ class Profiles extends Component {
 
     const { classes } = this.props;
 
-    console.log(this.props.profiles);
-
     return (
       <div>
         <ProfilesTable profiles={this.props.profiles} />

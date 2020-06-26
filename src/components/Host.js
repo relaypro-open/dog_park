@@ -314,7 +314,7 @@ class Host extends Component {
 
     const { classes, flanIps } = this.props;
 
-    const groups = this.props.groups.map(group => {
+    const groups = this.props.groups[0].map(group => {
       //let profileName = this.props.groups[profile][0];
       return (
         <MenuItem key={group.id} value={group.name}>

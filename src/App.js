@@ -18,6 +18,7 @@ import {
   List,
   IconButton,
   Tooltip,
+  CircularProgress
 } from '@material-ui/core';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import ListItem from '@material-ui/core/ListItem';
@@ -25,9 +26,6 @@ import ListItemText from '@material-ui/core/ListItemText';
 import CreateGroup from './components/CreateGroup';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-//import SpeedDial from '@material-ui/lab/SpeedDial';
-//import SpeedDialIcon from '@material-ui/lab/SpeedDialIcon';
-//import SpeedDialAction from '@material-ui/lab/SpeedDialAction';
 
 //icons
 import MenuIcon from '@material-ui/icons/Menu';
@@ -240,6 +238,15 @@ class App extends Component {
   };
 
   render() {
+    if(this.props.groups.length === 0) {
+      return (
+        <div>
+          {' '}
+          <CircularProgress />
+        </div>
+      );
+
+    }
     const { classes, theme } = this.props;
     const { sideBarActive } = this.state;
 
@@ -278,7 +285,7 @@ class App extends Component {
           component="nav"
           subheader={<ListSubheader component="div">Production</ListSubheader>}
         >
-          {this.props.groups.map(group => (
+          {this.props.groups[0].map(group => (
             <Link
               key={'link' + group.id}
               to={'/group/' + group.id}
@@ -373,6 +380,7 @@ class App extends Component {
                 <Route exact={true} path="/" component={Groups} />
                 <Route exact={true} path="/groups" component={Groups} />
                 <Route path="/group/:id" component={Group} />
+                <Route path="/groupByName/:id" component={Group} />
                 <Route exact={true} path="/profiles" component={Profiles} />
                 <Route exact={true} path="/zones" component={Zones} />
                 <Route

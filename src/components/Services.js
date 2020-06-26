@@ -149,7 +149,8 @@ class Services extends Component {
     if (this.props.hasErrored) {
       return <p>Sorry! There was an error loading the items</p>;
     }
-    if (this.props.isLoading) {
+    if (this.props.isLoading ||
+        this.props.services.length === 0 ) {
       return (
         <div>
           {' '}
@@ -162,7 +163,7 @@ class Services extends Component {
 
     return (
       <div>
-        <ServicesTable services={this.props.services} />
+        <ServicesTable services={this.props.services[0]} />
 
         <Fab
           color="secondary"

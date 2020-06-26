@@ -87,8 +87,12 @@ class Group extends Component {
     if (this.props.profiles === {}) {
       this.props.fetchProfiles();
     }
-    this.fetchGroup(this.props.match.params.id);
-    this.fetchGroupHosts(this.props.match.params.id);
+    console.log('Path: ' + this.props.match.path);
+    if (this.props.match.path === '/groupByName/:id') {
+      this.fetchGroupByName(this.props.match.params.id);
+    } else {
+      this.fetchGroup(this.props.match.params.id);
+    }
     this.props.handleSelectedTab(0);
   };
 
@@ -107,6 +111,55 @@ class Group extends Component {
       this.setState({ saveButtonDisabled: true });
     }
   };
+
+  fetchGroupByName = groupName => {
+
+    this.setState({ isLoading: true });
+
+    api
+      .get('group?name=' + groupName)
+      .then(response => {
+        if (response.status === 200) {
+          this.setState({ isLoading: false });
+          return response.data;
+        } else if (response.status === 404) {
+          this.setState({ noExist: true });
+          throw Error(response.statusText);
+        } else {
+          throw Error(response.statusText);
+        }
+      })
+      .then(group => {
+        this.groupId = group.id;
+        this.setState(group);
+        this.setState({ groupName: group.name });
+        this.setState({ defaultGroupName: group.name });
+        this.setState({ groupId: group.id });
+        this.setState({ groupCreated: group.created });
+        if ('profile_name' in group) {
+          this.setState({ groupProfileName: group.profile_name });
+          this.setState({ defaultProfileName: group.profile_name });
+        } else {
+          this.setState({ groupProfileName: '' });
+        }
+        if ('profile_version' in group) {
+          this.setState({ groupProfileVersion: group.profile_version });
+        } else {
+          this.setState({ groupProfileVersion: '' });
+        }
+        if ('profile_id' in group) {
+          this.setState({ groupProfileId: group.profile_id });
+          this.setState({ defaultProfileId: group.profile_id });
+        } else {
+          this.setState({ groupProfileVersion: '' });
+        }
+        return group.id;
+      }).then(id => {
+        this.fetchGroupHosts(id);
+      })
+      .catch(() => this.setState({ hasErrored: true }));
+  };
+
 
   fetchGroup = groupId => {
     this.setState({ isLoading: true });
@@ -147,12 +200,15 @@ class Group extends Component {
         } else {
           this.setState({ groupProfileVersion: '' });
         }
+        return group.id;
+      }).then(id => {
+        this.fetchGroupHosts(id);
       })
       .catch(() => this.setState({ hasErrored: true }));
   };
 
   fetchGroupHosts = groupId => {
-    this.setState({ isLoading: true });
+    //this.setState({ isLoading: true });
 
     api
       .get('group/' + groupId + '/hosts')

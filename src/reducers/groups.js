@@ -41,7 +41,15 @@ export const groups = handleAction(
         }
         return true;
       });
-      return groups;
+      let groupNames = {};
+      let groupIds = {};
+
+      groups.forEach(grp => {
+        groupNames[grp.name] = grp.id;
+        groupIds[grp.id] = grp.name;
+      });
+
+      return [groups, groupNames, groupIds];
     }
   },
   []

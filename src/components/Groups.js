@@ -193,7 +193,7 @@ class Groups extends Component {
 
     return (
       <div>
-        <GroupsTable groups={this.props.groups} flanIps={this.props.flanIps}/>
+        <GroupsTable groups={this.props.groups[0]} flanIps={this.props.flanIps}/>
         <Fab
           color="secondary"
           aria-label="Add"

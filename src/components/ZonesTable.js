@@ -9,6 +9,7 @@ import {
   TableRow,
   Paper,
 } from '@material-ui/core';
+import { pure } from 'recompose';
 
 const styles = theme => ({
   root: {
@@ -21,7 +22,7 @@ const styles = theme => ({
   },
 });
 
-const ZonesTable = props => {
+const ZonesTable = pure(props => {
   const { classes, zones } = props;
 
   return (
@@ -52,6 +53,6 @@ const ZonesTable = props => {
       </Table>
     </Paper>
   );
-};
+});
 
 export default withRouter(withStyles(styles)(ZonesTable));

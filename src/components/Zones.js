@@ -114,7 +114,7 @@ class Zones extends Component {
 
     return (
       <div>
-        <ZonesTable zones={this.props.zones} />
+        <ZonesTable zones={this.props.zones[0]} />
         <Fab
           color="secondary"
           aria-label="Add"

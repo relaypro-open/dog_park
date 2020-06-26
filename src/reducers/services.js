@@ -28,7 +28,16 @@ export const services = handleAction(
         return 0;
       }
     });
-    return services;
+
+    let serviceNames = {};
+    let serviceIds = {};
+
+    services.forEach(srv => {
+      serviceNames[srv.name] = srv.id;
+      serviceIds[srv.id] = srv.name;
+    });
+
+    return [services, serviceNames, serviceIds];
   },
   []
 );

@@ -516,9 +516,9 @@ class Profile extends Component {
         states: [],
         environments: [],
         interface: 'ANY',
-        group: 'ANY',
+        group: 'any',
         group_type: 'ANY',
-        service: 'ANY',
+        service: 'any',
         action: 'ACCEPT',
         log: false,
         log_prefix: '',
@@ -534,9 +534,9 @@ class Profile extends Component {
         states: [],
         environments: [],
         interface: 'ANY',
-        group: 'ANY',
+        group: 'any',
         group_type: 'ANY',
-        service: 'ANY',
+        service: 'any',
         action: 'ACCEPT',
         log: false,
         log_prefix: '',
@@ -559,9 +559,9 @@ class Profile extends Component {
           states: [],
           environments: [],
           interface: 'ANY',
-          group: 'ANY',
+          group: 'any',
           group_type: 'ANY',
-          service: 'ANY',
+          service: 'any',
           action: 'ACCEPT',
           log: false,
           log_prefix: '',
@@ -580,9 +580,9 @@ class Profile extends Component {
           states: [],
           environments: [],
           interface: 'ANY',
-          group: 'ANY',
+          group: 'any',
           group_type: 'ANY',
-          service: 'ANY',
+          service: 'any',
           action: 'ACCEPT',
           log: false,
           log_prefix: '',
@@ -668,7 +668,9 @@ class Profile extends Component {
       this.props.groupsIsLoading ||
       this.props.profilesIsLoading ||
       this.props.zonesIsLoading ||
-      this.props.groups === []
+      this.props.groups.length === 0 ||
+      this.props.zones.length === 0 ||
+      this.props.services.length === 0
     ) {
       return (
         <div>

@@ -28,7 +28,16 @@ export const zones = handleAction(
         return 0;
       }
     });
-    return zones;
+
+    let zoneIds = {};
+    let zoneNames = {};
+
+    zones.forEach(z => {
+      zoneNames[z.name] = z.id;
+      zoneIds[z.id] = z.name;
+    })
+
+    return [zones, zoneNames, zoneIds];
   },
   []
 );
