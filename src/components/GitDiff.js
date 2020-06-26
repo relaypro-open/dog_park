@@ -58,7 +58,6 @@ class GitDiff extends Component {
       })
       .then(response => {
         if (response.status === 200) {
-          console.log(response);
           this.setState({ isLoading: false });
           return response.data;
         } else if (response.status === 404) {
@@ -69,7 +68,6 @@ class GitDiff extends Component {
         }
       })
       .then(diff => {
-        console.log(diff);
         this.setState({ diff });
       })
       .catch(() => this.setState({ hasErrored: true }));

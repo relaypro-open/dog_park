@@ -55,7 +55,6 @@ class GitChanges extends Component {
       })
       .then(response => {
         if (response.status === 200) {
-          console.log(response);
           this.setState({ isLoading: false });
           return response.data;
         } else if (response.status === 404) {
@@ -66,7 +65,6 @@ class GitChanges extends Component {
         }
       })
       .then(changes => {
-        console.log(changes);
         this.setState({ adds: changes[0]});
         this.setState({ subs: changes[1]});
       })

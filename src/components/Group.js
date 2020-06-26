@@ -87,7 +87,6 @@ class Group extends Component {
     if (this.props.profiles === {}) {
       this.props.fetchProfiles();
     }
-    console.log('Path: ' + this.props.match.path);
     if (this.props.match.path === '/groupByName/:id') {
       this.fetchGroupByName(this.props.match.params.id);
     } else {
@@ -225,25 +224,6 @@ class Group extends Component {
       })
       .then(group => {
         this.setState({ groupHosts: group });
-        //group.forEach(host => {
-        //  this.fetchHostGroup(host.id)
-        //  .then(response => {
-        //    if (response.status === 200) {
-        //      this.setState({ isLoading: false });
-        //      return response.data;
-        //    } else if (response.status === 404) {
-        //      this.setState({ noExist: true });
-        //      throw Error(response.statusText);
-        //    } else {
-        //      console.log('here!!');
-        //      throw Error(response.statusText);
-        //    }
-        //  })
-        //  .then(h => {
-        //    host['group'] = h.group;
-        //    this.setState({ groupHosts: group });
-        //  })
-        //})
       })
       .catch(() => this.setState({ hasErrored: true }));
   };
@@ -493,7 +473,6 @@ class Group extends Component {
     let groupHosts = [];
 
     this.state.groupHosts.forEach(host => {
-      console.log(host)
       if(!(host.name.includes(".phonebooth.net")) && !(host.name.includes(".phoneboothdev.info"))) {
         if (host.name.includes("-qa-")) {
           host.name = host.name + ".phoneboothdev.info";
@@ -503,8 +482,6 @@ class Group extends Component {
       }
       groupHosts.push(hosts[1][host.name]);
     });
-
-    console.log(groupHosts);
 
     const profiles = Object.keys(this.props.profiles).sort().map(profile => {
       let value = this.props.profiles[profile][0].id;

@@ -55,8 +55,6 @@ class FlanScan extends Component {
   }
 
   handleDateChange = event => {
-    console.log(event);
-    console.log(moment(event).format("YYYY.MM.DD"));
     this.setState({selectedDate: event});
   }
 

@@ -213,7 +213,7 @@ class ProfileRow extends Component {
   };
 
   handleGroupSelect = value => {
-    if (value !== null) {
+    if (value != null) {
       this.setState({ group: value });
       this.groupFunction(
         this.props.pIndex,
@@ -232,7 +232,7 @@ class ProfileRow extends Component {
   };
 
   handleServiceSelect = value => {
-    if (value !== null) {
+    if (value != null) {
       this.setState({ service: value });
       this.serviceFunction(
         this.props.pIndex,
@@ -387,8 +387,6 @@ class ProfileRow extends Component {
     const serviceSelectOptions = {
       options: services[0].map(option => option.name)
     };
-
-
 
     return (
       <TableRow style={{ zIndex: 10000000 }}>

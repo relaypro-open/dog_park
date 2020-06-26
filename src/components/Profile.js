@@ -645,12 +645,6 @@ class Profile extends Component {
 
 
   render() {
-    /*console.log(
-      this.state.isLoading + ' ' +
-      this.props.servicesIsLoading + ' ' +
-      this.props.groupsIsLoading + ' ' +
-      this.props.profilesIsLoading + ' ' +
-      this.props.zonesIsLoading);*/
     if (this.state.hasErrored && this.state.noExist) {
       return <p>This profile no longer exists!</p>;
     } else if (

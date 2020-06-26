@@ -76,9 +76,6 @@ class EditGroup extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(group => {
-        console.log(group);
-      })
       .catch(() => {
         this.setState({ editGroupStatus: <div>An error has occurred!</div> });
         this.setState({ hasErrored: true });

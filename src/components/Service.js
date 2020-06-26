@@ -304,7 +304,6 @@ class Service extends Component {
           this.fetchService(this.props.match.params.id);
           this.props.fetchServices();
         } else {
-          console.log(response.data);
           let error_msg = response.data.error_msg + ":" + response.data.profiles;
           throw Error(error_msg);
         }

@@ -486,7 +486,6 @@ class Zone extends Component {
         this.setState({ addressErrorOpen: true });
       }
     } else if (v6IsErrored && !v4IsErrored) {
-      console.log(this.state.v6ZoneAddresses);
       if(this.state.v6ZoneAddresses.length === 1 && this.state.v6ZoneAddresses[0] === '') {
         this.setState({ updateZoneOpen: true });
       } else {

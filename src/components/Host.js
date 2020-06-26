@@ -117,7 +117,6 @@ class Host extends Component {
           this.setState({ noExist: true });
           throw Error(response.statusText);
         } else {
-          console.log('here!!');
           throw Error(response.statusText);
         }
       })

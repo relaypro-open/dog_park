@@ -50,7 +50,6 @@ class ProfileSelect extends Component {
   componentDidMount = () => {
     if (this.props.profiles !== undefined) {
       let checkedState = this.state.checkedState;
-      console.log("UPDATING!");
       this.props.profiles.map(profile => {
         checkedState[profile.id] = false;
         return true;
@@ -64,7 +63,6 @@ class ProfileSelect extends Component {
       if (this.props.profiles !== undefined) {
         this.props.handleCreateGroupButton(false);
         let checkedState = {};
-        console.log("UPDATING!");
         this.props.profiles.map(profile => {
           checkedState[profile.id] = false;
           return true;
@@ -78,8 +76,6 @@ class ProfileSelect extends Component {
     let checkedState = this.state.checkedState;
     checkedState[name] = event.target.checked;
 
-    console.log(checkedState)
-
     const anyTrue = Object.values(checkedState).reduce((acc, checkbox) => {
         if (checkbox) {
           return acc + 1;
@@ -88,10 +84,7 @@ class ProfileSelect extends Component {
         }
     }, 0);
 
-    console.log(anyTrue);
-
     if (anyTrue === 2) {
-      console.log("here");
       this.props.handleCreateGroupButton(false);
       this.setState({profileDiffButtonDisabled: false});
     } else if (anyTrue === 1) {
@@ -107,10 +100,7 @@ class ProfileSelect extends Component {
 
   handleProfileDiffButton = event => {
     const checkedState = this.state.checkedState;
-    console.log(checkedState);
     const profiles = Object.keys(checkedState).reduce((acc, key) => {
-      console.log(key);
-      console.log(acc);
       if (checkedState[key]) {
         acc.push(key);
         return acc;
