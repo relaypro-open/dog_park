@@ -94,9 +94,9 @@ class ProfileRow extends Component {
 
     this.activeFunction = debounce(this.props.handleActiveCheckbox, 500);
     this.intfFunction = debounce(this.props.handleIntfSelect, 500);
-    this.groupTypeFunction = debounce(this.props.handleGroupTypeSelect, 500);
-    this.groupFunction = debounce(this.props.handleGroupSelect, 500);
-    this.serviceFunction = debounce(this.props.handleServiceSelect, 500);
+    this.groupTypeFunction = debounce(this.props.handleGroupTypeSelect, 0);
+    this.groupFunction = debounce(this.props.handleGroupSelect, 0);
+    this.serviceFunction = debounce(this.props.handleServiceSelect, 0);
     this.statesFunction = debounce(this.props.handleStatesSelection, 500);
     this.actionFunction = debounce(this.props.handleActionSelect, 500);
     this.logFunction = debounce(this.props.handleLogCheckbox, 500);
@@ -212,7 +212,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleGroupSelect = value => {
+  handleGroupSelect = (value, prevVal) => {
     if (value != null) {
       this.setState({ group: value });
       this.groupFunction(
@@ -220,6 +220,8 @@ class ProfileRow extends Component {
         value,
         this.props.ruleType
       );
+    } else {
+      this.setState({groupValue: prevVal});
     }
   };
 
@@ -349,7 +351,6 @@ class ProfileRow extends Component {
       active,
       intf,
       group_type,
-      service,
       action,
       log,
       logPrefix,
@@ -388,6 +389,17 @@ class ProfileRow extends Component {
       options: services[0].map(option => option.name)
     };
 
+
+    let groupInput = groupName;
+    let groupValue_ = groupValue;
+
+    if (groupName == null && groupValue == null) {
+      groupInput = sourceSelectOptions['options'][0];
+      groupValue_ = sourceSelectOptions['options'][0];
+    } else if (groupName == null && groupValue != null) {
+      groupInput = groupValue;
+    }
+
     return (
       <TableRow style={{ zIndex: 10000000 }}>
         <TableCell>
@@ -414,11 +426,11 @@ class ProfileRow extends Component {
             style={{ width: 200 }}
             {...sourceSelectOptions}
             id="group_select"
-            inputValue={groupName}
-            value={groupValue}
+            inputValue={groupInput}
+            value={groupValue_}
             renderInput={(params) => <TextField {...params} variant="standard"/>}
             onChange={(event, value) => {
-              this.handleGroupSelect(sourceReverse[value]);
+              this.handleGroupSelect(sourceReverse[value], groupValue_);
             }}
             onInputChange={(event, value) => {
               this.handleGroupInput(value);
