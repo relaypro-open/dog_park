@@ -66,10 +66,11 @@ class ProfileRow extends Component {
       return true;
     });
 
-    const { sourceSelect, sourceReverse, groupName } = this.getGroupType(zones, groups, data);
+    const { sourceSelect, sourceReverse, groupName } = this.getGroupType(zones, groups, data, false);
 
     this.state = {
       active: data.active,
+      order: data.order,
       intf: data.interface,
       group_type: data.group_type,
       group: data.group,
@@ -128,12 +129,18 @@ class ProfileRow extends Component {
           return true;
         });
 
-        const { sourceSelect, sourceReverse, groupName } = this.getGroupType(zones, groups, data);
+        let groupChanged = false;
+        if(data.group_type !== prevProps.data.group_type && data.order === prevProps.data.order) {
+          groupChanged = true;
+        }
+
+        const { sourceSelect, sourceReverse, groupName, groupId} = this.getGroupType(zones, groups, data, groupChanged);
 
         return {
           active: data.active,
+          order: data.order,
           intf: data.interface,
-          group: data.group,
+          group: groupId,
           group_type: data.group_type,
           service: data.service,
           states: data.states,
@@ -156,33 +163,48 @@ class ProfileRow extends Component {
     }
   };
 
-  getGroupType = (zones, groups, data) => {
+  getGroupType = (zones, groups, data, groupChanged) => {
     let sourceSelect = null;
     let sourceReverse = {};
     let groupName = '';
+    let groupId = '';
 
+    console.log(groupChanged);
 
     if (groups.length !== 0 && zones.length !== 0) {
       switch (data.group_type) {
         case 'ANY':
           sourceSelect = [{id: "any", name: "any"}];
+          sourceReverse = {'any': 'any'};
+          groupId = 'any';
           groupName = "any";
-          sourceReverse = {'name': 'any'};
           break;
         case 'ROLE':
           sourceSelect = groups[0];
-          sourceReverse = groups[1]
-          groupName = groups[2][data.group];
+          sourceReverse = groups[1];
+          if (groupChanged) {
+            groupName = sourceSelect[0]['name'];
+            groupId = sourceSelect[0]['id'];
+          } else {
+            groupName = groups[2][data.group];
+            groupId = data.group;
+          }
           break;
         case 'ZONE':
           sourceSelect = zones[0];
           sourceReverse = zones[1]
-          groupName = zones[2][data.group];
+          if (groupChanged) {
+            groupName = sourceSelect[0]['name'];
+            groupId = sourceSelect[0]['id'];
+          } else {
+            groupName = zones[2][data.group];
+            groupId = data.group;
+          }
           break;
         default:
       }
     }
-    return {sourceSelect,sourceReverse,groupName};
+    return {sourceSelect,sourceReverse,groupName,groupId};
   }
 
   handleActiveCheckbox = event => {
@@ -425,7 +447,6 @@ class ProfileRow extends Component {
           <Autocomplete
             style={{ width: 200 }}
             {...sourceSelectOptions}
-            id="group_select"
             inputValue={groupInput}
             value={groupValue_}
             renderInput={(params) => <TextField {...params} variant="standard"/>}
@@ -442,7 +463,6 @@ class ProfileRow extends Component {
           <Autocomplete
             style={{ width: 200 }}
             {...serviceSelectOptions}
-            id="service_select"
             inputValue={serviceName}
             value={serviceValue}
             renderInput={(params) => <TextField {...params} variant="standard"/>}
@@ -463,7 +483,6 @@ class ProfileRow extends Component {
             {stateText}
           </Button>
           <Menu
-            id="simple-menu"
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={this.handleStateButtonClose}
@@ -522,7 +541,6 @@ class ProfileRow extends Component {
         <TableCell padding='checkbox'>
           <TextField
             margin="none"
-            id="logPrefix"
             value={logPrefix}
             onChange={this.handleLogPrefixInput}
             disabled={!active}
@@ -531,7 +549,6 @@ class ProfileRow extends Component {
         <TableCell padding='checkbox'>
           <TextField
             margin="none"
-            id="comment"
             value={comment}
             onChange={this.handleCommentInput}
             disabled={!active}

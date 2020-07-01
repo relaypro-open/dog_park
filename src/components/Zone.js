@@ -523,7 +523,7 @@ class Zone extends Component {
 
     return (
       <div>
-        <Typography variant="title">Zone {this.state.zoneName}</Typography>
+        <Typography variant="subtitle1">Zone {this.state.zoneName}</Typography>
         <br />
         <form>
           <Typography variant="h4">IPv4 Addresses</Typography>

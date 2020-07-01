@@ -340,7 +340,7 @@ class Host extends Component {
       <div>
         <form autoComplete="off">
           <Paper className={this.props.classes.root} elevation={1}>
-            <Typography variant="title">
+            <Typography variant="subtitle1">
               <strong>Host:</strong> {this.state.hostName}
             </Typography>
             <br />
@@ -482,7 +482,7 @@ class Host extends Component {
         />
         <br/>
         <br/>
-        <Typography variant="title">
+        <Typography variant="subtitle1">
           <strong>Flan Discovered Apps</strong>
         </Typography>
         <br/>

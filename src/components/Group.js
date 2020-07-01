@@ -519,7 +519,7 @@ class Group extends Component {
       <div>
         <form autoComplete="off">
           <Paper className={this.props.classes.root} elevation={1}>
-            <Typography variant="title">
+            <Typography variant="subtitle1">
               <strong>Group:</strong>&nbsp;&nbsp;
               <TextField
                 margin="dense"

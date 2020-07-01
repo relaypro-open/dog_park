@@ -677,13 +677,13 @@ class Profile extends Component {
 
     return (
       <div>
-        <Typography variant="headline">
+        <Typography variant="h5">
           Profile {this.state.profileName}
         </Typography>
         <br />
         <br />
         <span className={classes.wrapper}>
-        <Typography variant="title">Inbound Rules</Typography>
+        <Typography variant="subtitle1">Inbound Rules</Typography>
         <Button
           className={classes.button}
           style={{marginLeft:'auto'}}
@@ -744,7 +744,7 @@ class Profile extends Component {
         </Paper>
         <br />
         <br />
-        <Typography variant="title">Outbound Rules</Typography>
+        <Typography variant="subtitle1">Outbound Rules</Typography>
         <Paper className={classes.root}>
           <Table className={classes.table}>
             <TableHead>
@@ -752,8 +752,8 @@ class Profile extends Component {
                 <TableCell />
                 <TableCell padding='none'>Active</TableCell>
                 <TableCell padding='none'>Interface</TableCell>
-                <TableCell padding='none'>Source</TableCell>
                 <TableCell padding='none'>Source Type</TableCell>
+                <TableCell padding='none'>Source</TableCell>
                 <TableCell padding='none'>Service</TableCell>
                 <TableCell padding='none'>Conn. State(s)</TableCell>
                 <TableCell padding='none'>Action</TableCell>
@@ -801,7 +801,7 @@ class Profile extends Component {
         </Button>
         <br />
         <br />
-        <Typography variant="title">Revision History</Typography>
+        <Typography variant="subtitle1">Revision History</Typography>
         <ProfileHistory
           profiles={this.props.profiles[this.state.profileName]}
         />

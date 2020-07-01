@@ -422,7 +422,7 @@ class Service extends Component {
 
     return (
       <div>
-        <Typography variant="title">
+        <Typography variant="subtitle1">
           Service {this.state.serviceName}
         </Typography>
         <br />

@@ -108,7 +108,7 @@ class CreateGroup extends Component {
       <div>
         <form autoComplete="off">
           <Paper className={this.props.classes.root} elevation={1}>
-            <Typography variant="headline" component="h2">
+            <Typography variant="h2" component="h2">
               Create a New Group
             </Typography>
             <Typography component="p">
