@@ -107,6 +107,13 @@ class ProfileRow extends Component {
 
   componentDidUpdate = prevProps => {
     if (this.props.data !== prevProps.data) {
+      if(this.props.data.group_type !== prevProps.data.group_type &&
+         this.props.data.order === prevProps.data.order) {
+        const { zones, groups, services, data } = this.props;
+        const { groupId } = this.getGroupType(zones, groups, data, true);
+        this.handleGroupSelect(groupId, this.props.data.group);
+      } else {
+
       this.setState((state, props) => {
         const { zones, groups, services, data } = props;
         let checkedNew: false;
@@ -130,11 +137,12 @@ class ProfileRow extends Component {
         });
 
         let groupChanged = false;
-        if(data.group_type !== prevProps.data.group_type && data.order === prevProps.data.order) {
-          groupChanged = true;
-        }
+        //if(this.props.data.order !== prevProps.data.order) {
+        //  groupChanged = true;
+        //}
 
         const { sourceSelect, sourceReverse, groupName, groupId} = this.getGroupType(zones, groups, data, groupChanged);
+
 
         return {
           active: data.active,
@@ -160,6 +168,7 @@ class ProfileRow extends Component {
           serviceValue: services[2][data.service]
         };
       })
+      }
     }
   };
 
@@ -168,8 +177,6 @@ class ProfileRow extends Component {
     let sourceReverse = {};
     let groupName = '';
     let groupId = '';
-
-    console.log(groupChanged);
 
     if (groups.length !== 0 && zones.length !== 0) {
       switch (data.group_type) {
@@ -421,6 +428,7 @@ class ProfileRow extends Component {
     } else if (groupName == null && groupValue != null) {
       groupInput = groupValue;
     }
+
 
     return (
       <TableRow style={{ zIndex: 10000000 }}>
