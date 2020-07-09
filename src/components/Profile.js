@@ -78,6 +78,7 @@ const TableBodySortable = SortableContainer(
     services,
     zones,
     handleActiveCheckbox,
+    handleTypeSelect,
     handleIntfSelect,
     handleGroupSelect,
     handleGroupTypeSelect,
@@ -86,6 +87,12 @@ const TableBodySortable = SortableContainer(
     handleLogCheckbox,
     handleLogPrefixInput,
     handleCommentInput,
+    handleConnLimitAboveInput,
+    handleConnLimitMaskInput,
+    handleRecentNameInput,
+    handleRecentMaskInput,
+    handleSecondsInput,
+    handleHitCountInput,
     handleAddProfile,
     handleRemoveProfile,
     handleStatesSelection,
@@ -104,6 +111,7 @@ const TableBodySortable = SortableContainer(
               zones={zones}
               services={services}
               handleActiveCheckbox={handleActiveCheckbox}
+              handleTypeSelect={handleTypeSelect}
               handleIntfSelect={handleIntfSelect}
               handleGroupSelect={handleGroupSelect}
               handleGroupTypeSelect={handleGroupTypeSelect}
@@ -112,6 +120,12 @@ const TableBodySortable = SortableContainer(
               handleLogCheckbox={handleLogCheckbox}
               handleLogPrefixInput={handleLogPrefixInput}
               handleCommentInput={handleCommentInput}
+              handleConnLimitAboveInput={handleConnLimitAboveInput}
+              handleConnLimitMaskInput={handleConnLimitMaskInput}
+              handleRecentNameInput={handleRecentNameInput}
+              handleRecentMaskInput={handleRecentMaskInput}
+              handleSecondsInput={handleSecondsInput}
+              handleHitCountInput={handleHitCountInput}
               handleAddProfile={handleAddProfile}
               handleRemoveProfile={handleRemoveProfile}
               handleStatesSelection={handleStatesSelection}
@@ -372,6 +386,21 @@ class Profile extends Component {
     }
   };
 
+  handleTypeSelect = (index, value, ruleType) => {
+    let newState = [];
+    if (ruleType === 'inbound') {
+      newState = update(this.state.inboundRules, {
+        [index]: { type: { $set: value } },
+      });
+      this.setState({ inboundRules: newState });
+    } else {
+      newState = update(this.state.outboundRules, {
+        [index]: { type: { $set: value } },
+      });
+      this.setState({ outboundRules: newState });
+    }
+  };
+
   handleIntfSelect = (index, value, ruleType) => {
     let newState = [];
     if (ruleType === 'inbound') {
@@ -487,6 +516,96 @@ class Profile extends Component {
     } else {
       newState = update(this.state.outboundRules, {
         [index]: { comment: { $set: value } },
+      });
+      this.setState({ outboundRules: newState });
+    }
+  };
+
+  handleConnLimitAboveInput= (index, value, ruleType) => {
+   let newState = [];
+   if (ruleType === 'inbound') {
+     newState = update(this.state.inboundRules, {
+       [index]: { conn_limit_above: { $set: Number(value) } },
+     });
+     this.setState({ inboundRules: newState });
+   } else {
+     newState = update(this.state.outboundRules, {
+       [index]: { conn_limit_above: { $set: Number(value) } },
+     });
+     this.setState({ outboundRules: newState });
+   }
+  };
+
+  handleConnLimitMaskInput = (index, value, ruleType) => {
+    let newState = [];
+    if (ruleType === 'inbound') {
+      newState = update(this.state.inboundRules, {
+        [index]: { conn_limit_mask: { $set: Number(value) } },
+      });
+      this.setState({ inboundRules: newState });
+    } else {
+      newState = update(this.state.outboundRules, {
+        [index]: { conn_limit_mask: { $set: Number(value) } },
+      });
+      this.setState({ outboundRules: newState });
+    }
+  };
+  
+  handleRecentNameInput = (index, value, ruleType) => {
+    let newState = [];
+    if (ruleType === 'inbound') {
+      newState = update(this.state.inboundRules, {
+        [index]: { recent_name: { $set: value } },
+      });
+      this.setState({ inboundRules: newState });
+    } else {
+      newState = update(this.state.outboundRules, {
+        [index]: { recent_name: { $set: value } },
+      });
+      this.setState({ outboundRules: newState });
+    }
+  };
+
+  handleRecentMaskInput = (index, value, ruleType) => {
+    let newState = [];
+    if (ruleType === 'inbound') {
+      newState = update(this.state.inboundRules, {
+        [index]: { recent_mask: { $set: value } },
+      });
+      this.setState({ inboundRules: newState });
+    } else {
+      newState = update(this.state.outboundRules, {
+        [index]: { recent_mask: { $set: value } },
+      });
+      this.setState({ outboundRules: newState });
+    }
+  };
+
+  handleSecondsInput = (index, value, ruleType) => {
+    let newState = [];
+    if (ruleType === 'inbound') {
+      newState = update(this.state.inboundRules, {
+        [index]: { seconds: { $set: Number(value) } },
+      });
+      this.setState({ inboundRules: newState });
+    } else {
+      newState = update(this.state.outboundRules, {
+        [index]: { seconds: { $set: Number(value) } },
+      });
+      this.setState({ outboundRules: newState });
+    }
+  };
+
+  handleHitCountInput = (index, value, ruleType) => {
+    let newState = [];
+    if (ruleType === 'inbound') {
+      newState = update(this.state.inboundRules, {
+        [index]: { hit_count: { $set: Number(value) } },
+      });
+      this.setState({ inboundRules: newState });
+    } else {
+      newState = update(this.state.outboundRules, {
+        [index]: { hist_count: { $set: Number(value) } },
       });
       this.setState({ outboundRules: newState });
     }
@@ -707,6 +826,7 @@ class Profile extends Component {
               <TableRow>
                 <TableCell />
                 <TableCell padding='none'>Active</TableCell>
+                <TableCell padding='none'>Type</TableCell>
                 <TableCell padding='none'>Interface</TableCell>
                 <TableCell padding='none'>Source Type</TableCell>
                 <TableCell padding='none'>Source</TableCell>
@@ -728,6 +848,7 @@ class Profile extends Component {
               services={this.props.services}
               useDragHandle
               handleActiveCheckbox={this.handleActiveCheckbox}
+              handleTypeSelect={this.handleTypeSelect}
               handleIntfSelect={this.handleIntfSelect}
               handleGroupSelect={this.handleGroupSelect}
               handleGroupTypeSelect={this.handleGroupTypeSelect}
@@ -736,6 +857,12 @@ class Profile extends Component {
               handleLogCheckbox={this.handleLogCheckbox}
               handleLogPrefixInput={this.handleLogPrefixInput}
               handleCommentInput={this.handleCommentInput}
+              handleConnLimitAboveInput={this.handleConnLimitAboveInput}
+              handleConnLimitMaskInput={this.handleConnLimitMaskInput}
+              handleRecentNameInput={this.handleRecentNameInput}
+              handleRecentMaskInput={this.handleRecentMaskInput}
+              handleSecondsInput={this.handleSecondsInput}
+              handleHitCountInput={this.handleHitCountInput}
               handleAddProfile={this.handleAddProfile}
               handleRemoveProfile={this.handleRemoveProfile}
               handleStatesSelection={this.handleStatesSelection}
@@ -751,9 +878,11 @@ class Profile extends Component {
               <TableRow>
                 <TableCell />
                 <TableCell padding='none'>Active</TableCell>
+                <TableCell padding='none'>Type</TableCell>
                 <TableCell padding='none'>Interface</TableCell>
                 <TableCell padding='none'>Source Type</TableCell>
                 <TableCell padding='none'>Source</TableCell>
+                <TableCell padding='none'>Source Type</TableCell>
                 <TableCell padding='none'>Service</TableCell>
                 <TableCell padding='none'>Conn. State(s)</TableCell>
                 <TableCell padding='none'>Action</TableCell>
@@ -772,6 +901,7 @@ class Profile extends Component {
               services={this.props.services}
               useDragHandle
               handleActiveCheckbox={this.handleActiveCheckbox}
+              handleTypeSelect={this.handleTypeSelect}
               handleIntfSelect={this.handleIntfSelect}
               handleGroupSelect={this.handleGroupSelect}
               handleGroupTypeSelect={this.handleGroupTypeSelect}
@@ -780,6 +910,12 @@ class Profile extends Component {
               handleLogCheckbox={this.handleLogCheckbox}
               handleLogPrefixInput={this.handleLogPrefixInput}
               handleCommentInput={this.handleCommentInput}
+              handleConnLimitAboveInput={this.handleConnLimitAboveInput}
+              handleConnLimitMaskInput={this.handleConnLimitMaskInput}
+              handleRecentNameInput={this.handleRecentNameInput}
+              handleRecentMaskInput={this.handleRecentMaskInput}
+              handleSecondsInput={this.handleSecondsInput}
+              handleHitCountInput={this.handleHitCountInput}
               handleAddProfile={this.handleAddProfile}
               handleRemoveProfile={this.handleRemoveProfile}
               handleStatesSelection={this.handleStatesSelection}
