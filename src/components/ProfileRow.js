@@ -71,6 +71,7 @@ class ProfileRow extends Component {
     this.state = {
       active: data.active,
       order: data.order,
+      type: data.type,
       intf: data.interface,
       group_type: data.group_type,
       group: data.group,
@@ -79,6 +80,12 @@ class ProfileRow extends Component {
       log: data.log,
       logPrefix: data.logPrefix,
       comment: data.comment,
+      connLimitAbove : ((data.conn_limit_above !== undefined) ? data.conn_limit_above : ''),
+      connLimitMask: ((data.conn_limit_mask !== undefined) ? data.conn_limit_mask : ''),
+      recentName: ((data.recent_name !== undefined) ? data.recent_name : ''),
+      recentMask: ((data.recent_mask !== undefined) ? data.recent_mask : ''),
+      seconds: ((data.seconds !== undefined) ? data.seconds : ''),
+      hitCount: ((data.hit_count !== undefined) ? data.hit_count : ''),
       states: data.states,
       anchorEl: null,
       checkedNew,
@@ -95,6 +102,7 @@ class ProfileRow extends Component {
 
     this.activeFunction = debounce(this.props.handleActiveCheckbox, 500);
     this.intfFunction = debounce(this.props.handleIntfSelect, 500);
+    this.typeFunction = debounce(this.props.handleTypeSelect, 0);
     this.groupTypeFunction = debounce(this.props.handleGroupTypeSelect, 0);
     this.groupFunction = debounce(this.props.handleGroupSelect, 0);
     this.serviceFunction = debounce(this.props.handleServiceSelect, 0);
@@ -103,13 +111,19 @@ class ProfileRow extends Component {
     this.logFunction = debounce(this.props.handleLogCheckbox, 500);
     this.logPrefixFunction = debounce(this.props.handleLogPrefixInput, 500);
     this.commentFunction = debounce(this.props.handleCommentInput, 500);
+    this.connLimitAboveFunction = debounce(this.props.handleConnLimitAboveInput, 500);
+    this.connLimitMaskFunction = debounce(this.props.handleConnLimitMaskInput, 500);
+    this.recentNameFunction = debounce(this.props.handleRecentNameInput, 500);
+    this.recentMaskFunction = debounce(this.props.handleRecentMaskInput, 500);
+    this.secondsFunction = debounce(this.props.handleSecondsInput, 500);
+    this.hitCountFunction = debounce(this.props.handleHitCountInput, 500);
   }
 
   componentDidUpdate = prevProps => {
     if (this.props.data !== prevProps.data) {
       if(this.props.data.group_type !== prevProps.data.group_type &&
          this.props.data.order === prevProps.data.order) {
-        const { zones, groups, services, data } = this.props;
+        const { zones, groups, data } = this.props;
         const { groupId } = this.getGroupType(zones, groups, data, true);
         this.handleGroupSelect(groupId, this.props.data.group);
       } else {
@@ -147,6 +161,7 @@ class ProfileRow extends Component {
         return {
           active: data.active,
           order: data.order,
+          type: data.type,
           intf: data.interface,
           group: groupId,
           group_type: data.group_type,
@@ -156,6 +171,12 @@ class ProfileRow extends Component {
           log: data.log,
           logPrefix: data.log_prefix,
           comment: data.comment,
+          connLimitAbove : ((data.conn_limit_above !== undefined) ? data.conn_limit_above : ''),
+          connLimitMask: ((data.conn_limit_mask !== undefined) ? data.conn_limit_mask : ''),
+          recentName: ((data.recent_name !== undefined) ? data.recent_name : ''),
+          recentMask: ((data.recent_mask !== undefined) ? data.recent_mask : ''),
+          seconds: ((data.seconds !== undefined) ? data.seconds : ''),
+          hitCount: ((data.hit_count !== undefined) ? data.hit_count : ''),
           checkedNew,
           checkedEstablished,
           checkedRelated,
@@ -219,6 +240,15 @@ class ProfileRow extends Component {
     this.activeFunction(
       this.props.pIndex,
       event.target.checked,
+      this.props.ruleType
+    );
+  };
+
+  handleTypeSelect = event => {
+    this.setState({ type: event.target.value });
+    this.typeFunction(
+      this.props.pIndex,
+      event.target.value,
       this.props.ruleType
     );
   };
@@ -317,6 +347,60 @@ class ProfileRow extends Component {
     );
   };
 
+  handleConnLimitAboveInput = event => {
+    this.setState({ connLimitAbove: event.target.value });
+    this.connLimitAboveFunction(
+      this.props.pIndex,
+      event.target.value,
+      this.props.ruleType
+    );
+  };
+
+  handleConnLimitMaskInput = event => {
+    this.setState({ connLimitMask: event.target.value });
+    this.connLimitMaskFunction(
+      this.props.pIndex,
+      event.target.value,
+      this.props.ruleType
+    );
+  };
+
+  handleRecentNameInput = event => {
+    this.setState({ recentName: event.target.value });
+    this.recentNameFunction(
+      this.props.pIndex,
+      event.target.value,
+      this.props.ruleType
+    );
+  };
+
+  handleRecentMaskInput = event => {
+    this.setState({ recentMask: event.target.value });
+    this.recentMaskFunction(
+      this.props.pIndex,
+      event.target.value,
+      this.props.ruleType
+    );
+  };
+
+  handleSecondsInput = event => {
+    this.setState({ seconds: event.target.value });
+    this.secondsFunction(
+      this.props.pIndex,
+      event.target.value,
+      this.props.ruleType
+    );
+  };
+
+  handleHitCountInput = event => {
+    this.setState({ hitCount: event.target.value });
+    this.hitCountFunction(
+      this.props.pIndex,
+      event.target.value,
+      this.props.ruleType
+    );
+  };
+
   handleAddProfile = event => {
     this.props.handleAddProfile(this.props.pIndex, this.props.ruleType);
   };
@@ -378,12 +462,20 @@ class ProfileRow extends Component {
     }
     const {
       active,
+      type,
       intf,
+      order,
       group_type,
       action,
       log,
       logPrefix,
       comment,
+      connLimitAbove,
+      connLimitMask,
+      recentName,
+      recentMask,
+      seconds,
+      hitCount,
       states,
       anchorEl,
       checkedNew,
@@ -429,14 +521,110 @@ class ProfileRow extends Component {
       groupInput = groupValue;
     }
 
+    let ruleType = "";
+    if (type === 'CONNLIMIT') {
+      ruleType = (
+        <TableRow style={{ zIndex: 10000000 }} id={"connLimitRow_" + order}>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+          <TableCell padding='50' id={"connLimitCell1_" + order}>
+            <TextField
+              helperText="connLimitAbove"
+              placeholder="10"
+              margin="none"
+              id={"connLimitAbove_" + order}
+              value={connLimitAbove}
+              onChange={this.handleConnLimitAboveInput}
+              disabled={!active}
+            />
+          </TableCell>
+          <TableCell padding='50' id={"connLimitCell2_" + order}>
+            <TextField
+              helperText="connLimitMask"
+              placeholder="32"
+              margin="none"
+              id={"connLimitMask_" + order}
+              value={connLimitMask}
+              onChange={this.handleConnLimitMaskInput}
+              disabled={!active}
+            />
+          </TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+        </TableRow>
+      );
+    } else if( type === 'RECENT') {
+      ruleType = (
+        <TableRow style={{ zIndex: 10000000 }} id={"recentRow_" + order}>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+          <TableCell padding='50' id={"recentCell1_" + order}>
+            <TextField
+              helperText="recentName"
+              placeholder="DEFAULT"
+              defaultValue="DEFAULT"
+              margin="none"
+              id={"recentName_" + order}
+              value={recentName}
+              onChange={this.handleRecentNameInput}
+              disabled={!active}
+            />
+          </TableCell>
+          <TableCell padding='50' id={"recentCell2_" + order}>
+            <TextField
+              helperText="recentMask"
+              placeholder="255.255.255.255"
+              margin="none"
+              id={"recentMask_" + order}
+              value={recentMask}
+              onChange={this.handleRecentMaskInput}
+              disabled={!active}
+            />
+          </TableCell>
+          <TableCell padding='50' id={"recentCell3_" + order}>
+            <TextField
+              helperText="seconds"
+              placeholder="60"
+              margin="none"
+              id={"seconds_" + order}
+              value={seconds}
+              onChange={this.handleSecondsInput}
+              disabled={!active}
+            />
+          </TableCell>
+          <TableCell padding='50' id={"recentCell4_" + order}>
+            <TextField
+              helperText="hitCount"
+              placeholder="100"
+              margin="none"
+              id={"hitCount_" + order}
+              value={hitCount}
+              onChange={this.handleHitCountInput}
+              disabled={!active}
+            />
+          </TableCell>
+          <TableCell></TableCell>
+          <TableCell></TableCell>
+        </TableRow>
+      );
+    }
 
     return (
+      <React.Fragment>
       <TableRow style={{ zIndex: 10000000 }}>
         <TableCell>
           <DragHandle />
         </TableCell>
         <TableCell padding='none'>
           <Checkbox checked={active} onChange={this.handleActiveCheckbox} />
+        </TableCell>
+        <TableCell padding='checkbox' id={type + "TableCell"}>
+          <Select value={type} onChange={this.handleTypeSelect} disabled={!active}>
+            <MenuItem value={'BASIC'}>BASIC</MenuItem>
+            <MenuItem value={'CONNLIMIT'}>CONNLIMIT</MenuItem>
+            <MenuItem value={'RECENT'}>RECENT</MenuItem>
+          </Select>
+          {ruleType}
         </TableCell>
         <TableCell padding='none'>
           <Select value={interf} onChange={this.handleIntfSelect} disabled={!active}>
@@ -580,6 +768,7 @@ class ProfileRow extends Component {
           </Fab>
         </TableCell>
       </TableRow>
+    </React.Fragment>
     );
   }
 }
