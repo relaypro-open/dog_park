@@ -80,6 +80,7 @@ const TableBodySortable = SortableContainer(
     handleActiveCheckbox,
     handleTypeSelect,
     handleIntfSelect,
+    handleEnvironmentSelect,
     handleGroupSelect,
     handleGroupTypeSelect,
     handleServiceSelect,
@@ -87,6 +88,7 @@ const TableBodySortable = SortableContainer(
     handleLogCheckbox,
     handleLogPrefixInput,
     handleCommentInput,
+    handleExternalInput,
     handleConnLimitAboveInput,
     handleConnLimitMaskInput,
     handleRecentNameInput,
@@ -113,6 +115,7 @@ const TableBodySortable = SortableContainer(
               handleActiveCheckbox={handleActiveCheckbox}
               handleTypeSelect={handleTypeSelect}
               handleIntfSelect={handleIntfSelect}
+              handleEnvironmentSelect={handleEnvironmentSelect}
               handleGroupSelect={handleGroupSelect}
               handleGroupTypeSelect={handleGroupTypeSelect}
               handleServiceSelect={handleServiceSelect}
@@ -120,6 +123,7 @@ const TableBodySortable = SortableContainer(
               handleLogCheckbox={handleLogCheckbox}
               handleLogPrefixInput={handleLogPrefixInput}
               handleCommentInput={handleCommentInput}
+              handleExternalInput={handleExternalInput}
               handleConnLimitAboveInput={handleConnLimitAboveInput}
               handleConnLimitMaskInput={handleConnLimitMaskInput}
               handleRecentNameInput={handleRecentNameInput}
@@ -435,6 +439,21 @@ class Profile extends Component {
     }
   };
 
+  handleEnvironmentSelect = (index, value, ruleType) => {
+    let newState = [];
+    if (ruleType === 'inbound') {
+      newState = update(this.state.inboundRules, {
+        [index]: { environment: { $set: value } },
+      });
+      this.setState({ inboundRules: newState });
+    } else {
+      newState = update(this.state.outboundRules, {
+        [index]: { environment: { $set: value } },
+      });
+      this.setState({ outboundRules: newState });
+    }
+  };
+
   handleGroupSelect = (index, value, ruleType) => {
     let newState = [];
     if (ruleType === 'inbound') {
@@ -505,6 +524,21 @@ class Profile extends Component {
     } else {
       newState = update(this.state.outboundRules, {
         [index]: { log_prefix: { $set: value } },
+      });
+      this.setState({ outboundRules: newState });
+    }
+  };
+
+  handleExternalInput = (index, value, ruleType) => {
+    let newState = [];
+    if (ruleType === 'inbound') {
+      newState = update(this.state.inboundRules, {
+        [index]: { group: { $set: value } },
+      });
+      this.setState({ inboundRules: newState });
+    } else {
+      newState = update(this.state.outboundRules, {
+        [index]: { group: { $set: value } },
       });
       this.setState({ outboundRules: newState });
     }
@@ -856,6 +890,7 @@ class Profile extends Component {
                 <TableCell padding='none'>Active</TableCell>
                 <TableCell padding='none'>Type</TableCell>
                 <TableCell padding='none'>Interface</TableCell>
+                <TableCell padding='none'>Environment</TableCell>
                 <TableCell padding='none'>Source Type</TableCell>
                 <TableCell padding='none'>Source</TableCell>
                 <TableCell padding='none'>Service</TableCell>
@@ -878,6 +913,7 @@ class Profile extends Component {
               handleActiveCheckbox={this.handleActiveCheckbox}
               handleTypeSelect={this.handleTypeSelect}
               handleIntfSelect={this.handleIntfSelect}
+              handleEnvironmentSelect={this.handleEnvironmentSelect}
               handleGroupSelect={this.handleGroupSelect}
               handleGroupTypeSelect={this.handleGroupTypeSelect}
               handleServiceSelect={this.handleServiceSelect}
@@ -885,6 +921,7 @@ class Profile extends Component {
               handleLogCheckbox={this.handleLogCheckbox}
               handleLogPrefixInput={this.handleLogPrefixInput}
               handleCommentInput={this.handleCommentInput}
+              handleExternalInput={this.handleExternalInput}
               handleConnLimitAboveInput={this.handleConnLimitAboveInput}
               handleConnLimitMaskInput={this.handleConnLimitMaskInput}
               handleRecentNameInput={this.handleRecentNameInput}
@@ -908,6 +945,7 @@ class Profile extends Component {
                 <TableCell padding='none'>Active</TableCell>
                 <TableCell padding='none'>Type</TableCell>
                 <TableCell padding='none'>Interface</TableCell>
+                <TableCell padding='none'>Environment</TableCell>
                 <TableCell padding='none'>Source Type</TableCell>
                 <TableCell padding='none'>Source</TableCell>
                 <TableCell padding='none'>Source Type</TableCell>
@@ -931,6 +969,7 @@ class Profile extends Component {
               handleActiveCheckbox={this.handleActiveCheckbox}
               handleTypeSelect={this.handleTypeSelect}
               handleIntfSelect={this.handleIntfSelect}
+              handleEnvironmentSelect={this.handleEnvironmentSelect}
               handleGroupSelect={this.handleGroupSelect}
               handleGroupTypeSelect={this.handleGroupTypeSelect}
               handleServiceSelect={this.handleServiceSelect}
@@ -938,6 +977,7 @@ class Profile extends Component {
               handleLogCheckbox={this.handleLogCheckbox}
               handleLogPrefixInput={this.handleLogPrefixInput}
               handleCommentInput={this.handleCommentInput}
+              handleExternalInput={this.handleExternalInput}
               handleConnLimitAboveInput={this.handleConnLimitAboveInput}
               handleConnLimitMaskInput={this.handleConnLimitMaskInput}
               handleRecentNameInput={this.handleRecentNameInput}
