@@ -252,6 +252,52 @@ class Profile extends Component {
             profileVersion = '';
           }
 
+          if (inboundRules.length === 0) {
+            inboundRules.push({
+              order: 1,
+              active: false,
+              states: [],
+              environments: [],
+              interface: 'ANY',
+              group: 'any',
+              group_type: 'ANY',
+              service: 'any',
+              action: 'ACCEPT',
+              log: false,
+              log_prefix: '',
+              comment: '',
+              type: 'BASIC',
+              connLimitAbove : '',
+              connLimitMask: '',
+              recentName: '',
+              recentMask: '',
+              seconds: '',
+              hitCount: '',
+            });
+          };
+          if (outboundRules.length === 0) {
+            outboundRules.push({
+              order: 1,
+              active: false,
+              states: [],
+              environments: [],
+              interface: 'ANY',
+              group: 'any',
+              group_type: 'ANY',
+              service: 'any',
+              action: 'ACCEPT',
+              log: false,
+              log_prefix: '',
+              comment: '',
+              type: 'BASIC',
+              connLimitAbove : '',
+              connLimitMask: '',
+              recentName: '',
+              recentMask: '',
+              seconds: '',
+              hitCount: '',
+            });
+          }
           return {
             profileName: profile.name,
             profileId: profile.id,
@@ -948,7 +994,6 @@ class Profile extends Component {
                 <TableCell padding='none'>Environment</TableCell>
                 <TableCell padding='none'>Source Type</TableCell>
                 <TableCell padding='none'>Source</TableCell>
-                <TableCell padding='none'>Source Type</TableCell>
                 <TableCell padding='none'>Service</TableCell>
                 <TableCell padding='none'>Conn. State(s)</TableCell>
                 <TableCell padding='none'>Action</TableCell>
