@@ -263,12 +263,12 @@ class Profile extends Component {
               log_prefix: '',
               comment: '',
               type: 'BASIC',
-              connLimitAbove : '',
-              connLimitMask: '',
-              recentName: '',
-              recentMask: '',
-              seconds: '',
-              hitCount: '',
+              //connLimitAbove : '',
+              //connLimitMask: '',
+              //recentName: '',
+              //recentMask: '',
+              //seconds: '',
+              //hitCount: '',
             });
           };
           if (outboundRules.length === 0) {
@@ -286,12 +286,12 @@ class Profile extends Component {
               log_prefix: '',
               comment: '',
               type: 'BASIC',
-              connLimitAbove : '',
-              connLimitMask: '',
-              recentName: '',
-              recentMask: '',
-              seconds: '',
-              hitCount: '',
+              //connLimitAbove : '',
+              //connLimitMask: '',
+              //recentName: '',
+              //recentMask: '',
+              //seconds: '',
+              //hitCount: '',
             });
           }
           return {
@@ -438,14 +438,28 @@ class Profile extends Component {
 
   handleTypeSelect = (index, value, ruleType) => {
     let newState = [];
+    let actions = {};
+    if (value === "CONNLIMIT") {
+      actions = {type: { $set: value},
+                 $unset: ['recent_name', 'recent_mask', 'hit_count', 'seconds']
+      }
+    } else if (value === "RECENT") {
+      actions = {type: { $set: value},
+                 $unset: ['conn_limit_above', 'conn_limit_mask']
+      }
+    } else {
+      actions = {type: { $set: value},
+                 $unset: ['conn_limit_above', 'conn_limit_mask', 'recent_name', 'recent_mask', 'hit_count', 'seconds']
+      }
+    }
     if (ruleType === 'inbound') {
       newState = update(this.state.inboundRules, {
-        [index]: { type: { $set: value } },
+        [index]: actions,
       });
       this.setState({ inboundRules: newState });
     } else {
       newState = update(this.state.outboundRules, {
-        [index]: { type: { $set: value } },
+        [index]: actions,
       });
       this.setState({ outboundRules: newState });
     }
@@ -693,12 +707,12 @@ class Profile extends Component {
         log_prefix: '',
         comment: '',
         type: 'BASIC',
-        connLimitAbove : '',
-        connLimitMask: '',
-        recentName: '',
-        recentMask: '',
-        seconds: '',
-        hitCount: '',
+        //connLimitAbove : '',
+        //connLimitMask: '',
+        //recentName: '',
+        //recentMask: '',
+        //seconds: '',
+        //hitCount: '',
       });
       this.setState({ inboundRules: newState });
     } else {
@@ -717,12 +731,12 @@ class Profile extends Component {
         log_prefix: '',
         comment: '',
         type: 'BASIC',
-        connLimitAbove : '',
-        connLimitMask: '',
-        recentName: '',
-        recentMask: '',
-        seconds: '',
-        hitCount: '',
+        //connLimitAbove : '',
+        //connLimitMask: '',
+        //recentName: '',
+        //recentMask: '',
+        //seconds: '',
+        //hitCount: '',
       });
       this.setState({ outboundRules: newState });
     }
@@ -748,12 +762,12 @@ class Profile extends Component {
           log_prefix: '',
           comment: '',
           type: 'BASIC',
-          connLimitAbove : '',
-          connLimitMask: '',
-          recentName: '',
-          recentMask: '',
-          seconds: '',
-          hitCount: '',
+          //connLimitAbove : '',
+          //connLimitMask: '',
+          //recentName: '',
+          //recentMask: '',
+          //seconds: '',
+          //hitCount: '',
         });
       }
       this.setState({ inboundRules: newState });
@@ -775,12 +789,12 @@ class Profile extends Component {
           log_prefix: '',
           comment: '',
           type: 'BASIC',
-          connLimitAbove : '',
-          connLimitMask: '',
-          recentName: '',
-          recentMask: '',
-          seconds: '',
-          hitCount: '',
+          //connLimitAbove : '',
+          //connLimitMask: '',
+          //recentName: '',
+          //recentMask: '',
+          //seconds: '',
+          //hitCount: '',
         });
       }
       this.setState({ outboundRules: newState });
