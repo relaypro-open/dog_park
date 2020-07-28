@@ -68,7 +68,8 @@ class Groups extends Component {
   createGroup = () => {
     if (
       this.state.createGroupName === '' ||
-      this.state.createGroupProfile === ''
+      this.state.createGroupProfile === '' ||
+      this.state.createGroupName in this.props.groups[1]
     ) {
       this.setState({ groupErrorOpen: true });
       return;
@@ -281,8 +282,8 @@ class Groups extends Component {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
-              You have not entered a name or defined a profile to use. Please
-              fix these before creating the group.
+              You have not entered a valid/unused group name or defined a profile to use. Please
+              make sure you enter all fields and create a group name that does not already exist.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
