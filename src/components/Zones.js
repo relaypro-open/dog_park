@@ -45,6 +45,7 @@ class Zones extends Component {
     this.state = {
       createZoneName: '',
       createZoneProfile: '',
+      createZoneStatus: '',
       createZoneOpen: false,
     };
   }
@@ -57,32 +58,37 @@ class Zones extends Component {
   }
 
   createZone = () => {
-    this.setState({ isLoading: true });
+    if (this.state.createZoneName === '' ||
+        this.state.createZoneName in this.props.zones[1]) {
+          this.setState({createZoneStatus: "Please enter a valid/unused zone name!"});
+    } else {
+      this.setState({ isLoading: true });
 
-    api
-      .post('zone', {
-        name: this.state.createZoneName,
-        ipv4_addresses: [],
-        ipv6_addresses: [],
-      })
-      .then(response => {
-        if (response.status === 201) {
-          let re = /\/api\/zone\/(.+)/;
-          this.setState({ isLoading: false });
-          let zoneId = response.headers.location;
-          let newZoneId = zoneId.replace(re, '$1');
-          return newZoneId;
-        } else {
-          throw Error(response.statusText);
-        }
-      })
-      .then(zoneId => {
-        this.setState({ createZoneOpen: false });
-        this.setState({ createZoneName: '' });
-        this.props.fetchZones();
-        this.props.history.push('/zone/' + zoneId);
-      })
-      .catch(() => this.setState({ hasErrored: true }));
+      api
+        .post('zone', {
+          name: this.state.createZoneName,
+          ipv4_addresses: [],
+          ipv6_addresses: [],
+        })
+        .then(response => {
+          if (response.status === 201) {
+            let re = /\/api\/zone\/(.+)/;
+            this.setState({ isLoading: false });
+            let zoneId = response.headers.location;
+            let newZoneId = zoneId.replace(re, '$1');
+            return newZoneId;
+          } else {
+            throw Error(response.statusText);
+          }
+        })
+        .then(zoneId => {
+          this.setState({ createZoneOpen: false });
+          this.setState({ createZoneName: '' });
+          this.props.fetchZones();
+          this.props.history.push('/zone/' + zoneId);
+        })
+        .catch(() => this.setState({ hasErrored: true }));
+    }
   };
 
   handleCreateZoneButton = () => {
@@ -90,7 +96,12 @@ class Zones extends Component {
   };
 
   handleCreateZoneClose = () => {
-    this.setState({ createZoneOpen: false });
+    this.setState((state, props) => {
+      return {
+        createZoneOpen: false,
+        createZoneStatus: '',
+      }
+    });
   };
 
   handleCreateZoneName = event => {

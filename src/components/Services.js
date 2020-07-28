@@ -61,7 +61,8 @@ class Services extends Component {
   }
 
   createService = () => {
-    if (this.state.isErrored || this.state.createServiceName === '') {
+    if (this.state.isErrored || this.state.createServiceName === '' ||
+        this.state.createServiceName in this.props.services[1]) {
       this.setState({ serviceErrorOpen: true });
       return;
     }
@@ -246,7 +247,7 @@ class Services extends Component {
           <DialogContent>
             <DialogContentText>
               You have invalid port/port ranges defined or you have not entered
-              a name. Please fix these before updating service.
+              a unique name. Please fix these before updating service.
             </DialogContentText>
           </DialogContent>
           <DialogActions>

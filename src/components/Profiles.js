@@ -31,6 +31,7 @@ class Profiles extends Component {
     this.state = {
       createProfileName: '',
       createProfileOpen: false,
+      profileErrorOpen: false,
     };
   }
 
@@ -42,66 +43,77 @@ class Profiles extends Component {
   }
 
   createProfile = () => {
-    this.setState({ isLoading: true });
+    if (
+      this.state.createProfileName in this.props.profiles
+    ) {
+      this.setState({ profileErrorOpen: true });
+    } else {
+      this.setState({ isLoading: true });
 
-    api
-      .post('profile', {
-        name: this.state.createProfileName,
-        rules: {
-          inbound: [
-            {
-              order: 1,
-              active: false,
-              states: [],
-              environments: [],
-              interface: 'ANY',
-              group: 'any',
-              group_type: 'ANY',
-              service: 'any',
-              action: 'ACCEPT',
-              log: false,
-              log_prefix: '',
-              comment: '',
-              type: 'BASIC',
-            },
-          ],
-          outbound: [
-            {
-              order: 1,
-              active: false,
-              states: [],
-              environments: [],
-              interface: 'ANY',
-              group: 'any',
-              group_type: 'ANY',
-              service: 'any',
-              action: 'ACCEPT',
-              log: false,
-              log_prefix: '',
-              comment: '',
-              type: 'BASIC',
-            },
-          ],
-        },
-      })
-      .then(response => {
-        if (response.status === 201) {
-          let re = /\/api\/profile\/(.+)/;
-          this.setState({ isLoading: false });
-          let profileId = response.headers.location;
-          let newProfileId = profileId.replace(re, '$1');
-          return newProfileId;
-        } else {
-          throw Error(response.statusText);
-        }
-      })
-      .then(profileId => {
-        this.setState({ createProfileOpen: false });
-        this.setState({ createProfileName: '' });
-        this.props.history.push('/profile/' + profileId);
-        this.props.fetchProfiles();
-      })
-      .catch(() => this.setState({ hasErrored: true }));
+      api
+        .post('profile', {
+          name: this.state.createProfileName,
+          rules: {
+            inbound: [
+              {
+                order: 1,
+                active: false,
+                states: [],
+                environments: [],
+                interface: 'ANY',
+                group: 'any',
+                group_type: 'ANY',
+                service: 'any',
+                action: 'ACCEPT',
+                log: false,
+                log_prefix: '',
+                comment: '',
+                type: 'BASIC',
+              },
+            ],
+            outbound: [
+              {
+                order: 1,
+                active: false,
+                states: [],
+                environments: [],
+                interface: 'ANY',
+                group: 'any',
+                group_type: 'ANY',
+                service: 'any',
+                action: 'ACCEPT',
+                log: false,
+                log_prefix: '',
+                comment: '',
+                type: 'BASIC',
+              },
+            ],
+          },
+        })
+        .then(response => {
+          if (response.status === 201) {
+            let re = /\/api\/profile\/(.+)/;
+            this.setState({ isLoading: false });
+            let profileId = response.headers.location;
+            let newProfileId = profileId.replace(re, '$1');
+            return newProfileId;
+          } else {
+            throw Error(response.statusText);
+          }
+        })
+        .then(profileId => {
+          this.setState({ createProfileOpen: false });
+          this.setState({ createProfileName: '' });
+          this.props.history.push('/profile/' + profileId);
+          this.props.fetchProfiles();
+        })
+        .catch(() => this.setState({ hasErrored: true }));
+      }
+  };
+
+
+  handleProfileErrorButton = () => {
+    this.setState({ profileErrorOpen: false });
   };
 
   handleCreateProfileOpen = () => {
@@ -169,6 +181,25 @@ class Profiles extends Component {
               Create Profile
             </Button>
             &nbsp;&nbsp;{this.state.createProfileStatus}
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={this.state.profileErrorOpen}
+          onClose={this.handleProfileErrorButton}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">
+            Profile Validation Errors
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              The profile name you entered already exists, please choose a different name.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleProfileErrorButton} color="primary">
+              Ok
+            </Button>
           </DialogActions>
         </Dialog>
         <Fab
