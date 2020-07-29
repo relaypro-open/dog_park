@@ -73,6 +73,7 @@ class ProfileRow extends Component {
       order: data.order,
       type: data.type,
       intf: data.interface,
+      environment: data.environment,
       group_type: data.group_type,
       group: data.group,
       service: data.service,
@@ -97,11 +98,13 @@ class ProfileRow extends Component {
       groupName,
       groupValue: groupName,
       serviceName: services[2][data.service],
-      serviceValue: services[2][data.service]
+      serviceValue: services[2][data.service],
+      externalName: data.group
     };
 
     this.activeFunction = debounce(this.props.handleActiveCheckbox, 500);
     this.intfFunction = debounce(this.props.handleIntfSelect, 500);
+    this.environmentFunction = debounce(this.props.handleEnvironmentSelect, 0);
     this.typeFunction = debounce(this.props.handleTypeSelect, 0);
     this.groupTypeFunction = debounce(this.props.handleGroupTypeSelect, 0);
     this.groupFunction = debounce(this.props.handleGroupSelect, 0);
@@ -111,6 +114,7 @@ class ProfileRow extends Component {
     this.logFunction = debounce(this.props.handleLogCheckbox, 500);
     this.logPrefixFunction = debounce(this.props.handleLogPrefixInput, 500);
     this.commentFunction = debounce(this.props.handleCommentInput, 500);
+    this.externalFunction = debounce(this.props.handleExternalInput, 0);
     this.connLimitAboveFunction = debounce(this.props.handleConnLimitAboveInput, 500);
     this.connLimitMaskFunction = debounce(this.props.handleConnLimitMaskInput, 500);
     this.recentNameFunction = debounce(this.props.handleRecentNameInput, 500);
@@ -123,9 +127,15 @@ class ProfileRow extends Component {
     if (this.props.data !== prevProps.data) {
       if(this.props.data.group_type !== prevProps.data.group_type &&
          this.props.data.order === prevProps.data.order) {
-        const { zones, groups, data } = this.props;
-        const { groupId } = this.getGroupType(zones, groups, data, true);
-        this.handleGroupSelect(groupId, this.props.data.group);
+        if(this.props.environment !== prevProps.data.environment) {
+          if(this.props.environment != 'local') {
+            const { externalName } = "";
+          } else {
+            const { zones, groups, data } = this.props;
+            const { groupId } = this.getGroupType(zones, groups, data, true);
+            this.handleGroupSelect(groupId, this.props.data.group);
+          }
+        }
       } else {
 
       this.setState((state, props) => {
@@ -163,6 +173,7 @@ class ProfileRow extends Component {
           order: data.order,
           type: data.type,
           intf: data.interface,
+          environment: data.environment,
           group: groupId,
           group_type: data.group_type,
           service: data.service,
@@ -186,7 +197,8 @@ class ProfileRow extends Component {
           groupName,
           groupValue: groupName,
           serviceName: services[2][data.service],
-          serviceValue: services[2][data.service]
+          serviceValue: services[2][data.service],
+          externalName: groupName
         };
       })
       }
@@ -271,6 +283,15 @@ class ProfileRow extends Component {
     );
   };
 
+  handleEnvironmentSelect = event => {
+    this.setState({ environment: event.target.value });
+    this.environmentFunction(
+      this.props.pIndex,
+      event.target.value,
+      this.props.ruleType
+    );
+  };
+
   handleGroupSelect = (value, prevVal) => {
     if (value != null) {
       this.setState({ group: value });
@@ -290,6 +311,15 @@ class ProfileRow extends Component {
     } else {
       this.setState({ groupName: value });
     }
+  };
+
+  handleExternalInput = event => {
+    this.setState({ externalName: event.target.value });
+    this.externalFunction(
+      this.props.pIndex,
+      event.target.value,
+      this.props.ruleType
+    );
   };
 
   handleServiceSelect = value => {
@@ -463,9 +493,11 @@ class ProfileRow extends Component {
     const {
       active,
       type,
+      environment,
       intf,
       order,
       group_type,
+      group,
       action,
       log,
       logPrefix,
@@ -487,7 +519,8 @@ class ProfileRow extends Component {
       groupName,
       groupValue,
       serviceName,
-      serviceValue
+      serviceValue,
+      externalName
     } = this.state;
 
     let interf = intf;
@@ -510,7 +543,7 @@ class ProfileRow extends Component {
       options: services[0].map(option => option.name)
     };
 
-
+    //let externalName = group;
     let groupInput = groupName;
     let groupValue_ = groupValue;
 
@@ -609,6 +642,39 @@ class ProfileRow extends Component {
       );
     }
 
+    let groupSelect = "";
+    if (environment === 'local') {
+      groupSelect = (
+        <TableCell padding='none'>
+          <Autocomplete
+            style={{ width: 200 }}
+            {...sourceSelectOptions}
+            inputValue={groupInput}
+            value={groupValue_}
+            renderInput={(params) => <TextField {...params} variant="standard"/>}
+            onChange={(event, value) => {
+              this.handleGroupSelect(sourceReverse[value], groupValue_);
+            }}
+            onInputChange={(event, value) => {
+              this.handleGroupInput(value);
+            }}
+            disabled={!active}
+          />
+        </TableCell>
+        );
+    } else if( environment !== 'local') {
+      groupSelect = (
+        <TableCell padding='checkbox'>
+          <TextField
+            margin="none"
+            value={externalName}
+            onChange={this.handleExternalInput}
+            disabled={!active}
+          />
+        </TableCell>
+      );
+    }
+
     return (
       <React.Fragment>
       <TableRow style={{ zIndex: 10000000 }}>
@@ -633,28 +699,22 @@ class ProfileRow extends Component {
           </Select>
         </TableCell>
         <TableCell padding='none'>
+          <Select value={environment} onChange={this.handleEnvironmentSelect} disabled={!active}>
+            <MenuItem value={'local'}>local</MenuItem>
+            <MenuItem value={'q1'}>q1</MenuItem>
+            <MenuItem value={'p1'}>p1</MenuItem>
+            <MenuItem value={'d1'}>d1</MenuItem>
+            <MenuItem value={'d2'}>d2</MenuItem>
+          </Select>
+        </TableCell>
+        <TableCell padding='none'>
           <Select value={group_type} onChange={this.handleGroupTypeSelect} disabled={!active}>
             <MenuItem value={'ANY'}>any</MenuItem>
             <MenuItem value={'ROLE'}>group</MenuItem>
             <MenuItem value={'ZONE'}>zone</MenuItem>
           </Select>
         </TableCell>
-        <TableCell padding='none'>
-          <Autocomplete
-            style={{ width: 200 }}
-            {...sourceSelectOptions}
-            inputValue={groupInput}
-            value={groupValue_}
-            renderInput={(params) => <TextField {...params} variant="standard"/>}
-            onChange={(event, value) => {
-              this.handleGroupSelect(sourceReverse[value], groupValue_);
-            }}
-            onInputChange={(event, value) => {
-              this.handleGroupInput(value);
-            }}
-            disabled={!active}
-          />
-        </TableCell>
+        {groupSelect}
         <TableCell padding='checkbox'>
           <Autocomplete
             style={{ width: 200 }}
