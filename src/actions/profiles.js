@@ -1,6 +1,6 @@
 import { api } from '../api';
 import { createActions } from 'redux-actions';
-import { groupsFetchData } from './groups';
+import { environmentsFetchData } from './environments';
 
 export const {
   profilesHasErrored,
@@ -26,7 +26,7 @@ export function profilesFetchData() {
         return response.data;
       })
       .then(profiles => dispatch(profilesFetchDataSuccess(profiles)))
-      .then(() => dispatch(groupsFetchData()))
+      .then(() => dispatch(environmentsFetchData()))
       .catch(() => dispatch(profilesHasErrored(true)));
   };
 }

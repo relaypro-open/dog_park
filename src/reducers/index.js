@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import { groupsIsLoading, groupsHasErrored, groups } from './groups';
+import { environmentsIsLoading, environmentsHasErrored, environments, environmentAdd } from './environments';
 import { selectedTab } from './app';
 import { hostsHasErrored, hostsIsLoading, hosts } from './hosts';
 import { flanIpsHasErrored, flanIpsIsLoading, flanIps } from './flan_ips';
@@ -19,6 +20,10 @@ export default combineReducers({
   groupsHasErrored,
   groupsIsLoading,
   groups,
+  environmentsHasErrored,
+  environmentsIsLoading,
+  environmentAdd,
+  environments,
   groupHasErrored,
   groupIsLoading,
   group,

@@ -30,11 +30,11 @@ import {
   TableHead,
   TableRow,
 } from '@material-ui/core';
-import { SortableContainer} from 'react-sortable-hoc';
+import { SortableContainer } from 'react-sortable-hoc';
 import arrayMove from 'array-move';
 import update from 'immutability-helper';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     width: '100%',
     marginTop: theme.spacing(3),
@@ -67,13 +67,15 @@ const styles = theme => ({
   },
   cellWidth: {
     width: '50px',
-  }
+  },
 });
 
 const TableBodySortable = SortableContainer(
   ({
     children,
     ruleType,
+    environments,
+    environmentAdd,
     groups,
     services,
     zones,
@@ -88,7 +90,6 @@ const TableBodySortable = SortableContainer(
     handleLogCheckbox,
     handleLogPrefixInput,
     handleCommentInput,
-    handleExternalInput,
     handleConnLimitAboveInput,
     handleConnLimitMaskInput,
     handleRecentNameInput,
@@ -105,10 +106,12 @@ const TableBodySortable = SortableContainer(
           return (
             <ProfileRow
               index={index}
-              key={"profileTable" + index}
+              key={'profileTable' + index}
               pIndex={index}
               ruleType={ruleType}
               data={row}
+              environments={environments}
+              environmentAdd={environmentAdd}
               groups={groups}
               zones={zones}
               services={services}
@@ -123,7 +126,6 @@ const TableBodySortable = SortableContainer(
               handleLogCheckbox={handleLogCheckbox}
               handleLogPrefixInput={handleLogPrefixInput}
               handleCommentInput={handleCommentInput}
-              handleExternalInput={handleExternalInput}
               handleConnLimitAboveInput={handleConnLimitAboveInput}
               handleConnLimitMaskInput={handleConnLimitMaskInput}
               handleRecentNameInput={handleRecentNameInput}
@@ -179,7 +181,7 @@ class Profile extends Component {
     this.props.handleSelectedTab(1);
   };
 
-  componentDidUpdate = prevProps => {
+  componentDidUpdate = (prevProps) => {
     if (this.props.location !== prevProps.location) {
       this.setState({ saveProfileOpen: false });
       this.setState({ deleteProfileOpen: false });
@@ -196,10 +198,10 @@ class Profile extends Component {
         name: this.state.cloneProfileName,
         rules: {
           inbound: this.state.inboundRules,
-          outbound: this.state.outboundRules
+          outbound: this.state.outboundRules,
         },
       })
-      .then(response => {
+      .then((response) => {
         if (response.status === 201) {
           let re = /\/api\/profile\/(.+)/;
           this.setState({ isLoading: false });
@@ -210,7 +212,7 @@ class Profile extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(profileId => {
+      .then((profileId) => {
         this.setState({ cloneProfileOpen: false });
         this.setState({ cloneProfileName: '' });
         this.props.history.push('/profile/' + profileId);
@@ -219,12 +221,12 @@ class Profile extends Component {
       .catch(() => this.setState({ hasErrored: true }));
   };
 
-  fetchProfile = profileId => {
+  fetchProfile = (profileId) => {
     this.setState({ isLoading: true });
 
     api
       .get('profile/' + profileId)
-      .then(response => {
+      .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           return response.data;
@@ -235,8 +237,8 @@ class Profile extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(profile => {
-        this.setState((state,props) => {
+      .then((profile) => {
+        this.setState((state, props) => {
           let inboundRules, outboundRules;
           let profileVersion;
           if ('rules' in profile) {
@@ -258,6 +260,7 @@ class Profile extends Component {
               active: false,
               states: [],
               environments: [],
+              environment: '',
               interface: 'ANY',
               group: 'any',
               group_type: 'ANY',
@@ -274,13 +277,14 @@ class Profile extends Component {
               //seconds: '',
               //hitCount: '',
             });
-          };
+          }
           if (outboundRules.length === 0) {
             outboundRules.push({
               order: 1,
               active: false,
               states: [],
               environments: [],
+              environment: '',
               interface: 'ANY',
               group: 'any',
               group_type: 'ANY',
@@ -304,7 +308,7 @@ class Profile extends Component {
             inboundRules,
             outboundRules,
             profileVersion,
-          }
+          };
         });
       })
       .catch(() => this.setState({ hasErrored: true }));
@@ -323,14 +327,12 @@ class Profile extends Component {
     let inboundRules = this.state.inboundRules.slice(0);
     let outboundRules = this.state.outboundRules.slice(0);
 
-    inboundRules.map((rule, index) => {
+    inboundRules.forEach((rule, index) => {
       rule['order'] = index + 1;
-      return true;
     });
 
-    outboundRules.map((rule, index) => {
+    outboundRules.forEach((rule, index) => {
       rule['order'] = index + 1;
-      return true;
     });
 
     api
@@ -341,7 +343,7 @@ class Profile extends Component {
           outbound: outboundRules,
         },
       })
-      .then(response => {
+      .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           this.setState({
@@ -356,7 +358,7 @@ class Profile extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(profile => {
+      .then((profile) => {
         this.setState({ snackBarOpen: true });
         this.setState({ saveProfileOpen: false });
         this.setState({ saveProfileStatus: '' });
@@ -378,31 +380,37 @@ class Profile extends Component {
     });
     api
       .delete('/profile/' + this.props.match.params.id)
-      .then(response => {
+      .then((response) => {
         if (response.status === 204) {
-          this.setState((state,props) => {
+          this.setState((state, props) => {
             props.fetchProfiles();
             return {
               isDeleting: false,
               deleteProfileStatus: <div>Deleted!</div>,
-            }
+            };
           });
           this.props.history.push('/profiles');
         } else {
-          let error_msg = response.data.error_msg + ":" + response.data.groups;
+          let error_msg = response.data.error_msg + ':' + response.data.groups;
           throw Error(error_msg);
         }
       })
       .catch((error) => {
         this.setState({
-          deleteProfileStatus: <div style={{color:"red"}}><br/><br/>{error.message}</div>,
+          deleteProfileStatus: (
+            <div style={{ color: 'red' }}>
+              <br />
+              <br />
+              {error.message}
+            </div>
+          ),
         });
         this.setState({ deleteHasErrored: true });
       });
   };
 
   onSortEndInbound = ({ oldIndex, newIndex }) => {
-    if(oldIndex !== newIndex) {
+    if (oldIndex !== newIndex) {
       this.setState({
         inboundRules: arrayMove(this.state.inboundRules, oldIndex, newIndex),
       });
@@ -410,7 +418,7 @@ class Profile extends Component {
   };
 
   onSortEndOutbound = ({ oldIndex, newIndex }) => {
-    if(oldIndex !== newIndex) {
+    if (oldIndex !== newIndex) {
       this.setState({
         outboundRules: arrayMove(this.state.outboundRules, oldIndex, newIndex),
       });
@@ -443,18 +451,28 @@ class Profile extends Component {
   handleTypeSelect = (index, value, ruleType) => {
     let newState = [];
     let actions = {};
-    if (value === "CONNLIMIT") {
-      actions = {type: { $set: value},
-                 $unset: ['recent_name', 'recent_mask', 'hit_count', 'seconds']
-      }
-    } else if (value === "RECENT") {
-      actions = {type: { $set: value},
-                 $unset: ['conn_limit_above', 'conn_limit_mask']
-      }
+    if (value === 'CONNLIMIT') {
+      actions = {
+        type: { $set: value },
+        $unset: ['recent_name', 'recent_mask', 'hit_count', 'seconds'],
+      };
+    } else if (value === 'RECENT') {
+      actions = {
+        type: { $set: value },
+        $unset: ['conn_limit_above', 'conn_limit_mask'],
+      };
     } else {
-      actions = {type: { $set: value},
-                 $unset: ['conn_limit_above', 'conn_limit_mask', 'recent_name', 'recent_mask', 'hit_count', 'seconds']
-      }
+      actions = {
+        type: { $set: value },
+        $unset: [
+          'conn_limit_above',
+          'conn_limit_mask',
+          'recent_name',
+          'recent_mask',
+          'hit_count',
+          'seconds',
+        ],
+      };
     }
     if (ruleType === 'inbound') {
       newState = update(this.state.inboundRules, {
@@ -589,21 +607,6 @@ class Profile extends Component {
     }
   };
 
-  handleExternalInput = (index, value, ruleType) => {
-    let newState = [];
-    if (ruleType === 'inbound') {
-      newState = update(this.state.inboundRules, {
-        [index]: { group: { $set: value } },
-      });
-      this.setState({ inboundRules: newState });
-    } else {
-      newState = update(this.state.outboundRules, {
-        [index]: { group: { $set: value } },
-      });
-      this.setState({ outboundRules: newState });
-    }
-  };
-
   handleCommentInput = (index, value, ruleType) => {
     let newState = [];
     if (ruleType === 'inbound') {
@@ -619,19 +622,19 @@ class Profile extends Component {
     }
   };
 
-  handleConnLimitAboveInput= (index, value, ruleType) => {
-   let newState = [];
-   if (ruleType === 'inbound') {
-     newState = update(this.state.inboundRules, {
-       [index]: { conn_limit_above: { $set: Number(value) } },
-     });
-     this.setState({ inboundRules: newState });
-   } else {
-     newState = update(this.state.outboundRules, {
-       [index]: { conn_limit_above: { $set: Number(value) } },
-     });
-     this.setState({ outboundRules: newState });
-   }
+  handleConnLimitAboveInput = (index, value, ruleType) => {
+    let newState = [];
+    if (ruleType === 'inbound') {
+      newState = update(this.state.inboundRules, {
+        [index]: { conn_limit_above: { $set: Number(value) } },
+      });
+      this.setState({ inboundRules: newState });
+    } else {
+      newState = update(this.state.outboundRules, {
+        [index]: { conn_limit_above: { $set: Number(value) } },
+      });
+      this.setState({ outboundRules: newState });
+    }
   };
 
   handleConnLimitMaskInput = (index, value, ruleType) => {
@@ -732,6 +735,7 @@ class Profile extends Component {
         active: false,
         states: [],
         environments: [],
+        environment: '',
         interface: 'ANY',
         group: 'any',
         group_type: 'ANY',
@@ -748,6 +752,10 @@ class Profile extends Component {
         //seconds: '',
         //hitCount: '',
       });
+      newState.forEach((rule, index) => {
+        rule['order'] = index + 1;
+      });
+
       this.setState({ inboundRules: newState });
     } else {
       let newState = this.state.outboundRules.splice(0);
@@ -756,6 +764,7 @@ class Profile extends Component {
         active: false,
         states: [],
         environments: [],
+        environment: '',
         interface: 'ANY',
         group: 'any',
         group_type: 'ANY',
@@ -772,6 +781,11 @@ class Profile extends Component {
         //seconds: '',
         //hitCount: '',
       });
+
+      newState.forEach((rule, index) => {
+        rule['order'] = index + 1;
+      });
+
       this.setState({ outboundRules: newState });
     }
   };
@@ -787,6 +801,7 @@ class Profile extends Component {
           active: false,
           states: [],
           environments: [],
+          environment: '',
           interface: 'ANY',
           group: 'any',
           group_type: 'ANY',
@@ -804,6 +819,11 @@ class Profile extends Component {
           //hitCount: '',
         });
       }
+
+      newState.forEach((rule, index) => {
+        rule['order'] = index + 1;
+      });
+
       this.setState({ inboundRules: newState });
     } else {
       newState = update(this.state.outboundRules, { $unset: [index] });
@@ -814,6 +834,7 @@ class Profile extends Component {
           active: false,
           states: [],
           environments: [],
+          environment: '',
           interface: 'ANY',
           group: 'any',
           group_type: 'ANY',
@@ -831,6 +852,11 @@ class Profile extends Component {
           //hitCount: '',
         });
       }
+
+      newState.forEach((rule, index) => {
+        rule['order'] = index + 1;
+      });
+
       this.setState({ outboundRules: newState });
     }
   };
@@ -840,7 +866,7 @@ class Profile extends Component {
   };
 
   handleDeleteCloseButton = () => {
-    this.setState({deleteProfileStatus: ""});
+    this.setState({ deleteProfileStatus: '' });
     this.setState({ deleteProfileOpen: false });
   };
 
@@ -852,38 +878,31 @@ class Profile extends Component {
     this.setState({ snackBarOpen: false });
   };
 
-  handleIptablesViewButton = event => {
+  handleIptablesViewButton = (event) => {
     const iptablesOutput = (
-      <IptablesView
-        id={this.state.profileId}
-        version={"ipv4"}
-      />
+      <IptablesView id={this.state.profileId} version={'ipv4'} />
     );
 
     this.setState({ iptablesOutput });
     this.setState({ iptablesViewOpen: !this.state.iptablesViewOpen });
   };
 
-
-  handleCloneButton = event => {
-    this.setState({ cloneProfileName: this.state.profileName + '_clone'});
+  handleCloneButton = (event) => {
+    this.setState({ cloneProfileName: this.state.profileName + '_clone' });
     this.setState({ cloneProfileOpen: !this.state.cloneProfileOpen });
   };
 
-  handleCloneProfileName = event => {
+  handleCloneProfileName = (event) => {
     this.setState({ cloneProfileName: event.target.value });
   };
 
-  handleCloneProfileClose = event => {
+  handleCloneProfileClose = (event) => {
     this.setState({ cloneProfileOpen: false });
-  }
-
-  handleIptablesViewCloseButton = event => {
-    this.setState({ iptablesViewOpen: false });
   };
 
-
-
+  handleIptablesViewCloseButton = (event) => {
+    this.setState({ iptablesViewOpen: false });
+  };
 
   render() {
     if (this.state.hasErrored && this.state.noExist) {
@@ -903,9 +922,11 @@ class Profile extends Component {
       this.props.groupsIsLoading ||
       this.props.profilesIsLoading ||
       this.props.zonesIsLoading ||
+      this.props.environmentsIsLoading ||
       this.props.groups.length === 0 ||
       this.props.zones.length === 0 ||
-      this.props.services.length === 0
+      this.props.services.length === 0 ||
+      this.props.environments === undefined
     ) {
       return (
         <div>
@@ -914,306 +935,313 @@ class Profile extends Component {
         </div>
       );
     } else {
-    const { classes } = this.props;
+      const { classes } = this.props;
 
-    return (
-      <div>
-        <Typography variant="h5">
-          Profile {this.state.profileName}
-        </Typography>
-        <br />
-        <br />
-        <span className={classes.wrapper}>
-        <Typography variant="subtitle1">Inbound Rules</Typography>
-        <Button
-          className={classes.button}
-          style={{marginLeft:'auto'}}
-          onClick={this.handleCloneButton}
-          variant="contained"
-          color="primary"
-        >
-          Clone Profile
-        </Button>
-        <Button
-          onClick={this.handleIptablesViewButton}
-          variant="contained"
-          color="primary"
-        >
-          View Iptables Rules
-        </Button>
-        </span>
-        <Paper className={classes.root}>
-          <Table className={classes.table}>
-            <TableHead>
-              <TableRow>
-                <TableCell />
-                <TableCell padding='none'>Active</TableCell>
-                <TableCell padding='none'>Type</TableCell>
-                <TableCell padding='none'>Interface</TableCell>
-                <TableCell padding='none'>Environment</TableCell>
-                <TableCell padding='none'>Source Type</TableCell>
-                <TableCell padding='none'>Source</TableCell>
-                <TableCell padding='none'>Service</TableCell>
-                <TableCell padding='none'>Conn. State(s)</TableCell>
-                <TableCell padding='none'>Action</TableCell>
-                <TableCell padding='none'>Log</TableCell>
-                <TableCell>Log Prefix</TableCell>
-                <TableCell>Comment</TableCell>
-                <TableCell padding='none'>Add or Remove</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBodySortable
-              children={this.state.inboundRules}
-              ruleType={'inbound'}
-              onSortEnd={this.onSortEndInbound}
-              groups={this.props.groups}
-              zones={this.props.zones}
-              services={this.props.services}
-              useDragHandle
-              handleActiveCheckbox={this.handleActiveCheckbox}
-              handleTypeSelect={this.handleTypeSelect}
-              handleIntfSelect={this.handleIntfSelect}
-              handleEnvironmentSelect={this.handleEnvironmentSelect}
-              handleGroupSelect={this.handleGroupSelect}
-              handleGroupTypeSelect={this.handleGroupTypeSelect}
-              handleServiceSelect={this.handleServiceSelect}
-              handleActionSelect={this.handleActionSelect}
-              handleLogCheckbox={this.handleLogCheckbox}
-              handleLogPrefixInput={this.handleLogPrefixInput}
-              handleCommentInput={this.handleCommentInput}
-              handleExternalInput={this.handleExternalInput}
-              handleConnLimitAboveInput={this.handleConnLimitAboveInput}
-              handleConnLimitMaskInput={this.handleConnLimitMaskInput}
-              handleRecentNameInput={this.handleRecentNameInput}
-              handleRecentMaskInput={this.handleRecentMaskInput}
-              handleSecondsInput={this.handleSecondsInput}
-              handleHitCountInput={this.handleHitCountInput}
-              handleAddProfile={this.handleAddProfile}
-              handleRemoveProfile={this.handleRemoveProfile}
-              handleStatesSelection={this.handleStatesSelection}
-            />
-          </Table>
-        </Paper>
-        <br />
-        <br />
-        <Typography variant="subtitle1">Outbound Rules</Typography>
-        <Paper className={classes.root}>
-          <Table className={classes.table}>
-            <TableHead>
-              <TableRow>
-                <TableCell />
-                <TableCell padding='none'>Active</TableCell>
-                <TableCell padding='none'>Type</TableCell>
-                <TableCell padding='none'>Interface</TableCell>
-                <TableCell padding='none'>Environment</TableCell>
-                <TableCell padding='none'>Source Type</TableCell>
-                <TableCell padding='none'>Source</TableCell>
-                <TableCell padding='none'>Service</TableCell>
-                <TableCell padding='none'>Conn. State(s)</TableCell>
-                <TableCell padding='none'>Action</TableCell>
-                <TableCell padding='none'>Log</TableCell>
-                <TableCell>Log Prefix</TableCell>
-                <TableCell>Comment</TableCell>
-                <TableCell padding='none'>Add or Remove</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBodySortable
-              children={this.state.outboundRules}
-              ruleType={'outbound'}
-              onSortEnd={this.onSortEndOutbound}
-              groups={this.props.groups}
-              zones={this.props.zones}
-              services={this.props.services}
-              useDragHandle
-              handleActiveCheckbox={this.handleActiveCheckbox}
-              handleTypeSelect={this.handleTypeSelect}
-              handleIntfSelect={this.handleIntfSelect}
-              handleEnvironmentSelect={this.handleEnvironmentSelect}
-              handleGroupSelect={this.handleGroupSelect}
-              handleGroupTypeSelect={this.handleGroupTypeSelect}
-              handleServiceSelect={this.handleServiceSelect}
-              handleActionSelect={this.handleActionSelect}
-              handleLogCheckbox={this.handleLogCheckbox}
-              handleLogPrefixInput={this.handleLogPrefixInput}
-              handleCommentInput={this.handleCommentInput}
-              handleExternalInput={this.handleExternalInput}
-              handleConnLimitAboveInput={this.handleConnLimitAboveInput}
-              handleConnLimitMaskInput={this.handleConnLimitMaskInput}
-              handleRecentNameInput={this.handleRecentNameInput}
-              handleRecentMaskInput={this.handleRecentMaskInput}
-              handleSecondsInput={this.handleSecondsInput}
-              handleHitCountInput={this.handleHitCountInput}
-              handleAddProfile={this.handleAddProfile}
-              handleRemoveProfile={this.handleRemoveProfile}
-              handleStatesSelection={this.handleStatesSelection}
-            />
-          </Table>
-        </Paper>
-        <br />
-        <Button
-          onClick={this.handleSaveButton}
-          variant="contained"
-          color="primary"
-          disabled={this.state.saveButtonDisabled}
-        >
-          Save
-        </Button>
-        <Button onClick={this.handleDeleteButton}>
-          Delete
-          <DeleteIcon className={classes.rightIcon} />
-        </Button>
-        <br />
-        <br />
-        <Typography variant="subtitle1">Revision History</Typography>
-        <ProfileHistory
-          profiles={this.props.profiles[this.state.profileName]}
-        />
-
-        <Dialog
-          open={this.state.saveProfileOpen}
-          onClose={this.handleCloseButton}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle id="form-dialog-title">
-            Confirm save of profile: {this.state.profileName}?
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Are you sure you want to save the changes to profile:{' '}
-              {this.state.profileName}?
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleCloseButton} color="primary">
-              Cancel
-            </Button>
+      return (
+        <div>
+          <Typography variant="h5">Profile {this.state.profileName}</Typography>
+          <br />
+          <br />
+          <span className={classes.wrapper}>
+            <Typography variant="subtitle1">Inbound Rules</Typography>
             <Button
-              onClick={this.updateProfile}
+              className={classes.button}
+              style={{ marginLeft: 'auto' }}
+              onClick={this.handleCloneButton}
               variant="contained"
               color="primary"
             >
-              Submit Change
-            </Button>
-            &nbsp;&nbsp;{this.state.saveProfileStatus}
-          </DialogActions>
-        </Dialog>
-        <Dialog
-          open={this.state.deleteProfileOpen}
-          onClose={this.handleDeleteCloseButton}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle id="form-dialog-title">
-            Confirm delete of profile: {this.state.profileName}?
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Are you sure you want to delete profile: {this.state.profileName}?
-              {this.state.deleteProfileStatus}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleDeleteCloseButton} color="primary">
-              Cancel
+              Clone Profile
             </Button>
             <Button
-              onClick={this.deleteProfile}
+              onClick={this.handleIptablesViewButton}
               variant="contained"
               color="primary"
             >
-              Delete
-              <DeleteIcon className={classes.rightIcon} />
+              View Iptables Rules
             </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog
-          maxWidth={false}
-          fullWidth={false}
-          open={this.state.iptablesViewOpen}
-          onClose={this.handleIptablesViewCloseButton}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle id="form-dialog-title">
-            Iptables output for profile {this.state.profileName}:
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              iptables {this.props.version}:
-            </DialogContentText>
-            {this.state.iptablesOutput}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleIptablesViewCloseButton} color="primary">
-              Close
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog
-          open={this.state.cloneProfileOpen}
-          onClose={this.handleCloneProfileClose}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle id="form-dialog-title">Clone Profile</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Please enter the name of the profile:
-            </DialogContentText>
-            <form>
-              <TextField
-                margin="dense"
-                id="profileName"
-                label="Profile Name"
-                value={this.state.cloneProfileName}
-                onChange={this.handleCloneProfileName}
-                required
-                fullWidth
+          </span>
+          <Paper className={classes.root}>
+            <Table className={classes.table}>
+              <TableHead>
+                <TableRow>
+                  <TableCell />
+                  <TableCell padding="none">Active</TableCell>
+                  <TableCell padding="none">Type</TableCell>
+                  <TableCell padding="none">Interface</TableCell>
+                  <TableCell padding="none">Environment</TableCell>
+                  <TableCell padding="none">Source Type</TableCell>
+                  <TableCell padding="none">Source</TableCell>
+                  <TableCell padding="none">Service</TableCell>
+                  <TableCell padding="none">Conn. State(s)</TableCell>
+                  <TableCell padding="none">Action</TableCell>
+                  <TableCell padding="none">Log</TableCell>
+                  <TableCell>Log Prefix</TableCell>
+                  <TableCell>Comment</TableCell>
+                  <TableCell padding="none">Add or Remove</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBodySortable
+                children={this.state.inboundRules}
+                ruleType={'inbound'}
+                onSortEnd={this.onSortEndInbound}
+                environments={this.props.environments}
+                environmentAdd={this.props.environmentAdd}
+                groups={this.props.groups}
+                zones={this.props.zones}
+                services={this.props.services}
+                useDragHandle
+                handleActiveCheckbox={this.handleActiveCheckbox}
+                handleTypeSelect={this.handleTypeSelect}
+                handleIntfSelect={this.handleIntfSelect}
+                handleEnvironmentSelect={this.handleEnvironmentSelect}
+                handleGroupSelect={this.handleGroupSelect}
+                handleGroupTypeSelect={this.handleGroupTypeSelect}
+                handleServiceSelect={this.handleServiceSelect}
+                handleActionSelect={this.handleActionSelect}
+                handleLogCheckbox={this.handleLogCheckbox}
+                handleLogPrefixInput={this.handleLogPrefixInput}
+                handleCommentInput={this.handleCommentInput}
+                handleConnLimitAboveInput={this.handleConnLimitAboveInput}
+                handleConnLimitMaskInput={this.handleConnLimitMaskInput}
+                handleRecentNameInput={this.handleRecentNameInput}
+                handleRecentMaskInput={this.handleRecentMaskInput}
+                handleSecondsInput={this.handleSecondsInput}
+                handleHitCountInput={this.handleHitCountInput}
+                handleAddProfile={this.handleAddProfile}
+                handleRemoveProfile={this.handleRemoveProfile}
+                handleStatesSelection={this.handleStatesSelection}
               />
-            </form>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleCloneProfileClose} color="primary">
-              Cancel
-            </Button>
-            <Button
-              onClick={this.cloneProfile}
-              variant="contained"
-              color="primary"
-            >
-              Create Profile
-            </Button>
-            &nbsp;&nbsp;{this.state.cloneProfileStatus}
-          </DialogActions>
-        </Dialog>
-        <Snackbar
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          open={this.state.snackBarOpen}
-          autoHideDuration={6000}
-          onClose={this.handleSnackBarClose}
-          ContentProps={{
-            'aria-describedby': 'message-id',
-          }}
-          message={<span id="message-id">{this.state.snackBarMsg}</span>}
-          action={[
-            <IconButton
-              key="close"
-              aria-label="Close"
-              color="inherit"
-              className={classes.close}
-              onClick={this.handleSnackBarClose}
-            >
-              <CloseIcon />
-            </IconButton>,
-          ]}
-        />
-      </div>
-    );}
+            </Table>
+          </Paper>
+          <br />
+          <br />
+          <Typography variant="subtitle1">Outbound Rules</Typography>
+          <Paper className={classes.root}>
+            <Table className={classes.table}>
+              <TableHead>
+                <TableRow>
+                  <TableCell />
+                  <TableCell padding="none">Active</TableCell>
+                  <TableCell padding="none">Type</TableCell>
+                  <TableCell padding="none">Interface</TableCell>
+                  <TableCell padding="none">Environment</TableCell>
+                  <TableCell padding="none">Source Type</TableCell>
+                  <TableCell padding="none">Source</TableCell>
+                  <TableCell padding="none">Service</TableCell>
+                  <TableCell padding="none">Conn. State(s)</TableCell>
+                  <TableCell padding="none">Action</TableCell>
+                  <TableCell padding="none">Log</TableCell>
+                  <TableCell>Log Prefix</TableCell>
+                  <TableCell>Comment</TableCell>
+                  <TableCell padding="none">Add or Remove</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBodySortable
+                children={this.state.outboundRules}
+                ruleType={'outbound'}
+                onSortEnd={this.onSortEndOutbound}
+                environments={this.props.environments}
+                environmentAdd={this.props.environmentAdd}
+                groups={this.props.groups}
+                zones={this.props.zones}
+                services={this.props.services}
+                useDragHandle
+                handleActiveCheckbox={this.handleActiveCheckbox}
+                handleTypeSelect={this.handleTypeSelect}
+                handleIntfSelect={this.handleIntfSelect}
+                handleEnvironmentSelect={this.handleEnvironmentSelect}
+                handleGroupSelect={this.handleGroupSelect}
+                handleGroupTypeSelect={this.handleGroupTypeSelect}
+                handleServiceSelect={this.handleServiceSelect}
+                handleActionSelect={this.handleActionSelect}
+                handleLogCheckbox={this.handleLogCheckbox}
+                handleLogPrefixInput={this.handleLogPrefixInput}
+                handleCommentInput={this.handleCommentInput}
+                handleConnLimitAboveInput={this.handleConnLimitAboveInput}
+                handleConnLimitMaskInput={this.handleConnLimitMaskInput}
+                handleRecentNameInput={this.handleRecentNameInput}
+                handleRecentMaskInput={this.handleRecentMaskInput}
+                handleSecondsInput={this.handleSecondsInput}
+                handleHitCountInput={this.handleHitCountInput}
+                handleAddProfile={this.handleAddProfile}
+                handleRemoveProfile={this.handleRemoveProfile}
+                handleStatesSelection={this.handleStatesSelection}
+              />
+            </Table>
+          </Paper>
+          <br />
+          <Button
+            onClick={this.handleSaveButton}
+            variant="contained"
+            color="primary"
+            disabled={this.state.saveButtonDisabled}
+          >
+            Save
+          </Button>
+          <Button onClick={this.handleDeleteButton}>
+            Delete
+            <DeleteIcon className={classes.rightIcon} />
+          </Button>
+          <br />
+          <br />
+          <Typography variant="subtitle1">Revision History</Typography>
+          <ProfileHistory
+            profiles={this.props.profiles[this.state.profileName]}
+          />
+
+          <Dialog
+            open={this.state.saveProfileOpen}
+            onClose={this.handleCloseButton}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogTitle id="form-dialog-title">
+              Confirm save of profile: {this.state.profileName}?
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Are you sure you want to save the changes to profile:{' '}
+                {this.state.profileName}?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.handleCloseButton} color="primary">
+                Cancel
+              </Button>
+              <Button
+                onClick={this.updateProfile}
+                variant="contained"
+                color="primary"
+              >
+                Submit Change
+              </Button>
+              &nbsp;&nbsp;{this.state.saveProfileStatus}
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            open={this.state.deleteProfileOpen}
+            onClose={this.handleDeleteCloseButton}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogTitle id="form-dialog-title">
+              Confirm delete of profile: {this.state.profileName}?
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Are you sure you want to delete profile:{' '}
+                {this.state.profileName}?{this.state.deleteProfileStatus}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.handleDeleteCloseButton} color="primary">
+                Cancel
+              </Button>
+              <Button
+                onClick={this.deleteProfile}
+                variant="contained"
+                color="primary"
+              >
+                Delete
+                <DeleteIcon className={classes.rightIcon} />
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            maxWidth={false}
+            fullWidth={false}
+            open={this.state.iptablesViewOpen}
+            onClose={this.handleIptablesViewCloseButton}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogTitle id="form-dialog-title">
+              Iptables output for profile {this.state.profileName}:
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                iptables {this.props.version}:
+              </DialogContentText>
+              {this.state.iptablesOutput}
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={this.handleIptablesViewCloseButton}
+                color="primary"
+              >
+                Close
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            open={this.state.cloneProfileOpen}
+            onClose={this.handleCloneProfileClose}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogTitle id="form-dialog-title">Clone Profile</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Please enter the name of the profile:
+              </DialogContentText>
+              <form>
+                <TextField
+                  margin="dense"
+                  id="profileName"
+                  label="Profile Name"
+                  value={this.state.cloneProfileName}
+                  onChange={this.handleCloneProfileName}
+                  required
+                  fullWidth
+                />
+              </form>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.handleCloneProfileClose} color="primary">
+                Cancel
+              </Button>
+              <Button
+                onClick={this.cloneProfile}
+                variant="contained"
+                color="primary"
+              >
+                Create Profile
+              </Button>
+              &nbsp;&nbsp;{this.state.cloneProfileStatus}
+            </DialogActions>
+          </Dialog>
+          <Snackbar
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            open={this.state.snackBarOpen}
+            autoHideDuration={6000}
+            onClose={this.handleSnackBarClose}
+            ContentProps={{
+              'aria-describedby': 'message-id',
+            }}
+            message={<span id="message-id">{this.state.snackBarMsg}</span>}
+            action={[
+              <IconButton
+                key="close"
+                aria-label="Close"
+                color="inherit"
+                className={classes.close}
+                onClick={this.handleSnackBarClose}
+              >
+                <CloseIcon />
+              </IconButton>,
+            ]}
+          />
+        </div>
+      );
+    }
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
+    environments: state.environments,
+    environmentAdd: state.environmentAdd,
+    environmentsIsLoading: state.environmentsIsLoading,
     services: state.services,
     profiles: state.profiles,
     profilesHasErrored: state.profilesHasErrored,
@@ -1225,16 +1253,16 @@ const mapStateToProps = state => {
     groupsIsLoading: state.groupsIsLoading,
     zones: state.zones,
     zonesHasErrored: state.zonesHasErrored,
-    zonesIsLoading: state.zonesIsLoading
+    zonesIsLoading: state.zonesIsLoading,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
     fetchServices: () => dispatch(servicesFetchData()),
     fetchProfiles: () => dispatch(profilesFetchData()),
     fetchZones: () => dispatch(zonesFetchData()),
-    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
   };
 };
 

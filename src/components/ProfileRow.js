@@ -16,7 +16,7 @@ import { SortableElement, SortableHandle } from 'react-sortable-hoc';
 import debounce from 'lodash/debounce';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
@@ -44,13 +44,13 @@ class ProfileRow extends Component {
   constructor(props) {
     super(props);
 
-    let { groups, zones, services, data } = props;
+    let { groups, zones, environments, environmentAdd, services, data } = props;
 
     let checkedNew: false;
     let checkedEstablished: false;
     let checkedRelated: false;
 
-    data.states.map(state => {
+    data.states.map((state) => {
       switch (state) {
         case 'NEW':
           checkedNew = true;
@@ -66,7 +66,13 @@ class ProfileRow extends Component {
       return true;
     });
 
-    const { sourceSelect, sourceReverse, groupName } = this.getGroupType(zones, groups, data, false);
+    const { sourceSelect, sourceReverse, groupName } = this.getGroupValues(
+      zones,
+      groups,
+      data,
+      false,
+      environmentAdd
+    );
 
     this.state = {
       active: data.active,
@@ -81,12 +87,14 @@ class ProfileRow extends Component {
       log: data.log,
       logPrefix: data.logPrefix,
       comment: data.comment,
-      connLimitAbove : ((data.conn_limit_above !== undefined) ? data.conn_limit_above : ''),
-      connLimitMask: ((data.conn_limit_mask !== undefined) ? data.conn_limit_mask : ''),
-      recentName: ((data.recent_name !== undefined) ? data.recent_name : ''),
-      recentMask: ((data.recent_mask !== undefined) ? data.recent_mask : ''),
-      seconds: ((data.seconds !== undefined) ? data.seconds : ''),
-      hitCount: ((data.hit_count !== undefined) ? data.hit_count : ''),
+      connLimitAbove:
+        data.conn_limit_above !== undefined ? data.conn_limit_above : '',
+      connLimitMask:
+        data.conn_limit_mask !== undefined ? data.conn_limit_mask : '',
+      recentName: data.recent_name !== undefined ? data.recent_name : '',
+      recentMask: data.recent_mask !== undefined ? data.recent_mask : '',
+      seconds: data.seconds !== undefined ? data.seconds : '',
+      hitCount: data.hit_count !== undefined ? data.hit_count : '',
       states: data.states,
       anchorEl: null,
       checkedNew,
@@ -99,7 +107,7 @@ class ProfileRow extends Component {
       groupValue: groupName,
       serviceName: services[2][data.service],
       serviceValue: services[2][data.service],
-      externalName: data.group
+      environments,
     };
 
     this.activeFunction = debounce(this.props.handleActiveCheckbox, 500);
@@ -114,94 +122,126 @@ class ProfileRow extends Component {
     this.logFunction = debounce(this.props.handleLogCheckbox, 500);
     this.logPrefixFunction = debounce(this.props.handleLogPrefixInput, 500);
     this.commentFunction = debounce(this.props.handleCommentInput, 500);
-    this.externalFunction = debounce(this.props.handleExternalInput, 0);
-    this.connLimitAboveFunction = debounce(this.props.handleConnLimitAboveInput, 500);
-    this.connLimitMaskFunction = debounce(this.props.handleConnLimitMaskInput, 500);
+    this.connLimitAboveFunction = debounce(
+      this.props.handleConnLimitAboveInput,
+      500
+    );
+    this.connLimitMaskFunction = debounce(
+      this.props.handleConnLimitMaskInput,
+      500
+    );
     this.recentNameFunction = debounce(this.props.handleRecentNameInput, 500);
     this.recentMaskFunction = debounce(this.props.handleRecentMaskInput, 500);
     this.secondsFunction = debounce(this.props.handleSecondsInput, 500);
     this.hitCountFunction = debounce(this.props.handleHitCountInput, 500);
   }
 
-  componentDidUpdate = prevProps => {
+  componentDidUpdate = (prevProps) => {
     if (this.props.data !== prevProps.data) {
-      if(this.props.data.group_type !== prevProps.data.group_type &&
-         this.props.data.order === prevProps.data.order) {
-        if(this.props.environment !== prevProps.data.environment) {
-          if(this.props.environment != 'local') {
-            const { externalName } = "";
-          } else {
-            const { zones, groups, data } = this.props;
-            const { groupId } = this.getGroupType(zones, groups, data, true);
-            this.handleGroupSelect(groupId, this.props.data.group);
-          }
-        }
+      if (
+        (this.props.data.group_type !== prevProps.data.group_type ||
+          this.props.data.environment !== prevProps.data.environment) &&
+        this.props.data.order === prevProps.data.order
+      ) {
+        const { zones, groups, data, environmentAdd } = this.props;
+        const { groupId } = this.getGroupValues(
+          zones,
+          groups,
+          data,
+          true,
+          environmentAdd
+        );
+        this.handleGroupSelect(groupId, data.group);
       } else {
+        this.setState((state, props) => {
+          const {
+            zones,
+            groups,
+            services,
+            data,
+            environmentAdd,
+            environments,
+          } = props;
+          let checkedNew: false;
+          let checkedEstablished: false;
+          let checkedRelated: false;
 
-      this.setState((state, props) => {
-        const { zones, groups, services, data } = props;
-        let checkedNew: false;
-        let checkedEstablished: false;
-        let checkedRelated: false;
+          data.states.map((state) => {
+            switch (state) {
+              case 'NEW':
+                checkedNew = true;
+                break;
+              case 'ESTABLISHED':
+                checkedEstablished = true;
+                break;
+              case 'RELATED':
+                checkedRelated = true;
+                break;
+              default:
+            }
+            return true;
+          });
 
-        data.states.map(state =>{
-          switch (state) {
-            case 'NEW':
-              checkedNew = true;
-              break;
-            case 'ESTABLISHED':
-              checkedEstablished = true;
-              break;
-            case 'RELATED':
-              checkedRelated = true;
-              break;
-            default:
-          }
-          return true;
+          const {
+            sourceSelect,
+            sourceReverse,
+            groupName,
+            groupId,
+          } = this.getGroupValues(zones, groups, data, false, environmentAdd);
+
+          return {
+            active: data.active,
+            order: data.order,
+            type: data.type,
+            intf: data.interface,
+            environment: data.environment,
+            group: groupId,
+            group_type: data.group_type,
+            service: data.service,
+            states: data.states,
+            action: data.action,
+            log: data.log,
+            logPrefix: data.log_prefix,
+            comment: data.comment,
+            connLimitAbove:
+              data.conn_limit_above !== undefined ? data.conn_limit_above : '',
+            connLimitMask:
+              data.conn_limit_mask !== undefined ? data.conn_limit_mask : '',
+            recentName: data.recent_name !== undefined ? data.recent_name : '',
+            recentMask: data.recent_mask !== undefined ? data.recent_mask : '',
+            seconds: data.seconds !== undefined ? data.seconds : '',
+            hitCount: data.hit_count !== undefined ? data.hit_count : '',
+            checkedNew,
+            checkedEstablished,
+            checkedRelated,
+            sourceSelect,
+            sourceReverse,
+            serviceReverse: services[1],
+            groupName,
+            groupValue: groupName,
+            serviceName: services[2][data.service],
+            serviceValue: services[2][data.service],
+            environments,
+          };
         });
-
-        let groupChanged = false;
-        //if(this.props.data.order !== prevProps.data.order) {
-        //  groupChanged = true;
-        //}
-
-        const { sourceSelect, sourceReverse, groupName, groupId} = this.getGroupType(zones, groups, data, groupChanged);
-
-
-        return {
-          active: data.active,
-          order: data.order,
-          type: data.type,
-          intf: data.interface,
-          environment: data.environment,
-          group: groupId,
-          group_type: data.group_type,
-          service: data.service,
-          states: data.states,
-          action: data.action,
-          log: data.log,
-          logPrefix: data.log_prefix,
-          comment: data.comment,
-          connLimitAbove : ((data.conn_limit_above !== undefined) ? data.conn_limit_above : ''),
-          connLimitMask: ((data.conn_limit_mask !== undefined) ? data.conn_limit_mask : ''),
-          recentName: ((data.recent_name !== undefined) ? data.recent_name : ''),
-          recentMask: ((data.recent_mask !== undefined) ? data.recent_mask : ''),
-          seconds: ((data.seconds !== undefined) ? data.seconds : ''),
-          hitCount: ((data.hit_count !== undefined) ? data.hit_count : ''),
-          checkedNew,
-          checkedEstablished,
-          checkedRelated,
-          sourceSelect,
-          sourceReverse,
-          serviceReverse: services[1],
-          groupName,
-          groupValue: groupName,
-          serviceName: services[2][data.service],
-          serviceValue: services[2][data.service],
-          externalName: groupName
-        };
-      })
       }
+    }
+  };
+
+  getGroupValues = (zones, groups, data, groupChanged, environmentAdd) => {
+    if (
+      !('environment' in data) ||
+      data.environment === '' ||
+      data.environment === 'local'
+    ) {
+      return this.getGroupType(zones, groups, data, groupChanged);
+    } else {
+      return this.getGroupType(
+        environmentAdd[data.environment]['zones'],
+        environmentAdd[data.environment]['groups'],
+        data,
+        groupChanged
+      );
     }
   };
 
@@ -211,43 +251,41 @@ class ProfileRow extends Component {
     let groupName = '';
     let groupId = '';
 
-    if (groups.length !== 0 && zones.length !== 0) {
-      switch (data.group_type) {
-        case 'ANY':
-          sourceSelect = [{id: "any", name: "any"}];
-          sourceReverse = {'any': 'any'};
-          groupId = 'any';
-          groupName = "any";
-          break;
-        case 'ROLE':
-          sourceSelect = groups[0];
-          sourceReverse = groups[1];
-          if (groupChanged) {
-            groupName = sourceSelect[0]['name'];
-            groupId = sourceSelect[0]['id'];
-          } else {
-            groupName = groups[2][data.group];
-            groupId = data.group;
-          }
-          break;
-        case 'ZONE':
-          sourceSelect = zones[0];
-          sourceReverse = zones[1]
-          if (groupChanged) {
-            groupName = sourceSelect[0]['name'];
-            groupId = sourceSelect[0]['id'];
-          } else {
-            groupName = zones[2][data.group];
-            groupId = data.group;
-          }
-          break;
-        default:
-      }
+    switch (data.group_type) {
+      case 'ANY':
+        sourceSelect = [{ id: 'any', name: 'any' }];
+        sourceReverse = { any: 'any' };
+        groupId = 'any';
+        groupName = 'any';
+        break;
+      case 'ROLE':
+        sourceSelect = groups[0];
+        sourceReverse = groups[1];
+        if (groupChanged) {
+          groupName = sourceSelect[0]['name'];
+          groupId = sourceSelect[0]['id'];
+        } else {
+          groupName = groups[2][data.group];
+          groupId = data.group;
+        }
+        break;
+      case 'ZONE':
+        sourceSelect = zones[0];
+        sourceReverse = zones[1];
+        if (groupChanged) {
+          groupName = sourceSelect[0]['name'];
+          groupId = sourceSelect[0]['id'];
+        } else {
+          groupName = zones[2][data.group];
+          groupId = data.group;
+        }
+        break;
+      default:
     }
-    return {sourceSelect,sourceReverse,groupName,groupId};
-  }
+    return { sourceSelect, sourceReverse, groupName, groupId };
+  };
 
-  handleActiveCheckbox = event => {
+  handleActiveCheckbox = (event) => {
     this.setState({ active: event.target.checked });
     this.activeFunction(
       this.props.pIndex,
@@ -256,7 +294,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleTypeSelect = event => {
+  handleTypeSelect = (event) => {
     this.setState({ type: event.target.value });
     this.typeFunction(
       this.props.pIndex,
@@ -265,7 +303,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleIntfSelect = event => {
+  handleIntfSelect = (event) => {
     this.setState({ intf: event.target.value });
     this.intfFunction(
       this.props.pIndex,
@@ -274,7 +312,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleGroupTypeSelect = event => {
+  handleGroupTypeSelect = (event) => {
     this.setState({ group_type: event.target.value });
     this.groupTypeFunction(
       this.props.pIndex,
@@ -283,7 +321,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleEnvironmentSelect = event => {
+  handleEnvironmentSelect = (event) => {
     this.setState({ environment: event.target.value });
     this.environmentFunction(
       this.props.pIndex,
@@ -295,53 +333,36 @@ class ProfileRow extends Component {
   handleGroupSelect = (value, prevVal) => {
     if (value != null) {
       this.setState({ group: value });
-      this.groupFunction(
-        this.props.pIndex,
-        value,
-        this.props.ruleType
-      );
+      this.groupFunction(this.props.pIndex, value, this.props.ruleType);
     } else {
-      this.setState({groupValue: prevVal});
+      this.setState({ groupValue: prevVal });
     }
   };
 
-  handleGroupInput = value => {
+  handleGroupInput = (value) => {
     if (value == null) {
-      this.setState({ groupName: "" });
+      this.setState({ groupName: '' });
     } else {
       this.setState({ groupName: value });
     }
   };
 
-  handleExternalInput = event => {
-    this.setState({ externalName: event.target.value });
-    this.externalFunction(
-      this.props.pIndex,
-      event.target.value,
-      this.props.ruleType
-    );
-  };
-
-  handleServiceSelect = value => {
+  handleServiceSelect = (value) => {
     if (value != null) {
       this.setState({ service: value });
-      this.serviceFunction(
-        this.props.pIndex,
-        value,
-        this.props.ruleType
-      );
+      this.serviceFunction(this.props.pIndex, value, this.props.ruleType);
     }
   };
 
-  handleServiceInput = value => {
+  handleServiceInput = (value) => {
     if (value == null) {
-      this.setState({ serviceName: "" });
+      this.setState({ serviceName: '' });
     } else {
       this.setState({ serviceName: value });
     }
   };
 
-  handleActionSelect = event => {
+  handleActionSelect = (event) => {
     this.setState({ action: event.target.value });
     this.actionFunction(
       this.props.pIndex,
@@ -350,7 +371,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleLogCheckbox = event => {
+  handleLogCheckbox = (event) => {
     this.setState({ log: event.target.checked });
     this.logFunction(
       this.props.pIndex,
@@ -359,7 +380,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleLogPrefixInput = event => {
+  handleLogPrefixInput = (event) => {
     this.setState({ logPrefix: event.target.value });
     this.logPrefixFunction(
       this.props.pIndex,
@@ -368,7 +389,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleCommentInput = event => {
+  handleCommentInput = (event) => {
     this.setState({ comment: event.target.value });
     this.commentFunction(
       this.props.pIndex,
@@ -377,7 +398,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleConnLimitAboveInput = event => {
+  handleConnLimitAboveInput = (event) => {
     this.setState({ connLimitAbove: event.target.value });
     this.connLimitAboveFunction(
       this.props.pIndex,
@@ -386,7 +407,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleConnLimitMaskInput = event => {
+  handleConnLimitMaskInput = (event) => {
     this.setState({ connLimitMask: event.target.value });
     this.connLimitMaskFunction(
       this.props.pIndex,
@@ -395,7 +416,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleRecentNameInput = event => {
+  handleRecentNameInput = (event) => {
     this.setState({ recentName: event.target.value });
     this.recentNameFunction(
       this.props.pIndex,
@@ -404,7 +425,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleRecentMaskInput = event => {
+  handleRecentMaskInput = (event) => {
     this.setState({ recentMask: event.target.value });
     this.recentMaskFunction(
       this.props.pIndex,
@@ -413,7 +434,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleSecondsInput = event => {
+  handleSecondsInput = (event) => {
     this.setState({ seconds: event.target.value });
     this.secondsFunction(
       this.props.pIndex,
@@ -422,7 +443,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleHitCountInput = event => {
+  handleHitCountInput = (event) => {
     this.setState({ hitCount: event.target.value });
     this.hitCountFunction(
       this.props.pIndex,
@@ -431,23 +452,23 @@ class ProfileRow extends Component {
     );
   };
 
-  handleAddProfile = event => {
+  handleAddProfile = (event) => {
     this.props.handleAddProfile(this.props.pIndex, this.props.ruleType);
   };
 
-  handleRemoveProfile = event => {
+  handleRemoveProfile = (event) => {
     this.props.handleRemoveProfile(this.props.pIndex, this.props.ruleType);
   };
 
-  handleStateButton = event => {
-    this.setState({anchorEl: event.currentTarget});
+  handleStateButton = (event) => {
+    this.setState({ anchorEl: event.currentTarget });
   };
 
   handleStateButtonClose = () => {
-    this.setState({anchorEl: null});
+    this.setState({ anchorEl: null });
   };
 
-  handleStateChange = name => event => {
+  handleStateChange = (name) => (event) => {
     let checkedNew = this.state.checkedNew;
     let checkedEstablished = this.state.checkedEstablished;
     let checkedRelated = this.state.checkedRelated;
@@ -458,7 +479,7 @@ class ProfileRow extends Component {
         checkedNew = event.target.checked;
         break;
       case 'checkedEstablished':
-        checkedEstablished = event.target.checked
+        checkedEstablished = event.target.checked;
         break;
       case 'checkedRelated':
         checkedRelated = event.target.checked;
@@ -475,19 +496,15 @@ class ProfileRow extends Component {
       states.push('RELATED');
     }
 
-    this.statesFunction(
-      this.props.pIndex,
-      states,
-      this.props.ruleType
-    );
+    this.statesFunction(this.props.pIndex, states, this.props.ruleType);
     this.setState({ [name]: event.target.checked });
-  }
+  };
 
   render() {
     //add logic to prevent rerendering while loading
 
-    const { groups, zones, services, classes } = this.props;
-    if ( groups.length === 0 || zones.length === 0 || services.length === 0 ) {
+    const { groups, zones, services, environments, classes } = this.props;
+    if (groups.length === 0 || zones.length === 0 || services.length === 0) {
       return '';
     }
     const {
@@ -497,7 +514,6 @@ class ProfileRow extends Component {
       intf,
       order,
       group_type,
-      group,
       action,
       log,
       logPrefix,
@@ -520,10 +536,17 @@ class ProfileRow extends Component {
       groupValue,
       serviceName,
       serviceValue,
-      externalName
     } = this.state;
 
     let interf = intf;
+
+    let environmentChoice = '';
+
+    if (environment === undefined || environment === '') {
+      environmentChoice = 'local';
+    } else {
+      environmentChoice = environment;
+    }
 
     if (intf === '') {
       interf = 'ANY';
@@ -536,14 +559,13 @@ class ProfileRow extends Component {
     }
 
     const sourceSelectOptions = {
-      options: sourceSelect.map(option => option.name)
+      options: sourceSelect.map((option) => option.name),
     };
 
     const serviceSelectOptions = {
-      options: services[0].map(option => option.name)
+      options: services[0].map((option) => option.name),
     };
 
-    //let externalName = group;
     let groupInput = groupName;
     let groupValue_ = groupValue;
 
@@ -554,29 +576,29 @@ class ProfileRow extends Component {
       groupInput = groupValue;
     }
 
-    let ruleType = "";
+    let ruleType = '';
     if (type === 'CONNLIMIT') {
       ruleType = (
-        <TableRow style={{ zIndex: 10000000 }} id={"connLimitRow_" + order}>
+        <TableRow style={{ zIndex: 10000000 }} id={'connLimitRow_' + order}>
           <TableCell></TableCell>
           <TableCell></TableCell>
-          <TableCell padding='50' id={"connLimitCell1_" + order}>
+          <TableCell padding="50" id={'connLimitCell1_' + order}>
             <TextField
               helperText="connLimitAbove"
               placeholder="10"
               margin="none"
-              id={"connLimitAbove_" + order}
+              id={'connLimitAbove_' + order}
               value={connLimitAbove}
               onChange={this.handleConnLimitAboveInput}
               disabled={!active}
             />
           </TableCell>
-          <TableCell padding='50' id={"connLimitCell2_" + order}>
+          <TableCell padding="50" id={'connLimitCell2_' + order}>
             <TextField
               helperText="connLimitMask"
               placeholder="32"
               margin="none"
-              id={"connLimitMask_" + order}
+              id={'connLimitMask_' + order}
               value={connLimitMask}
               onChange={this.handleConnLimitMaskInput}
               disabled={!active}
@@ -586,51 +608,51 @@ class ProfileRow extends Component {
           <TableCell></TableCell>
         </TableRow>
       );
-    } else if( type === 'RECENT') {
+    } else if (type === 'RECENT') {
       ruleType = (
-        <TableRow style={{ zIndex: 10000000 }} id={"recentRow_" + order}>
+        <TableRow style={{ zIndex: 10000000 }} id={'recentRow_' + order}>
           <TableCell></TableCell>
           <TableCell></TableCell>
-          <TableCell padding='50' id={"recentCell1_" + order}>
+          <TableCell padding="50" id={'recentCell1_' + order}>
             <TextField
               helperText="recentName"
               placeholder="DEFAULT"
               defaultValue="DEFAULT"
               margin="none"
-              id={"recentName_" + order}
+              id={'recentName_' + order}
               value={recentName}
               onChange={this.handleRecentNameInput}
               disabled={!active}
             />
           </TableCell>
-          <TableCell padding='50' id={"recentCell2_" + order}>
+          <TableCell padding="50" id={'recentCell2_' + order}>
             <TextField
               helperText="recentMask"
               placeholder="255.255.255.255"
               margin="none"
-              id={"recentMask_" + order}
+              id={'recentMask_' + order}
               value={recentMask}
               onChange={this.handleRecentMaskInput}
               disabled={!active}
             />
           </TableCell>
-          <TableCell padding='50' id={"recentCell3_" + order}>
+          <TableCell padding="50" id={'recentCell3_' + order}>
             <TextField
               helperText="seconds"
               placeholder="60"
               margin="none"
-              id={"seconds_" + order}
+              id={'seconds_' + order}
               value={seconds}
               onChange={this.handleSecondsInput}
               disabled={!active}
             />
           </TableCell>
-          <TableCell padding='50' id={"recentCell4_" + order}>
+          <TableCell padding="50" id={'recentCell4_' + order}>
             <TextField
               helperText="hitCount"
               placeholder="100"
               margin="none"
-              id={"hitCount_" + order}
+              id={'hitCount_' + order}
               value={hitCount}
               onChange={this.handleHitCountInput}
               disabled={!active}
@@ -642,193 +664,204 @@ class ProfileRow extends Component {
       );
     }
 
-    let groupSelect = "";
-    if (environment === 'local') {
-      groupSelect = (
-        <TableCell padding='none'>
-          <Autocomplete
-            style={{ width: 200 }}
-            {...sourceSelectOptions}
-            inputValue={groupInput}
-            value={groupValue_}
-            renderInput={(params) => <TextField {...params} variant="standard"/>}
-            onChange={(event, value) => {
-              this.handleGroupSelect(sourceReverse[value], groupValue_);
-            }}
-            onInputChange={(event, value) => {
-              this.handleGroupInput(value);
-            }}
-            disabled={!active}
-          />
-        </TableCell>
-        );
-    } else if( environment !== 'local') {
-      groupSelect = (
-        <TableCell padding='checkbox'>
-          <TextField
-            margin="none"
-            value={externalName}
-            onChange={this.handleExternalInput}
-            disabled={!active}
-          />
-        </TableCell>
-      );
-    }
+    let groupSelect = '';
+    groupSelect = (
+      <TableCell padding="none">
+        <Autocomplete
+          style={{ width: 200 }}
+          {...sourceSelectOptions}
+          inputValue={groupInput}
+          value={groupValue_}
+          renderInput={(params) => <TextField {...params} variant="standard" />}
+          onChange={(event, value) => {
+            this.handleGroupSelect(sourceReverse[value], groupValue_);
+          }}
+          onInputChange={(event, value) => {
+            this.handleGroupInput(value);
+          }}
+          disabled={!active}
+        />
+      </TableCell>
+    );
 
     return (
       <React.Fragment>
-      <TableRow style={{ zIndex: 10000000 }}>
-        <TableCell>
-          <DragHandle />
-        </TableCell>
-        <TableCell padding='none'>
-          <Checkbox checked={active} onChange={this.handleActiveCheckbox} />
-        </TableCell>
-        <TableCell padding='checkbox' id={type + "TableCell"}>
-          <Select value={type} onChange={this.handleTypeSelect} disabled={!active}>
-            <MenuItem value={'BASIC'}>BASIC</MenuItem>
-            <MenuItem value={'CONNLIMIT'}>CONNLIMIT</MenuItem>
-            <MenuItem value={'RECENT'}>RECENT</MenuItem>
-          </Select>
-          {ruleType}
-        </TableCell>
-        <TableCell padding='none'>
-          <Select value={interf} onChange={this.handleIntfSelect} disabled={!active}>
-            <MenuItem value={'lo'}>lo</MenuItem>
-            <MenuItem value={'ANY'}>any</MenuItem>
-          </Select>
-        </TableCell>
-        <TableCell padding='none'>
-          <Select value={environment} onChange={this.handleEnvironmentSelect} disabled={!active}>
-            <MenuItem value={'local'}>local</MenuItem>
-            <MenuItem value={'q1'}>q1</MenuItem>
-            <MenuItem value={'p1'}>p1</MenuItem>
-            <MenuItem value={'d1'}>d1</MenuItem>
-            <MenuItem value={'d2'}>d2</MenuItem>
-          </Select>
-        </TableCell>
-        <TableCell padding='none'>
-          <Select value={group_type} onChange={this.handleGroupTypeSelect} disabled={!active}>
-            <MenuItem value={'ANY'}>any</MenuItem>
-            <MenuItem value={'ROLE'}>group</MenuItem>
-            <MenuItem value={'ZONE'}>zone</MenuItem>
-          </Select>
-        </TableCell>
-        {groupSelect}
-        <TableCell padding='checkbox'>
-          <Autocomplete
-            style={{ width: 200 }}
-            {...serviceSelectOptions}
-            inputValue={serviceName}
-            value={serviceValue}
-            renderInput={(params) => <TextField {...params} variant="standard"/>}
-            onChange={(event, value) => {
-              this.handleServiceSelect(serviceReverse[value]);
-            }}
-            onInputChange={(event, value) => {
-              this.handleServiceInput(value);
-            }}
-            disabled={!active}
-          />
-        </TableCell>
-        <TableCell padding='none'>
-          <Button
-            onClick={this.handleStateButton}
-            disabled={!active}
-          >
-            {stateText}
-          </Button>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={this.handleStateButtonClose}
-          >
-            <MenuItem>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={checkedNew}
-                    onChange={this.handleStateChange('checkedNew')}
-                    value="checkedNew"
-                    color="primary"
-                  />
-                }
-                label="NEW"
-               />
-            </MenuItem>
-            <MenuItem>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={checkedEstablished}
-                    onChange={this.handleStateChange('checkedEstablished')}
-                    value="checkedEstablished"
-                    color="primary"
-                  />
-                }
-                label="ESTABLISHED"
-               />
-            </MenuItem>
-            <MenuItem>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={checkedRelated}
-                    onChange={this.handleStateChange('checkedRelated')}
-                    value="checkedRelated"
-                    color="primary"
-                  />
-                }
-                label="RELATED"
-               />
-            </MenuItem>
-          </Menu>
-        </TableCell>
-        <TableCell padding='none'>
-          <Select value={action} onChange={this.handleActionSelect} disabled={!active}>
-            <MenuItem value={'ACCEPT'}>ACCEPT</MenuItem>
-            <MenuItem value={'DROP'}>DROP</MenuItem>
-            <MenuItem value={'REJECT'}>REJECT</MenuItem>
-          </Select>
-        </TableCell>
-        <TableCell padding='none'>
-          <Checkbox checked={log} onChange={this.handleLogCheckbox} disabled={!active} />
-        </TableCell>
-        <TableCell padding='checkbox'>
-          <TextField
-            margin="none"
-            value={logPrefix}
-            onChange={this.handleLogPrefixInput}
-            disabled={!active}
-          />
-        </TableCell>
-        <TableCell padding='checkbox'>
-          <TextField
-            margin="none"
-            value={comment}
-            onChange={this.handleCommentInput}
-            disabled={!active}
-          />
-        </TableCell>
-        <TableCell padding='none'>
-          <Fab
-            size="small"
-            color="secondary"
-            aria-label="Add"
-            className={classes.button}
-            onClick={this.handleAddProfile}>
-            <AddIcon />
-          </Fab>
-          <Fab
-            size="small"
-            aria-label="Remove"
-            className={classes.button}
-            onClick={this.handleRemoveProfile}>
-            <RemoveIcon />
-          </Fab>
-        </TableCell>
-      </TableRow>
-    </React.Fragment>
+        <TableRow style={{ zIndex: 10000000 }}>
+          <TableCell>
+            <DragHandle />
+          </TableCell>
+          <TableCell padding="none">
+            <Checkbox checked={active} onChange={this.handleActiveCheckbox} />
+          </TableCell>
+          <TableCell padding="checkbox" id={type + 'TableCell'}>
+            <Select
+              value={type}
+              onChange={this.handleTypeSelect}
+              disabled={!active}
+            >
+              <MenuItem value={'BASIC'}>BASIC</MenuItem>
+              <MenuItem value={'CONNLIMIT'}>CONNLIMIT</MenuItem>
+              <MenuItem value={'RECENT'}>RECENT</MenuItem>
+            </Select>
+            {ruleType}
+          </TableCell>
+          <TableCell padding="none">
+            <Select
+              value={interf}
+              onChange={this.handleIntfSelect}
+              disabled={!active}
+            >
+              <MenuItem value={'lo'}>lo</MenuItem>
+              <MenuItem value={'ANY'}>any</MenuItem>
+            </Select>
+          </TableCell>
+          <TableCell padding="none">
+            <Select
+              value={environmentChoice}
+              onChange={this.handleEnvironmentSelect}
+              disabled={!active}
+            >
+              <MenuItem value={'local'}>local</MenuItem>
+              {environments.map((env) => {
+                return <MenuItem value={env.name}>{env.name}</MenuItem>;
+              })}
+            </Select>
+          </TableCell>
+          <TableCell padding="none">
+            <Select
+              value={group_type}
+              onChange={this.handleGroupTypeSelect}
+              disabled={!active}
+            >
+              <MenuItem value={'ANY'}>any</MenuItem>
+              <MenuItem value={'ROLE'}>group</MenuItem>
+              <MenuItem value={'ZONE'}>zone</MenuItem>
+            </Select>
+          </TableCell>
+          {groupSelect}
+          <TableCell padding="checkbox">
+            <Autocomplete
+              style={{ width: 200 }}
+              {...serviceSelectOptions}
+              inputValue={serviceName}
+              value={serviceValue}
+              renderInput={(params) => (
+                <TextField {...params} variant="standard" />
+              )}
+              onChange={(event, value) => {
+                this.handleServiceSelect(serviceReverse[value]);
+              }}
+              onInputChange={(event, value) => {
+                this.handleServiceInput(value);
+              }}
+              disabled={!active}
+            />
+          </TableCell>
+          <TableCell padding="none">
+            <Button onClick={this.handleStateButton} disabled={!active}>
+              {stateText}
+            </Button>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={this.handleStateButtonClose}
+            >
+              <MenuItem>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={checkedNew}
+                      onChange={this.handleStateChange('checkedNew')}
+                      value="checkedNew"
+                      color="primary"
+                    />
+                  }
+                  label="NEW"
+                />
+              </MenuItem>
+              <MenuItem>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={checkedEstablished}
+                      onChange={this.handleStateChange('checkedEstablished')}
+                      value="checkedEstablished"
+                      color="primary"
+                    />
+                  }
+                  label="ESTABLISHED"
+                />
+              </MenuItem>
+              <MenuItem>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={checkedRelated}
+                      onChange={this.handleStateChange('checkedRelated')}
+                      value="checkedRelated"
+                      color="primary"
+                    />
+                  }
+                  label="RELATED"
+                />
+              </MenuItem>
+            </Menu>
+          </TableCell>
+          <TableCell padding="none">
+            <Select
+              value={action}
+              onChange={this.handleActionSelect}
+              disabled={!active}
+            >
+              <MenuItem value={'ACCEPT'}>ACCEPT</MenuItem>
+              <MenuItem value={'DROP'}>DROP</MenuItem>
+              <MenuItem value={'REJECT'}>REJECT</MenuItem>
+            </Select>
+          </TableCell>
+          <TableCell padding="none">
+            <Checkbox
+              checked={log}
+              onChange={this.handleLogCheckbox}
+              disabled={!active}
+            />
+          </TableCell>
+          <TableCell padding="checkbox">
+            <TextField
+              margin="none"
+              value={logPrefix}
+              onChange={this.handleLogPrefixInput}
+              disabled={!active}
+            />
+          </TableCell>
+          <TableCell padding="checkbox">
+            <TextField
+              margin="none"
+              value={comment}
+              onChange={this.handleCommentInput}
+              disabled={!active}
+            />
+          </TableCell>
+          <TableCell padding="none">
+            <Fab
+              size="small"
+              color="secondary"
+              aria-label="Add"
+              className={classes.button}
+              onClick={this.handleAddProfile}
+            >
+              <AddIcon />
+            </Fab>
+            <Fab
+              size="small"
+              aria-label="Remove"
+              className={classes.button}
+              onClick={this.handleRemoveProfile}
+            >
+              <RemoveIcon />
+            </Fab>
+          </TableCell>
+        </TableRow>
+      </React.Fragment>
     );
   }
 }
