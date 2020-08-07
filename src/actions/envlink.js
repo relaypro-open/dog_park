@@ -29,6 +29,19 @@ export function createLink(linkName, linkAddresses) {
     api
       .post('link', {
         name: linkName,
+            id: linkId ,
+            connection_type: linkConnectionType,
+            link.direction: linkDirection,
+            link.enabled: linkEnabled,
+            link.connection.api_port: linkApiPort,
+            link.connection.host: linkHost,
+            link.connection.password: linkPassword,
+            linkPort: link.connection.port,
+            linkCACertFile: link.connection.ssl_options.cacertfile,
+            linkCertFile: link.connection.ssl_options.certfile,
+            linkFailIfNoPeerCert: link.connection.ssl_options.fail_if_no_peer_cert,
+            linkServerNameIndication: link.connection.ssl_options.server_name_indication,
+            linkVerify: link.connection.ssl_options.verify,
       })
       .then(response => {
         dispatch(setNewLinkId(response.url));

@@ -44,6 +44,7 @@ import Services from './components/Services';
 import Host from './components/Host';
 import FlanScan from './components/FlanScan';
 import Links from './components/Links';
+import EnvLink from './components/EnvLink';
 
 //redux store
 import { groupsFetchData } from './actions/groups';
@@ -403,7 +404,7 @@ class App extends Component {
                 <Route path="/service/:id" component={Service} />
                 <Route exact={true} path="/flanscans" component={FlanScan} />
                 <Route exact={true} path="/links" component={Links} />
-                <Route path="/link/:id" component={Link} />
+                <Route path="/link/:id" component={EnvLink} />
               </main>
             </div>
           </MuiPickersUtilsProvider>

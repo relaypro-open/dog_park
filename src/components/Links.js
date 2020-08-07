@@ -57,6 +57,46 @@ class Links extends Component {
     this.props.handleSelectedTab(4);
   }
 
+  //  createLink = () => {
+  //    this.setState({ isLoading: true });
+  //
+  //    api
+  //      .post('link', {
+  //        name: this.state.createLinkName,
+  //            connection_type: linkConnectionType,
+  //            direction: linkDirection,
+  //            enabled: linkEnabled,
+  //            "connection.api_port": linkApiPort,
+  //            "connection.host": linkHost,
+  //            "connection.password": linkPassword,
+  //            "connection.port": linkPort,
+  //            "connection.ssl_options.cacertfile": linkCACertFile,
+  //            "connection.ssl_options.certfile": linkCertFile,
+  //            "connection.ssl_options.fail_if_no_peer_cert": linkFailIfNoPeerCert,
+  //            "connection.ssl_options.server_name_indication": linkServerNameIndication,
+  //            "connection.ssl_options.verify": linkVerify,
+  //      })
+  //      .then(response => {
+  //        if (response.status === 201) {
+  //          let re = /\/api\/link\/(.+)/;
+  //          this.setState({ isLoading: false });
+  //          let linkId = response.headers.location;
+  //          let newLinkId = linkId.replace(re, '$1');
+  //          return newLinkId;
+  //        } else {
+  //          throw Error(response.statusText);
+  //        }
+  //      })
+  //      .then(linkId => {
+  //        this.setState({ createLinkOpen: false });
+  //        this.setState({ createLinkName: '' });
+  //        this.setState({ createLinkLink: '' });
+  //        this.props.history.push('/link/' + linkId);
+  //        this.props.fetchLinks();
+  //      })
+  //      .catch(() => this.setState({ hasErrored: true }));
+  //  };
+
   createLink = () => {
     if (this.state.createLinkName === '' ||
         this.state.createLinkName in this.props.links[1]) {
