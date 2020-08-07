@@ -43,6 +43,7 @@ import Hosts from './components/Hosts';
 import Services from './components/Services';
 import Host from './components/Host';
 import FlanScan from './components/FlanScan';
+import Links from './components/Links';
 
 //redux store
 import { groupsFetchData } from './actions/groups';
@@ -51,6 +52,7 @@ import { profilesFetchData } from './actions/profiles';
 import { zonesFetchData } from './actions/zones';
 import { hostsFetchData } from './actions/hosts';
 import { servicesFetchData } from './actions/services';
+import { linksFetchData } from './actions/links';
 import { handleSelectedTab } from './actions/app';
 
 const drawerWidth = 240;
@@ -185,6 +187,7 @@ class App extends Component {
     this.props.fetchZones();
     this.props.fetchServices();
     this.props.fetchHosts();
+    this.props.fetchLinks();
   }
 
   handleDrawerOpen = () => {
@@ -214,6 +217,9 @@ class App extends Component {
         break;
       case 5:
         this.props.history.push('/flanscans');
+        break;
+      case 6:
+        this.props.history.push('/links');
         break;
       default:
         this.props.history.push('/groups');
@@ -351,6 +357,7 @@ class App extends Component {
                     <Tab label="Hosts" />
                     <Tab label="Zones" />
                     <Tab label="Flan Scans" />
+                    <Tab label="Links" />
                   </Tabs>
                   {
                     <span>
@@ -395,6 +402,8 @@ class App extends Component {
                 <Route exact={true} path="/services" component={Services} />
                 <Route path="/service/:id" component={Service} />
                 <Route exact={true} path="/flanscans" component={FlanScan} />
+                <Route exact={true} path="/links" component={Links} />
+                <Route path="/link/:id" component={Link} />
               </main>
             </div>
           </MuiPickersUtilsProvider>
@@ -421,6 +430,7 @@ const mapDispatchToProps = dispatch => {
     fetchZones: () => dispatch(zonesFetchData()),
     fetchHosts: () => dispatch(hostsFetchData()),
     fetchServices: () => dispatch(servicesFetchData()),
+    fetchLinks: () => dispatch(linksFetchData()),
     handleSelectedTab: value => dispatch(handleSelectedTab(value)),
   };
 };

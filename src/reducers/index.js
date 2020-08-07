@@ -7,6 +7,7 @@ import { flanIpsHasErrored, flanIpsIsLoading, flanIps } from './flan_ips';
 import { profilesHasErrored, profilesIsLoading, profiles } from './profiles';
 import { servicesHasErrored, servicesIsLoading, services } from './services';
 import { zonesHasErrored, zonesIsLoading, zones } from './zones';
+import { linksHasErrored, linksIsLoading, links } from './links';
 import {
   groupHasErrored,
   groupIsLoading,
@@ -46,4 +47,7 @@ export default combineReducers({
   zonesHasErrored,
   zonesIsLoading,
   zones,
+  linksHasErrored,
+  linksIsLoading,
+  links,
 });
