@@ -106,7 +106,7 @@ class EnvLink extends Component {
 
   componentDidMount = () => {
     this.fetchLink(this.props.match.params.id);
-    this.props.handleSelectedTab(3);
+    this.props.handleSelectedTab(6);
   };
 
   componentDidUpdate = prevProps => {
@@ -124,7 +124,7 @@ class EnvLink extends Component {
 
   fetchLink(linkId) {
     this.setState({ isLoading: true });
-
+    if(linkId !== undefined) {
     api
       .get('link/' + linkId)
       .then(response => {
@@ -165,8 +165,56 @@ class EnvLink extends Component {
           this.setState({ linkLinkName: '' });
         }
       })
-      .catch(() => this.setState({ hasErrored: true }));
+        .catch(() => this.setState({ hasErrored: true }));
+    }
   }
+
+  createLink = () => {
+    this.setState({ isLoading: true });
+  
+    api
+      .post('link', {
+        name: this.state.linkName,
+        connection_type: this.state.linkConnectionType,
+        direction: this.state.linkDirection,
+        enabled: this.state.linkEnabled,
+        connection: {
+          api_port: this.state.linkApiPort,
+          host: this.state.linkHost,
+          password: this.state.linkPassword,
+          port: this.state.linkPort,
+          user: this.state.linkUser,
+          virtual_host: this.state.linkVirtualHost,
+          ssl_options: {
+            cacertfile: this.state.linkCACertFile,
+            keyfile: this.state.linkKeyFile,
+            certfile: this.state.linkCertFile,
+            fail_if_no_peer_cert: this.state.linkFailIfNoPeerCert,
+            server_name_indication: this.state.linkServerNameIndication,
+            verify: this.state.linkVerify,
+          }
+        }
+      })
+      .then(response => {
+        if (response.status === 201) {
+          let re = /\/api\/link\/(.+)/;
+          this.setState({ isLoading: false });
+          let linkId = response.headers.location;
+          let newLinkId = linkId.replace(re, '$1');
+          return newLinkId;
+        } else {
+          throw Error(response.statusText);
+        }
+      })
+      .then(linkId => {
+        this.setState({ createLinkOpen: false });
+        this.setState({ createLinkName: '' });
+        this.setState({ createLinkLink: '' });
+        this.props.history.push('/link/' + linkId);
+        this.props.fetchLinks();
+      })
+      .catch(() => this.setState({ hasErrored: true }));
+  };
 
   updateLink = () => {
     this.setState({ isLoading: true });
@@ -188,6 +236,8 @@ class EnvLink extends Component {
           host: this.state.linkHost,
           password: this.state.linkPassword,
           port: this.state.linkPort,
+          user: this.state.linkUser,
+          virtual_host: this.state.linkVirtualHost,
           ssl_options: {
             cacertfile: this.state.linkCACertFile,
             keyfile: this.state.linkKeyFile,
@@ -277,7 +327,7 @@ class EnvLink extends Component {
   };
 
   handleLinkApiPort = event => {
-    this.setState({ linkApiPort: event.target.value });
+    this.setState({ linkApiPort: Number(event.target.value) });
   };
 
   handleLinkHost = event => {
@@ -289,7 +339,7 @@ class EnvLink extends Component {
   };
 
   handleLinkPort = event => {
-    this.setState({ linkPort: event.target.value });
+    this.setState({ linkPort: Number(event.target.value) });
   };
 
   handleLinkUser = event => {
@@ -300,15 +350,15 @@ class EnvLink extends Component {
     this.setState({ linkVirtualHost: event.target.value });
   };
 
-  handleCACertFile = event => {
+  handleLinkCACertFile = event => {
     this.setState({ linkCACertFile: event.target.value });
   };
 
-  handleKeyFile = event => {
+  handleLinkKeyFile = event => {
     this.setState({ linkKeyFile: event.target.value });
   };
 
-  handleCertFile = event => {
+  handleLinkCertFile = event => {
     this.setState({ linkCertFile: event.target.value });
   };
 
@@ -383,6 +433,27 @@ class EnvLink extends Component {
     //});
 
     //let linkName = this.state.linkName;
+    let buttonType = '';
+    if (this.state.linkId !== "") {
+      buttonType = (
+        <Button
+          onClick={this.updateLink}
+          variant="contained"
+          color="primary"
+        >
+          Submit Change
+        </Button>)
+    } else {
+      buttonType = (
+        <Button
+          onClick={this.createLink}
+          variant="contained"
+          color="primary"
+        >
+          Create Link
+        </Button>
+      )
+    }
 
     return (
       <div>
@@ -474,6 +545,7 @@ class EnvLink extends Component {
                       value={this.state.linkApiPort}
                       margin="dense"
                       onChange={this.handleLinkApiPort}
+                      placeholder="15672"
                     />
                   </TableCell>
                 </TableRow>
@@ -526,6 +598,7 @@ class EnvLink extends Component {
                       value={this.state.linkPort}
                       margin="dense"
                       onChange={this.handleLinkPort}
+                      placeholder="5673"
                     />
                   </TableCell>
                 </TableRow>
@@ -543,6 +616,7 @@ class EnvLink extends Component {
                       value={this.state.linkUser}
                       margin="dense"
                       onChange={this.handleLinkUser}
+                      placeholder="dog_trainer"
                     />
                   </TableCell>
                 </TableRow>
@@ -560,6 +634,7 @@ class EnvLink extends Component {
                       value={this.state.linkVirtualHost}
                       margin="dense"
                       onChange={this.handleLinkVirtualHost}
+                      placeholder="dog"
                     />
                   </TableCell>
                 </TableRow>
@@ -581,6 +656,7 @@ class EnvLink extends Component {
                       value={this.state.linkCACertFile}
                       margin="dense"
                       onChange={this.handleLinkCACertFile}
+                      placeholder="/var/consul/data/pki/certs/ca.crt"
                     />
                   </TableCell>
                 </TableRow>
@@ -598,6 +674,7 @@ class EnvLink extends Component {
                       value={this.state.linkKeyFile}
                       margin="dense"
                       onChange={this.handleLinkKeyFile}
+                      placeholder="/var/consul/data/pki/private/server.key"
                     />
                   </TableCell>
                 </TableRow>
@@ -615,6 +692,7 @@ class EnvLink extends Component {
                       value={this.state.linkCertFile}
                       margin="dense"
                       onChange={this.handleLinkCertFile}
+                      placeholder="/var/consul/data/pki/certs/server.crt"
                     />
                   </TableCell>
                 </TableRow>
@@ -648,6 +726,7 @@ class EnvLink extends Component {
                       value={this.state.linkServerNameIndication}
                       margin="dense"
                       onChange={this.handleLinkServerNameIndication}
+                      placeholder="disable"
                     />
                   </TableCell>
                 </TableRow>
@@ -704,14 +783,9 @@ class EnvLink extends Component {
             <Button onClick={this.handleCloseButton} color="primary">
               Cancel
             </Button>
-            <Button
-              onClick={this.updateLink}
-              variant="contained"
-              color="primary"
-            >
-              Submit Change
-            </Button>
-            &nbsp;&nbsp;{this.state.editLinkStatus}
+            {buttonType}
+                &nbsp;&nbsp;{this.state.editLinkStatus}
+
           </DialogActions>
         </Dialog>
         <Dialog
@@ -790,7 +864,7 @@ const mapDispatchToProps = dispatch => {
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(withRouter(withStyles(styles)(EnvLink)));
 
 /*

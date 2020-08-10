@@ -405,6 +405,7 @@ class App extends Component {
                 <Route exact={true} path="/flanscans" component={FlanScan} />
                 <Route exact={true} path="/links" component={Links} />
                 <Route path="/link/:id" component={EnvLink} />
+                <Route exact={true} path="/link" component={EnvLink} />
               </main>
             </div>
           </MuiPickersUtilsProvider>
