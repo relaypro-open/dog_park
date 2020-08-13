@@ -159,11 +159,6 @@ class EnvLink extends Component {
             linkServerNameIndication: link.connection.ssl_options.server_name_indication,
             linkVerify: link.connection.ssl_options.verify,
         });
-        if ('link' in link) {
-          this.setState({ linkLinkName: link.link });
-        } else {
-          this.setState({ linkLinkName: '' });
-        }
       })
         .catch(() => this.setState({ hasErrored: true }));
     }
@@ -201,17 +196,15 @@ class EnvLink extends Component {
           this.setState({ isLoading: false });
           let linkId = response.headers.location;
           let newLinkId = linkId.replace(re, '$1');
+          this.setState({ createLinkOpen: false });
+          this.setState({ createLinkName: '' });
+          this.setState({ createLinkLink: '' });
+          this.props.fetchLinks();
+          this.props.history.push('/links');
           return newLinkId;
         } else {
           throw Error(response.statusText);
         }
-      })
-      .then(linkId => {
-        this.setState({ createLinkOpen: false });
-        this.setState({ createLinkName: '' });
-        this.setState({ createLinkLink: '' });
-        this.props.history.push('/link/' + linkId);
-        this.props.fetchLinks();
       })
       .catch(() => this.setState({ hasErrored: true }));
   };
@@ -255,11 +248,12 @@ class EnvLink extends Component {
           this.setState({ defaultLinkId: this.state.linkLinkId });
           this.setState({ saveButtonDisabled: false });
           this.handleCloseButton();
-          this.fetchLink(this.state.linkId);
           this.setState({
             snackBarMsg:
               this.state.linkName + ' has been modified successfully!',
           });
+          this.props.fetchLinks();
+          this.props.history.push('/links');
           return response.data;
         } else {
           throw Error(response.statusText);
@@ -286,8 +280,8 @@ class EnvLink extends Component {
         if (response.status === 204) {
           this.setState({ isDeleting: false });
           this.setState({ deleteLinkStatus: <div>Deleted!</div> });
-          this.fetchLink(this.props.match.params.id);
           this.props.fetchLinks();
+          this.props.history.push('/links');
         } else {
           throw Error(response.statusText);
         }
@@ -798,6 +792,12 @@ class EnvLink extends Component {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
+              WARNING!
+               Deleting a Link will delete the related External, 
+               causing all related profiles and iptables
+               with rules with this environment as source to fail.
+              WARNING!
+
               Are you sure you want to delete: {this.state.linkName}?
             </DialogContentText>
           </DialogContent>
@@ -866,17 +866,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(withRouter(withStyles(styles)(EnvLink)));
-
-/*
-<EditLink
-  linkName={this.state.linkName}
-  linkId={this.state.linkId}
-  linkLinkId={this.state.linkLinkId}
-  linkLinkName={this.state.linkLinkName}
-  linkLinkVersion={this.state.linkLinkVersion}
-  open={this.state.editLinkOpen}
-  links={this.props.links}
-  handleCloseButton={this.handleEditButton}
-  fetchLink={this.fetchLink}
-  history={this.props.history}
-/>*/
