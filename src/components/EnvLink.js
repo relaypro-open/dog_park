@@ -78,6 +78,7 @@ class EnvLink extends Component {
       linkId: '',
       linkConnectionType: '',
       linkDirection: '',
+      linkAddressHandling: '',
       linkEnabled: '',
       linkApiPort: '',
       linkHost: '',
@@ -145,6 +146,7 @@ class EnvLink extends Component {
             linkId: link.id,
             linkConnectionType: link.connection_type,
             linkDirection: link.direction,
+            linkAddressHandling: link.address_handling,
             linkEnabled: link.enabled,
             linkApiPort: link.connection.api_port,
             linkHost: link.connection.host,
@@ -172,6 +174,7 @@ class EnvLink extends Component {
         name: this.state.linkName,
         connection_type: this.state.linkConnectionType,
         direction: this.state.linkDirection,
+        address_handling: this.state.linkAddressHandling,
         enabled: this.state.linkEnabled,
         connection: {
           api_port: this.state.linkApiPort,
@@ -223,6 +226,7 @@ class EnvLink extends Component {
         name: this.state.linkName,
         connection_type: this.state.linkConnectionType,
         direction: this.state.linkDirection,
+        address_handling: this.state.linkAddressHandling,
         enabled: this.state.linkEnabled,
         connection: {
           api_port: this.state.linkApiPort,
@@ -308,6 +312,10 @@ class EnvLink extends Component {
     this.setState({ linkEnabled: event.target.value });
   };
 
+  handleLinkAddressHandling = event => {
+    this.setState({ linkAddressHandling: event.target.value });
+  };
+
   handleLinkFailIfNoPeerCert = event => {
     this.setState({ linkFailIfNoPeerCert: event.target.value });
   };
@@ -318,6 +326,10 @@ class EnvLink extends Component {
 
   handleLinkDirection = event => {
     this.setState({ linkDirection: event.target.value });
+  };
+
+  handleLinkAddressHandling = event => {
+    this.setState({ linkAddressHandling: event.target.value });
   };
 
   handleLinkApiPort = event => {
@@ -489,6 +501,21 @@ class EnvLink extends Component {
                       <MenuItem value={'bidirectional'}>bidirectional</MenuItem>
                       <MenuItem value={'inbound'}>inbound</MenuItem>
                       <MenuItem value={'outbound'}>outbound</MenuItem>
+                    </Select>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <Typography variant="body1">
+                      <strong>Address Handling:</strong>
+                    </Typography>
+                    <Select
+                      value={this.state.linkAddressHandling}
+                      onChange={this.handleLinkAddressHandling}
+                      fullWidth
+                    >
+                      <MenuItem value={'union'}>union</MenuItem>
+                      <MenuItem value={'prefix'}>prefix</MenuItem>
                     </Select>
                   </TableCell>
                 </TableRow>
