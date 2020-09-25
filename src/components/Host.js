@@ -21,9 +21,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import { CloudOff, Check, Error, Help } from '@material-ui/icons';
 
-
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
@@ -57,6 +57,7 @@ class Host extends Component {
       hasErrored: false,
       isLoading: false,
       noExist: false,
+      hostActive: '',
       hostName: '',
       hostId: '',
       hostEnv: '',
@@ -88,28 +89,30 @@ class Host extends Component {
     this.props.handleSelectedTab(3);
   };
 
-  componentDidUpdate = prevProps => {
-    if(this.props.match.params.id !== prevProps.match.params.id) {
+  componentDidUpdate = (prevProps) => {
+    if (this.props.match.params.id !== prevProps.match.params.id) {
       this.fetchHost(this.props.match.params.id);
     }
     if (this.props !== prevProps) {
-      this.setState({ isLoading: false,
-                      hasErrored: false,
-                      noExist: false,
-                      isDeleting: false,
-                      deleteHasErrored: false,
-                      editHostStatus: '',
-                      deleteHostStatus: '',
-                      saveButtonDisabled: true });
+      this.setState({
+        isLoading: false,
+        hasErrored: false,
+        noExist: false,
+        isDeleting: false,
+        deleteHasErrored: false,
+        editHostStatus: '',
+        deleteHostStatus: '',
+        saveButtonDisabled: true,
+      });
     }
   };
 
-  fetchHost = hostId => {
+  fetchHost = (hostId) => {
     this.setState({ isLoading: true });
 
     api
       .get('host/' + hostId)
-      .then(response => {
+      .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           return response.data;
@@ -120,16 +123,19 @@ class Host extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(host => {
+      .then((host) => {
         this.setState(host);
-        this.setState({ hostName: host.name,
-                        hostId: host.id,
-                        hostEnv: host.environment,
-                        hostIntf: host.interfaces,
-                        hostLocation: host.location,
-                        hostProvider: host.provider,
-                        hostUpdateType: host.updatetype,
-                        hostVersion: host.version });
+        this.setState({
+          hostActive: host.active,
+          hostName: host.name,
+          hostId: host.id,
+          hostEnv: host.environment,
+          hostIntf: host.interfaces,
+          hostLocation: host.location,
+          hostProvider: host.provider,
+          hostUpdateType: host.updatetype,
+          hostVersion: host.version,
+        });
         if ('group' in host) {
           this.setState({ hostGroupName: host.group });
         } else {
@@ -148,7 +154,7 @@ class Host extends Component {
         profile_name: this.props.groups[this.state.createHostGroup],
         profile_version: 'latest',
       })
-      .then(response => {
+      .then((response) => {
         if (response.status === 201) {
           let re = /\/api\/host\/(.+)/;
           this.setState({ isLoading: false });
@@ -159,7 +165,7 @@ class Host extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(hostId => {
+      .then((hostId) => {
         this.setState({ createHostOpen: false });
         this.setState({ createHostName: '' });
         this.setState({ createHostGroup: '' });
@@ -183,7 +189,7 @@ class Host extends Component {
         name: this.state.hostName,
         group: this.state.hostGroupName,
       })
-      .then(response => {
+      .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           this.setState({ editHostStatus: '' });
@@ -200,7 +206,7 @@ class Host extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(host => {
+      .then((host) => {
         this.setState({ snackBarOpen: true });
       })
       .catch(() => {
@@ -220,7 +226,7 @@ class Host extends Component {
     });
     api
       .delete('/host/' + this.props.match.params.id)
-      .then(response => {
+      .then((response) => {
         if (response.status === 204) {
           this.setState({ isDeleting: false });
           this.setState({ deleteHostStatus: <div>Deleted!</div> });
@@ -236,19 +242,19 @@ class Host extends Component {
       });
   };
 
-  handleNameInput = event => {
+  handleNameInput = (event) => {
     this.setState({ hostName: event.target.value });
   };
 
-  handleIdInput = event => {
+  handleIdInput = (event) => {
     this.setState({ hostId: event.target.value });
   };
 
-  handleGroupNameInput = event => {
+  handleGroupNameInput = (event) => {
     this.setState({ hostGroupName: event.target.value });
   };
 
-  handleGroupSelect = event => {
+  handleGroupSelect = (event) => {
     this.setState({ hostGroupName: event.target.value });
     if (event.target.value !== this.state.defaultGroupName) {
       this.setState({ saveButtonDisabled: false });
@@ -257,27 +263,27 @@ class Host extends Component {
     }
   };
 
-  handleGroupVersionInput = event => {
+  handleGroupVersionInput = (event) => {
     this.setState({ hostGroupVersion: event.target.value });
   };
 
-  handleEditButton = event => {
+  handleEditButton = (event) => {
     this.setState({ editHostOpen: !this.state.editHostOpen });
   };
 
-  handleSaveButton = event => {
+  handleSaveButton = (event) => {
     this.setState({ saveHostOpen: !this.state.saveHostOpen });
   };
 
-  handleDeleteButton = event => {
+  handleDeleteButton = (event) => {
     this.setState({ deleteHostOpen: !this.state.deleteHostOpen });
   };
 
-  handleCloseButton = event => {
+  handleCloseButton = (event) => {
     this.setState({ saveHostOpen: false });
   };
 
-  handleDeleteCloseButton = event => {
+  handleDeleteCloseButton = (event) => {
     this.setState({ deleteHostOpen: false });
   };
 
@@ -292,8 +298,11 @@ class Host extends Component {
   render() {
     if (this.state.hasErrored && this.state.noExist) {
       return <p>This host no longer exists!</p>;
-    } else if (this.state.hasErrored || this.props.groupsHasErrored ||
-               this.props.flanIpsHasErrored) {
+    } else if (
+      this.state.hasErrored ||
+      this.props.groupsHasErrored ||
+      this.props.flanIpsHasErrored
+    ) {
       return <p>Sorry! There was an error loading the items</p>;
     }
     if (
@@ -313,7 +322,7 @@ class Host extends Component {
 
     const { classes, flanIps } = this.props;
 
-    const groups = this.props.groups[0].map(group => {
+    const groups = this.props.groups[0].map((group) => {
       //let profileName = this.props.groups[profile][0];
       return (
         <MenuItem key={group.id} value={group.name}>
@@ -325,21 +334,44 @@ class Host extends Component {
     let flanApps = [];
     let hostName = this.state.hostName;
 
-    if(!(hostName.includes(".phonebooth.net")) && !(hostName.includes(".phoneboothdev.info"))) {
-      if (hostName.includes("-qa-")) {
-        hostName = hostName + ".phoneboothdev.info";
-      } else if (hostName.includes("-pro-")) {
-        hostName = hostName + ".phonebooth.net";
+    if (
+      !hostName.includes('.phonebooth.net') &&
+      !hostName.includes('.phoneboothdev.info')
+    ) {
+      if (hostName.includes('-qa-')) {
+        hostName = hostName + '.phoneboothdev.info';
+      } else if (hostName.includes('-pro-')) {
+        hostName = hostName + '.phonebooth.net';
       }
     }
     if (hostName in flanIps[0]) {
       flanApps = flanIps[0][hostName];
     }
 
+    let activeIcon = null;
+
+    switch (this.state.hostActive) {
+      case 'active':
+        activeIcon = <Check style={{ fill: 'green' }} />;
+        break;
+      case 'inactive':
+        activeIcon = <Error style={{ fill: 'red' }} />;
+        break;
+      case 'retired':
+        activeIcon = <CloudOff />;
+        break;
+      default:
+        activeIcon = <Help />;
+    }
+
     return (
       <div>
         <form autoComplete="off">
           <Paper className={this.props.classes.root} elevation={1}>
+            <Typography variant="subtitle1">
+              <strong>Active:</strong>&nbsp;&nbsp;&nbsp;&nbsp;{activeIcon}
+            </Typography>
+            <br />
             <Typography variant="subtitle1">
               <strong>Host:</strong> {this.state.hostName}
             </Typography>
@@ -480,26 +512,32 @@ class Host extends Component {
             </IconButton>,
           ]}
         />
-        <br/>
-        <br/>
+        <br />
+        <br />
         <Typography variant="subtitle1">
           <strong>Flan Discovered Apps</strong>
         </Typography>
-        <br/>
-        <br/>
+        <br />
+        <br />
 
-        {flanApps.map(a => (
-            <div>
-            <FlanApp key={'appkey_' + a.app} app={a.app} ip={a.ip} port={a.port} vulns={a.vulns} />
-            <br/>
-            </div>
-          ))}
+        {flanApps.map((a) => (
+          <div>
+            <FlanApp
+              key={'appkey_' + a.app}
+              app={a.app}
+              ip={a.ip}
+              port={a.port}
+              vulns={a.vulns}
+            />
+            <br />
+          </div>
+        ))}
       </div>
     );
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     groups: state.groups,
     groupsHasErrored: state.groupsHasErrored,
@@ -510,11 +548,11 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
     fetchGroups: () => dispatch(groupsFetchData()),
     fetchHosts: () => dispatch(hostsFetchData()),
-    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
   };
 };
 
