@@ -16,7 +16,7 @@ import { SortableElement, SortableHandle } from 'react-sortable-hoc';
 import debounce from 'lodash/debounce';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
@@ -50,7 +50,7 @@ class ProfileRow extends Component {
     let checkedEstablished: false;
     let checkedRelated: false;
 
-    data.states.map((state) => {
+    data.states.map(state => {
       switch (state) {
         case 'NEW':
           checkedNew = true;
@@ -136,12 +136,13 @@ class ProfileRow extends Component {
     this.hitCountFunction = debounce(this.props.handleHitCountInput, 500);
   }
 
-  componentDidUpdate = (prevProps) => {
+  componentDidUpdate = prevProps => {
     if (this.props.data !== prevProps.data) {
       if (
         (this.props.data.group_type !== prevProps.data.group_type ||
           this.props.data.environment !== prevProps.data.environment) &&
-        this.props.data.order === prevProps.data.order
+        (this.props.data.order === prevProps.data.order &&
+          this.props.data.group === prevProps.data.group)
       ) {
         const { zones, groups, data, environmentAdd } = this.props;
         const { groupId } = this.getGroupValues(
@@ -166,7 +167,7 @@ class ProfileRow extends Component {
           let checkedEstablished: false;
           let checkedRelated: false;
 
-          data.states.map((state) => {
+          data.states.map(state => {
             switch (state) {
               case 'NEW':
                 checkedNew = true;
@@ -285,7 +286,7 @@ class ProfileRow extends Component {
     return { sourceSelect, sourceReverse, groupName, groupId };
   };
 
-  handleActiveCheckbox = (event) => {
+  handleActiveCheckbox = event => {
     this.setState({ active: event.target.checked });
     this.activeFunction(
       this.props.pIndex,
@@ -294,7 +295,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleTypeSelect = (event) => {
+  handleTypeSelect = event => {
     this.setState({ type: event.target.value });
     this.typeFunction(
       this.props.pIndex,
@@ -303,7 +304,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleIntfSelect = (event) => {
+  handleIntfSelect = event => {
     this.setState({ intf: event.target.value });
     this.intfFunction(
       this.props.pIndex,
@@ -312,7 +313,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleGroupTypeSelect = (event) => {
+  handleGroupTypeSelect = event => {
     this.setState({ group_type: event.target.value });
     this.groupTypeFunction(
       this.props.pIndex,
@@ -321,7 +322,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleEnvironmentSelect = (event) => {
+  handleEnvironmentSelect = event => {
     this.setState({ environment: event.target.value });
     this.environmentFunction(
       this.props.pIndex,
@@ -339,7 +340,7 @@ class ProfileRow extends Component {
     }
   };
 
-  handleGroupInput = (value) => {
+  handleGroupInput = value => {
     if (value == null) {
       this.setState({ groupName: '' });
     } else {
@@ -347,14 +348,14 @@ class ProfileRow extends Component {
     }
   };
 
-  handleServiceSelect = (value) => {
+  handleServiceSelect = value => {
     if (value != null) {
       this.setState({ service: value });
       this.serviceFunction(this.props.pIndex, value, this.props.ruleType);
     }
   };
 
-  handleServiceInput = (value) => {
+  handleServiceInput = value => {
     if (value == null) {
       this.setState({ serviceName: '' });
     } else {
@@ -362,7 +363,7 @@ class ProfileRow extends Component {
     }
   };
 
-  handleActionSelect = (event) => {
+  handleActionSelect = event => {
     this.setState({ action: event.target.value });
     this.actionFunction(
       this.props.pIndex,
@@ -371,7 +372,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleLogCheckbox = (event) => {
+  handleLogCheckbox = event => {
     this.setState({ log: event.target.checked });
     this.logFunction(
       this.props.pIndex,
@@ -380,7 +381,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleLogPrefixInput = (event) => {
+  handleLogPrefixInput = event => {
     this.setState({ logPrefix: event.target.value });
     this.logPrefixFunction(
       this.props.pIndex,
@@ -389,7 +390,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleCommentInput = (event) => {
+  handleCommentInput = event => {
     this.setState({ comment: event.target.value });
     this.commentFunction(
       this.props.pIndex,
@@ -398,7 +399,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleConnLimitAboveInput = (event) => {
+  handleConnLimitAboveInput = event => {
     this.setState({ connLimitAbove: event.target.value });
     this.connLimitAboveFunction(
       this.props.pIndex,
@@ -407,7 +408,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleConnLimitMaskInput = (event) => {
+  handleConnLimitMaskInput = event => {
     this.setState({ connLimitMask: event.target.value });
     this.connLimitMaskFunction(
       this.props.pIndex,
@@ -416,7 +417,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleRecentNameInput = (event) => {
+  handleRecentNameInput = event => {
     this.setState({ recentName: event.target.value });
     this.recentNameFunction(
       this.props.pIndex,
@@ -425,7 +426,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleRecentMaskInput = (event) => {
+  handleRecentMaskInput = event => {
     this.setState({ recentMask: event.target.value });
     this.recentMaskFunction(
       this.props.pIndex,
@@ -434,7 +435,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleSecondsInput = (event) => {
+  handleSecondsInput = event => {
     this.setState({ seconds: event.target.value });
     this.secondsFunction(
       this.props.pIndex,
@@ -443,7 +444,7 @@ class ProfileRow extends Component {
     );
   };
 
-  handleHitCountInput = (event) => {
+  handleHitCountInput = event => {
     this.setState({ hitCount: event.target.value });
     this.hitCountFunction(
       this.props.pIndex,
@@ -452,15 +453,15 @@ class ProfileRow extends Component {
     );
   };
 
-  handleAddProfile = (event) => {
+  handleAddProfile = event => {
     this.props.handleAddProfile(this.props.pIndex, this.props.ruleType);
   };
 
-  handleRemoveProfile = (event) => {
+  handleRemoveProfile = event => {
     this.props.handleRemoveProfile(this.props.pIndex, this.props.ruleType);
   };
 
-  handleStateButton = (event) => {
+  handleStateButton = event => {
     this.setState({ anchorEl: event.currentTarget });
   };
 
@@ -468,7 +469,7 @@ class ProfileRow extends Component {
     this.setState({ anchorEl: null });
   };
 
-  handleStateChange = (name) => (event) => {
+  handleStateChange = name => event => {
     let checkedNew = this.state.checkedNew;
     let checkedEstablished = this.state.checkedEstablished;
     let checkedRelated = this.state.checkedRelated;
@@ -559,11 +560,11 @@ class ProfileRow extends Component {
     }
 
     const sourceSelectOptions = {
-      options: sourceSelect.map((option) => option.name),
+      options: sourceSelect.map(option => option.name),
     };
 
     const serviceSelectOptions = {
-      options: services[0].map((option) => option.name),
+      options: services[0].map(option => option.name),
     };
 
     let groupInput = groupName;
@@ -580,8 +581,8 @@ class ProfileRow extends Component {
     if (type === 'CONNLIMIT') {
       ruleType = (
         <TableRow style={{ zIndex: 10000000 }} id={'connLimitRow_' + order}>
-          <TableCell></TableCell>
-          <TableCell></TableCell>
+          <TableCell />
+          <TableCell />
           <TableCell padding="50" id={'connLimitCell1_' + order}>
             <TextField
               helperText="connLimitAbove"
@@ -604,15 +605,15 @@ class ProfileRow extends Component {
               disabled={!active}
             />
           </TableCell>
-          <TableCell></TableCell>
-          <TableCell></TableCell>
+          <TableCell />
+          <TableCell />
         </TableRow>
       );
     } else if (type === 'RECENT') {
       ruleType = (
         <TableRow style={{ zIndex: 10000000 }} id={'recentRow_' + order}>
-          <TableCell></TableCell>
-          <TableCell></TableCell>
+          <TableCell />
+          <TableCell />
           <TableCell padding="50" id={'recentCell1_' + order}>
             <TextField
               helperText="recentName"
@@ -658,8 +659,8 @@ class ProfileRow extends Component {
               disabled={!active}
             />
           </TableCell>
-          <TableCell></TableCell>
-          <TableCell></TableCell>
+          <TableCell />
+          <TableCell />
         </TableRow>
       );
     }
@@ -672,7 +673,7 @@ class ProfileRow extends Component {
           {...sourceSelectOptions}
           inputValue={groupInput}
           value={groupValue_}
-          renderInput={(params) => <TextField {...params} variant="standard" />}
+          renderInput={params => <TextField {...params} variant="standard" />}
           onChange={(event, value) => {
             this.handleGroupSelect(sourceReverse[value], groupValue_);
           }}
@@ -722,7 +723,7 @@ class ProfileRow extends Component {
               disabled={!active}
             >
               <MenuItem value={'local'}>local</MenuItem>
-              {environments.map((env) => {
+              {environments.map(env => {
                 return <MenuItem value={env.name}>{env.name}</MenuItem>;
               })}
             </Select>
@@ -745,7 +746,7 @@ class ProfileRow extends Component {
               {...serviceSelectOptions}
               inputValue={serviceName}
               value={serviceValue}
-              renderInput={(params) => (
+              renderInput={params => (
                 <TextField {...params} variant="standard" />
               )}
               onChange={(event, value) => {

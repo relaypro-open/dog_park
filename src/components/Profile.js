@@ -34,7 +34,7 @@ import { SortableContainer } from 'react-sortable-hoc';
 import arrayMove from 'array-move';
 import update from 'immutability-helper';
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {
     width: '100%',
     marginTop: theme.spacing(3),
@@ -181,7 +181,7 @@ class Profile extends Component {
     this.props.handleSelectedTab(1);
   };
 
-  componentDidUpdate = (prevProps) => {
+  componentDidUpdate = prevProps => {
     if (this.props.location !== prevProps.location) {
       this.setState({ saveProfileOpen: false });
       this.setState({ deleteProfileOpen: false });
@@ -201,7 +201,7 @@ class Profile extends Component {
           outbound: this.state.outboundRules,
         },
       })
-      .then((response) => {
+      .then(response => {
         if (response.status === 201) {
           let re = /\/api\/profile\/(.+)/;
           this.setState({ isLoading: false });
@@ -212,7 +212,7 @@ class Profile extends Component {
           throw Error(response.statusText);
         }
       })
-      .then((profileId) => {
+      .then(profileId => {
         this.setState({ cloneProfileOpen: false });
         this.setState({ cloneProfileName: '' });
         this.props.history.push('/profile/' + profileId);
@@ -221,12 +221,12 @@ class Profile extends Component {
       .catch(() => this.setState({ hasErrored: true }));
   };
 
-  fetchProfile = (profileId) => {
+  fetchProfile = profileId => {
     this.setState({ isLoading: true });
 
     api
       .get('profile/' + profileId)
-      .then((response) => {
+      .then(response => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           return response.data;
@@ -237,7 +237,7 @@ class Profile extends Component {
           throw Error(response.statusText);
         }
       })
-      .then((profile) => {
+      .then(profile => {
         this.setState((state, props) => {
           let inboundRules, outboundRules;
           let profileVersion;
@@ -343,7 +343,7 @@ class Profile extends Component {
           outbound: outboundRules,
         },
       })
-      .then((response) => {
+      .then(response => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           this.setState({
@@ -358,7 +358,7 @@ class Profile extends Component {
           throw Error(response.statusText);
         }
       })
-      .then((profile) => {
+      .then(profile => {
         this.setState({ snackBarOpen: true });
         this.setState({ saveProfileOpen: false });
         this.setState({ saveProfileStatus: '' });
@@ -380,7 +380,7 @@ class Profile extends Component {
     });
     api
       .delete('/profile/' + this.props.match.params.id)
-      .then((response) => {
+      .then(response => {
         if (response.status === 204) {
           this.setState((state, props) => {
             props.fetchProfiles();
@@ -395,7 +395,7 @@ class Profile extends Component {
           throw Error(error_msg);
         }
       })
-      .catch((error) => {
+      .catch(error => {
         this.setState({
           deleteProfileStatus: (
             <div style={{ color: 'red' }}>
@@ -878,7 +878,7 @@ class Profile extends Component {
     this.setState({ snackBarOpen: false });
   };
 
-  handleIptablesViewButton = (event) => {
+  handleIptablesViewButton = event => {
     const iptablesOutput = (
       <IptablesView id={this.state.profileId} version={'ipv4'} />
     );
@@ -887,20 +887,20 @@ class Profile extends Component {
     this.setState({ iptablesViewOpen: !this.state.iptablesViewOpen });
   };
 
-  handleCloneButton = (event) => {
+  handleCloneButton = event => {
     this.setState({ cloneProfileName: this.state.profileName + '_clone' });
     this.setState({ cloneProfileOpen: !this.state.cloneProfileOpen });
   };
 
-  handleCloneProfileName = (event) => {
+  handleCloneProfileName = event => {
     this.setState({ cloneProfileName: event.target.value });
   };
 
-  handleCloneProfileClose = (event) => {
+  handleCloneProfileClose = event => {
     this.setState({ cloneProfileOpen: false });
   };
 
-  handleIptablesViewCloseButton = (event) => {
+  handleIptablesViewCloseButton = event => {
     this.setState({ iptablesViewOpen: false });
   };
 
@@ -1237,7 +1237,7 @@ class Profile extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     environments: state.environments,
     environmentAdd: state.environmentAdd,
@@ -1257,12 +1257,12 @@ const mapStateToProps = (state) => {
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
     fetchServices: () => dispatch(servicesFetchData()),
     fetchProfiles: () => dispatch(profilesFetchData()),
     fetchZones: () => dispatch(zonesFetchData()),
-    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
   };
 };
 
