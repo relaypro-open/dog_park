@@ -59,6 +59,7 @@ class Host extends Component {
       noExist: false,
       hostActive: '',
       hostName: '',
+      hostKey: '',
       hostId: '',
       hostEnv: '',
       hostIntf: '',
@@ -128,6 +129,7 @@ class Host extends Component {
         this.setState({
           hostActive: host.active,
           hostName: host.name,
+          hostKey: host.hostkey,
           hostId: host.id,
           hostEnv: host.environment,
           hostIntf: host.interfaces,
@@ -373,7 +375,11 @@ class Host extends Component {
             </Typography>
             <br />
             <Typography variant="subtitle1">
-              <strong>Host:</strong> {this.state.hostName}
+              <strong>Name:</strong> {this.state.hostName}
+            </Typography>
+            <br />
+            <Typography variant="subtitle1">
+              <strong>HostKey:</strong> {this.state.hostKey}
             </Typography>
             <br />
             <Typography variant="body1">
