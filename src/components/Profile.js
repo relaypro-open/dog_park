@@ -247,7 +247,6 @@ class Profile extends Component {
         this.setState((state, props) => {
           let inboundRules, outboundRules;
           let profileVersion;
-          let docker;
           if ('rules' in profile) {
             inboundRules = profile.rules.inbound;
             outboundRules = profile.rules.outbound;
@@ -259,11 +258,6 @@ class Profile extends Component {
             profileVersion = profile.version;
           } else {
             profileVersion = '';
-          }
-          if ('docker' in profile) {
-            docker = profile.docker;
-          } else {
-            docker = '';
           }
 
           if (inboundRules.length === 0) {
