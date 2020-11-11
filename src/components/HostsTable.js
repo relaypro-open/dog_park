@@ -38,7 +38,7 @@ const HostsTable = pure((props) => {
           <TableRow>
             <TableCell>Active</TableCell>
             <TableCell>Host Name</TableCell>
-            <TableCell>Host ID</TableCell>
+            <TableCell>Host Key</TableCell>
             <TableCell>Host Group</TableCell>
             <TableCell>Flan Events</TableCell>
             <TableCell>Open Apps</TableCell>
@@ -88,7 +88,7 @@ const HostsTable = pure((props) => {
               >
                 <TableCell>{activeIcon}</TableCell>
                 <TableCell>{host.name}</TableCell>
-                <TableCell>{host.id}</TableCell>
+                <TableCell>{host.hostkey}</TableCell>
                 <TableCell
                   title={'Click to view group: ' + host.group}
                   Style="text-decoration:underline; cursor: pointer;"
