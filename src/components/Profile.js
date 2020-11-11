@@ -33,6 +33,8 @@ import {
 import { SortableContainer } from 'react-sortable-hoc';
 import arrayMove from 'array-move';
 import update from 'immutability-helper';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const styles = theme => ({
   root: {
@@ -99,6 +101,7 @@ const TableBodySortable = SortableContainer(
     handleAddProfile,
     handleRemoveProfile,
     handleStatesSelection,
+    handleDockerSelection,
   }) => {
     return (
       <TableBody>
@@ -135,6 +138,7 @@ const TableBodySortable = SortableContainer(
               handleAddProfile={handleAddProfile}
               handleRemoveProfile={handleRemoveProfile}
               handleStatesSelection={handleStatesSelection}
+              handleDockerSelection={handleDockerSelection}
             />
           );
         })}
@@ -170,6 +174,7 @@ class Profile extends Component {
       snackBarMsg: '',
       iptablesOutput: '',
       iptablesViewOpen: false,
+      docker: false,
     };
   }
 
@@ -196,6 +201,7 @@ class Profile extends Component {
     api
       .post('profile', {
         name: this.state.cloneProfileName,
+        docker: this.state.docker,
         rules: {
           inbound: this.state.inboundRules,
           outbound: this.state.outboundRules,
@@ -241,6 +247,7 @@ class Profile extends Component {
         this.setState((state, props) => {
           let inboundRules, outboundRules;
           let profileVersion;
+          let docker;
           if ('rules' in profile) {
             inboundRules = profile.rules.inbound;
             outboundRules = profile.rules.outbound;
@@ -252,6 +259,11 @@ class Profile extends Component {
             profileVersion = profile.version;
           } else {
             profileVersion = '';
+          }
+          if ('docker' in profile) {
+            docker = profile.docker;
+          } else {
+            docker = '';
           }
 
           if (inboundRules.length === 0) {
@@ -305,6 +317,7 @@ class Profile extends Component {
           return {
             profileName: profile.name,
             profileId: profile.id,
+            docker: profile.docker,
             inboundRules,
             outboundRules,
             profileVersion,
@@ -338,6 +351,7 @@ class Profile extends Component {
     api
       .put('profile/' + this.state.profileId, {
         name: this.state.profileName,
+        docker: this.state.docker,
         rules: {
           inbound: inboundRules,
           outbound: outboundRules,
@@ -431,6 +445,10 @@ class Profile extends Component {
 
   handleDeleteButton = () => {
     this.setState({ deleteProfileOpen: true });
+  };
+
+  handleDockerSelection = event => {
+    this.setState({ docker: event.target.value });
   };
 
   handleActiveCheckbox = (index, value, ruleType) => {
@@ -1067,9 +1085,18 @@ class Profile extends Component {
                 handleAddProfile={this.handleAddProfile}
                 handleRemoveProfile={this.handleRemoveProfile}
                 handleStatesSelection={this.handleStatesSelection}
+                handleDockerSelection={this.handleDockerSelection}
               />
             </Table>
           </Paper>
+          <br />
+          <br />
+                <Typography variant="body1">Docker Rules: <Select value={this.state.docker} onChange={this.handleDockerSelection} >
+                  <MenuItem value={'true'}>true</MenuItem>
+                  <MenuItem value={'false'}>false</MenuItem>
+                </Select>
+            </Typography>
+          <br />
           <br />
           <Button
             onClick={this.handleSaveButton}
