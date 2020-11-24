@@ -16,10 +16,10 @@ class Hosts extends Component {
   }
 
   render() {
-    if (this.props.hasErrored || this.props.flanIpsHasErrored) {
+    if (this.props.hasErrored) {
       return <p>Sorry! There was an error loading the items</p>;
     }
-    if (this.props.isLoading || this.props.flanIpsIsLoading || this.props.flanIps.length === 0) {
+    if (this.props.isLoading || this.props.flanIpsIsLoading) {
       return (
         <div>
           {' '}
@@ -30,14 +30,17 @@ class Hosts extends Component {
 
     return (
       <div>
-        <HostsTable hosts={this.props.hosts[0]} flanIps={this.props.flanIps} />
+        <HostsTable
+          hosts={this.props.hosts.hostList}
+          flanIps={this.props.flanIps}
+        />
         <br />
       </div>
     );
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     hosts: state.hosts,
     hasErrored: state.hostsHasErrored,
@@ -48,13 +51,10 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Hosts);
+export default connect(mapStateToProps, mapDispatchToProps)(Hosts);

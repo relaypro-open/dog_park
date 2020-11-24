@@ -6,7 +6,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import FlanCVE from './FlanCVE';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     width: '50%',
   },
@@ -42,22 +42,23 @@ class FlanApp extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if(this.props !== prevProps) {
-      this.setState({app: this.props.app,
-                     ip: this.props.ip,
-                     port: this.props.port,
-                     vulns: this.props.vulns});
+    if (this.props !== prevProps) {
+      this.setState({
+        app: this.props.app,
+        ip: this.props.ip,
+        port: this.props.port,
+        vulns: this.props.vulns,
+      });
     }
-
   }
 
   render() {
     const { classes } = this.props;
     const { app, port, vulns } = this.state;
-    return(
+    return (
       <Card className={classes.root}>
-      <CardHeader
-        /*avatar={
+        <CardHeader
+          /*avatar={
           <Avatar aria-label="recipe" style={avatar}>
             {sevLetter}
           </Avatar>
@@ -67,26 +68,31 @@ class FlanApp extends Component {
             <LinkIcon />
           </IconButton>
         }*/
-        title={app}
-        subheader={"Ports: " + port}
-      />
-      <CardContent>
-        <Typography variant="h6">
-          <strong>Flan CVEs:</strong>
-        </Typography>
-        <br/>
-        <br/>
-        {vulns.map(vuln => (
-          <div>
-            <FlanCVE key={'key_' + vuln.name} title={vuln.name} app={vuln.app} description={vuln.description} severity={vuln.severity} link={'https://nvd.nist.gov/vuln/detail/' + vuln.name} />
-            <br/>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
-
-  );
-
+          title={app}
+          subheader={'Ports: ' + port}
+        />
+        <CardContent>
+          <Typography variant="h6">
+            <strong>Flan CVEs:</strong>
+          </Typography>
+          <br />
+          <br />
+          {vulns.map((vuln) => (
+            <div>
+              <FlanCVE
+                key={'key_' + vuln.name}
+                title={vuln.name}
+                app={vuln.app}
+                description={vuln.description}
+                severity={vuln.severity}
+                link={'https://vulners.com/cve/' + vuln.name}
+              />
+              <br />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
   }
 }
 

@@ -20,7 +20,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Fab from '@material-ui/core/Fab';
 import validator from 'validator';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
@@ -61,8 +61,11 @@ class Services extends Component {
   }
 
   createService = () => {
-    if (this.state.isErrored || this.state.createServiceName === '' ||
-        this.state.createServiceName in this.props.services[1]) {
+    if (
+      this.state.isErrored ||
+      this.state.createServiceName === '' ||
+      this.state.createServiceName in this.props.services.serviceNames
+    ) {
       this.setState({ serviceErrorOpen: true });
       return;
     }
@@ -79,7 +82,7 @@ class Services extends Component {
         ],
         version: 1,
       })
-      .then(response => {
+      .then((response) => {
         if (response.status === 201) {
           let re = /\/api\/service\/(.+)/;
           this.setState({ isLoading: false });
@@ -90,7 +93,7 @@ class Services extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(serviceId => {
+      .then((serviceId) => {
         this.setState({ createServiceOpen: false });
         this.setState({ createServiceName: '' });
         this.props.fetchServices();
@@ -111,15 +114,15 @@ class Services extends Component {
     this.setState({ createServiceOpen: false });
   };
 
-  handleCreateServiceName = event => {
+  handleCreateServiceName = (event) => {
     this.setState({ createServiceName: event.target.value });
   };
 
-  handleCreateServicePorts = event => {
+  handleCreateServicePorts = (event) => {
     const ports = event.target.value;
     const portList = ports.split(',');
     const isValid = portList
-      .map(portString => {
+      .map((portString) => {
         const range = portString.split('-');
         if (range !== portString && range.length === 2) {
           return (
@@ -142,7 +145,7 @@ class Services extends Component {
     this.setState({ createServicePorts: event.target.value });
   };
 
-  handleCreateServiceProtocol = event => {
+  handleCreateServiceProtocol = (event) => {
     this.setState({ createServiceProtocol: event.target.value });
   };
 
@@ -150,8 +153,7 @@ class Services extends Component {
     if (this.props.hasErrored) {
       return <p>Sorry! There was an error loading the items</p>;
     }
-    if (this.props.isLoading ||
-        this.props.services.length === 0 ) {
+    if (this.props.isLoading) {
       return (
         <div>
           {' '}
@@ -164,7 +166,7 @@ class Services extends Component {
 
     return (
       <div>
-        <ServicesTable services={this.props.services[0]} />
+        <ServicesTable services={this.props.services.serviceList} />
 
         <Fab
           color="secondary"
@@ -261,7 +263,7 @@ class Services extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     services: state.services,
     hasErrored: state.servicesHasErrored,
@@ -269,9 +271,9 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
     fetchServices: () => dispatch(servicesFetchData()),
   };
 };

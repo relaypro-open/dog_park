@@ -64,8 +64,8 @@ const HostsTable = pure((props) => {
             let flanEventCount = 0;
             let openAppCount = 0;
             let flanEvent = '';
-            if (host.name in flanIps[0]) {
-              flanIps[0][host.name].forEach((app) => {
+            if (host.name in flanIps.hosts) {
+              flanIps.hosts[host.name].forEach((app) => {
                 flanEventCount += app['vulns'].length;
                 openAppCount += 1;
               });

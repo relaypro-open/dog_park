@@ -20,9 +20,9 @@ export const links = handleAction(
   'LINKS_FETCH_DATA_SUCCESS',
   (state, action) => {
     const links = action.payload.sort((x, y) => {
-      if(x.name.toLowerCase() < y.name.toLowerCase()) {
+      if (x.name.toLowerCase() < y.name.toLowerCase()) {
         return -1;
-      } else if (x.name.toLowerCase() > y.name.toLowerCase()){
+      } else if (x.name.toLowerCase() > y.name.toLowerCase()) {
         return 1;
       } else {
         return 0;
@@ -32,12 +32,12 @@ export const links = handleAction(
     let linkIds = {};
     let linkNames = {};
 
-    links.forEach(z => {
+    links.forEach((z) => {
       linkNames[z.name] = z.id;
       linkIds[z.id] = z.name;
-    })
+    });
 
-    return [links, linkNames, linkIds];
+    return { linkList: links, linkNames: linkNames, linkIds: linkIds };
   },
-  []
+  { linkList: [], linkNames: {}, linkIds: {} }
 );

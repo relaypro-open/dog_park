@@ -11,7 +11,7 @@ import {
 } from '@material-ui/core';
 import { pure } from 'recompose';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     width: '100%',
     marginTop: theme.spacing(3),
@@ -22,7 +22,7 @@ const styles = theme => ({
   },
 });
 
-const ZonesTable = pure(props => {
+const ZonesTable = pure((props) => {
   const { classes, zones } = props;
 
   return (
@@ -35,12 +35,12 @@ const ZonesTable = pure(props => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {zones.map(zone => {
+          {zones.map((zone) => {
             return (
               <TableRow
                 key={zone.id}
                 hover
-                onClick={event => {
+                onClick={(event) => {
                   props.history.push('/zone/' + zone.id);
                 }}
               >

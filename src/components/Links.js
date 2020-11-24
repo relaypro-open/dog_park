@@ -10,7 +10,7 @@ import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import Fab from '@material-ui/core/Fab';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
@@ -32,8 +32,6 @@ const styles = theme => ({
   },
 });
 
-
-
 class Links extends Component {
   constructor(props) {
     super(props);
@@ -46,10 +44,10 @@ class Links extends Component {
     };
   }
 
-  createLink = () =>{ 
+  createLink = () => {
     this.props.history.push('/link/');
     this.props.fetchLinks();
-  }
+  };
 
   componentDidMount() {
     if (this.props.links === []) {
@@ -67,11 +65,11 @@ class Links extends Component {
       return {
         createLinkOpen: false,
         createLinkStatus: '',
-      }
+      };
     });
   };
 
-  handleCreateLinkName = event => {
+  handleCreateLinkName = (event) => {
     this.setState({ createLinkName: event.target.value });
   };
 
@@ -92,7 +90,7 @@ class Links extends Component {
 
     return (
       <div>
-        <LinksTable links={this.props.links[0]} />
+        <LinksTable links={this.props.links.linkList} />
         <Fab
           color="secondary"
           aria-label="Add"
@@ -101,21 +99,16 @@ class Links extends Component {
         >
           <AddIcon />
         </Fab>
-
-            <Button
-              onClick={this.createLink}
-              variant="contained"
-              color="primary"
-            >
-              Create Link
-            </Button>
-            &nbsp;&nbsp;{this.state.createLinkStatus}
+        <Button onClick={this.createLink} variant="contained" color="primary">
+          Create Link
+        </Button>
+        &nbsp;&nbsp;{this.state.createLinkStatus}
       </div>
     );
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     links: state.links,
     hasErrored: state.linksHasErrored,
@@ -123,10 +116,10 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
     fetchLinks: () => dispatch(linksFetchData()),
-    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
   };
 };
 

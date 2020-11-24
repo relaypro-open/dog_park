@@ -16,7 +16,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Fab from '@material-ui/core/Fab';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
@@ -58,9 +58,13 @@ class Zones extends Component {
   }
 
   createZone = () => {
-    if (this.state.createZoneName === '' ||
-        this.state.createZoneName in this.props.zones[1]) {
-          this.setState({createZoneStatus: "Please enter a valid/unused zone name!"});
+    if (
+      this.state.createZoneName === '' ||
+      this.state.createZoneName in this.props.zones.zoneNames
+    ) {
+      this.setState({
+        createZoneStatus: 'Please enter a valid/unused zone name!',
+      });
     } else {
       this.setState({ isLoading: true });
 
@@ -70,7 +74,7 @@ class Zones extends Component {
           ipv4_addresses: [],
           ipv6_addresses: [],
         })
-        .then(response => {
+        .then((response) => {
           if (response.status === 201) {
             let re = /\/api\/zone\/(.+)/;
             this.setState({ isLoading: false });
@@ -81,7 +85,7 @@ class Zones extends Component {
             throw Error(response.statusText);
           }
         })
-        .then(zoneId => {
+        .then((zoneId) => {
           this.setState({ createZoneOpen: false });
           this.setState({ createZoneName: '' });
           this.props.fetchZones();
@@ -100,11 +104,11 @@ class Zones extends Component {
       return {
         createZoneOpen: false,
         createZoneStatus: '',
-      }
+      };
     });
   };
 
-  handleCreateZoneName = event => {
+  handleCreateZoneName = (event) => {
     this.setState({ createZoneName: event.target.value });
   };
 
@@ -125,7 +129,7 @@ class Zones extends Component {
 
     return (
       <div>
-        <ZonesTable zones={this.props.zones[0]} />
+        <ZonesTable zones={this.props.zones.zoneList} />
         <Fab
           color="secondary"
           aria-label="Add"
@@ -179,7 +183,7 @@ class Zones extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     zones: state.zones,
     hasErrored: state.zonesHasErrored,
@@ -187,10 +191,10 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
     fetchZones: () => dispatch(zonesFetchData()),
-    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
   };
 };
 

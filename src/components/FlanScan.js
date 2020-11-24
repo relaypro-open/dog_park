@@ -6,11 +6,11 @@ import { handleSelectedTab } from '../actions/app';
 //import { DatePicker } from "@material-ui/pickers";
 //import FlanCVE from './FlanCVE';
 import HostsTable from './HostsTable';
-import moment from "moment";
+import moment from 'moment';
 import { flan_api } from '../flan_api';
 import { CircularProgress, Typography } from '@material-ui/core';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
@@ -44,7 +44,7 @@ class FlanScan extends Component {
       isLoading: false,
       noExist: false,
       scan: {},
-      selectedDate: moment()
+      selectedDate: moment(),
     };
   }
 
@@ -54,38 +54,40 @@ class FlanScan extends Component {
     //this.props.fetchGroups();
   }
 
-  handleDateChange = event => {
-    this.setState({selectedDate: event});
-  }
+  handleDateChange = (event) => {
+    this.setState({ selectedDate: event });
+  };
 
   fetchScans = () => {
-    this.setState({isLoading: true});
+    this.setState({ isLoading: true });
 
     flan_api
       .get('/vulners_by_hostname')
-      .then(response => {
-        if(response.status ===200) {
-          this.setState({isLoading: false});
+      .then((response) => {
+        if (response.status === 200) {
+          this.setState({ isLoading: false });
           return response.data;
         } else if (response.status === 404) {
-          this.setState({isLoading: false});
-          throw Error(response.statusText)
+          this.setState({ isLoading: false });
+          throw Error(response.statusText);
         } else {
-          this.setState({isLoading: false});
+          this.setState({ isLoading: false });
           throw Error(response.statusText);
         }
       })
-      .then(scan => {
-        this.setState({scan: scan});
+      .then((scan) => {
+        this.setState({ scan: scan });
       })
       .catch(() => this.setState({ hasErrored: true }));
-  }
+  };
 
   render() {
-    if (this.state.hasErrored ||
-        this.props.profilesHasErrored ||
-        this.props.hostsHasErrored ||
-        this.props.flanIpsHasErrored) {
+    if (
+      this.state.hasErrored ||
+      this.props.profilesHasErrored ||
+      this.props.hostsHasErrored ||
+      this.props.flanIpsHasErrored
+    ) {
       return <p>Sorry! There was an error loading the items</p>;
     }
     if (
@@ -93,7 +95,7 @@ class FlanScan extends Component {
       this.props.profilesIsLoading ||
       this.props.hostsIsLoading ||
       this.props.flanIpsIsLoading ||
-      this.props.flanIps.length === 0
+      Object.keys(this.props.flanIps.hosts).length === 0
     ) {
       return (
         <div>
@@ -108,13 +110,13 @@ class FlanScan extends Component {
     const { hosts, flanIps } = this.props;
 
     let output = [];
-    Object.keys(scan).forEach(key => {
+    Object.keys(scan).forEach((key) => {
       let application = scan[key];
-      if ('locations' in application ) {
+      if ('locations' in application) {
         application['hosts'] = [];
-        Object.keys(application['locations']).forEach(h => {
-          if (h in hosts[1]) {
-            application['hosts'].push(hosts[1][h]);
+        Object.keys(application['locations']).forEach((h) => {
+          if (h in hosts.hostObjects) {
+            application['hosts'].push(hosts.hostObjects[h]);
           }
         });
       }
@@ -125,50 +127,56 @@ class FlanScan extends Component {
     });
 
     return (
-    <div>
-      <a href="https://us-east-1.console.aws.amazon.com/s3/buckets/flan-scans/?region=us-east-1&tab=overview">Flan Scans</a>
-      <br/>
-      <br/>
-
-    {output.map(app => (
       <div>
-      <Typography variant="h4
-      ">
-        <strong>{app.name}</strong>
-      </Typography>
-      <br/>
-      <HostsTable hosts={app.hosts} flanIps={flanIps} />
-      <br/>
+        <a href="https://us-east-1.console.aws.amazon.com/s3/buckets/flan-scans/?region=us-east-1&tab=overview">
+          Flan Scans
+        </a>
+        <br />
+        <br />
 
-      <br/>
+        {output.map((app) => (
+          <div>
+            <Typography
+              variant="h4
+      "
+            >
+              <strong>{app.name}</strong>
+            </Typography>
+            <br />
+            <HostsTable hosts={app.hosts} flanIps={flanIps} />
+            <br />
+
+            <br />
+          </div>
+        ))}
       </div>
-
-    ))}
-
-     </div>
-    )}
+    );
   }
+}
 
-  const mapStateToProps = state => {
-    return {
-      profilesHasErrored: state.profilesHasErrored,
-      profilesIsLoading: state.profilesIsLoading,
-      hosts: state.hosts,
-      hostsHasErrored: state.hostsHasErrored,
-      hostsIsLoading: state.hostsIsLoading,
-      flanIps: state.flanIps,
-      flanIpsHasErrored: state.flanIpsHasErrored,
-      flanIpsIsLoading: state.flanIpsIsLoading,
-    };
-  };
-
-const mapDispatchToProps = dispatch => {
+const mapStateToProps = (state) => {
   return {
-    handleSelectedTab: value => dispatch(handleSelectedTab(value))
+    profilesHasErrored: state.profilesHasErrored,
+    profilesIsLoading: state.profilesIsLoading,
+    hosts: state.hosts,
+    hostsHasErrored: state.hostsHasErrored,
+    hostsIsLoading: state.hostsIsLoading,
+    flanIps: state.flanIps,
+    flanIpsHasErrored: state.flanIpsHasErrored,
+    flanIpsIsLoading: state.flanIpsIsLoading,
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(withStyles(styles)(FlanScan)));
+const mapDispatchToProps = (dispatch) => {
+  return {
+    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(withStyles(styles)(FlanScan)));
 
 //      <FlanCVE key={'key_' + vuln.name} title={vuln.name} app={vuln.app} description={vuln.description} severity={vuln.severity} link={'https://nvd.nist.gov/vuln/detail/' + vuln.name} />
 //{app.vulns.map(vuln => (

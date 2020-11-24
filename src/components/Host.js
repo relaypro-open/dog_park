@@ -300,19 +300,14 @@ class Host extends Component {
   render() {
     if (this.state.hasErrored && this.state.noExist) {
       return <p>This host no longer exists!</p>;
-    } else if (
-      this.state.hasErrored ||
-      this.props.groupsHasErrored ||
-      this.props.flanIpsHasErrored
-    ) {
+    } else if (this.state.hasErrored || this.props.groupsHasErrored) {
       return <p>Sorry! There was an error loading the items</p>;
     }
     if (
       this.state.isLoading ||
       this.props.groupsIsLoading ||
       this.state.isDeleting ||
-      this.props.flanIpsIsLoading ||
-      this.props.flanIps.length === 0
+      this.props.flanIpsIsLoading
     ) {
       return (
         <div>
@@ -324,8 +319,7 @@ class Host extends Component {
 
     const { classes, flanIps } = this.props;
 
-    const groups = this.props.groups[0].map((group) => {
-      //let profileName = this.props.groups[profile][0];
+    const groups = this.props.groups.groupList.map((group) => {
       return (
         <MenuItem key={group.id} value={group.name}>
           {group.name}
@@ -346,8 +340,8 @@ class Host extends Component {
         hostName = hostName + '.phonebooth.net';
       }
     }
-    if (hostName in flanIps[0]) {
-      flanApps = flanIps[0][hostName];
+    if (hostName in flanIps.hosts) {
+      flanApps = flanIps.hosts[hostName];
     }
 
     let activeIcon = null;

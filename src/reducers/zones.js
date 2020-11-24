@@ -20,9 +20,9 @@ export const zones = handleAction(
   'ZONES_FETCH_DATA_SUCCESS',
   (state, action) => {
     const zones = action.payload.sort((x, y) => {
-      if(x.name.toLowerCase() < y.name.toLowerCase()) {
+      if (x.name.toLowerCase() < y.name.toLowerCase()) {
         return -1;
-      } else if (x.name.toLowerCase() > y.name.toLowerCase()){
+      } else if (x.name.toLowerCase() > y.name.toLowerCase()) {
         return 1;
       } else {
         return 0;
@@ -32,12 +32,12 @@ export const zones = handleAction(
     let zoneIds = {};
     let zoneNames = {};
 
-    zones.forEach(z => {
+    zones.forEach((z) => {
       zoneNames[z.name] = z.id;
       zoneIds[z.id] = z.name;
-    })
+    });
 
-    return [zones, zoneNames, zoneIds];
+    return { zoneList: zones, zoneNames: zoneNames, zoneIds: zoneIds };
   },
-  []
+  { zoneList: [], zoneNames: {}, zoneIds: {} }
 );

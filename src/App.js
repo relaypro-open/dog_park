@@ -18,7 +18,7 @@ import {
   List,
   IconButton,
   Tooltip,
-  CircularProgress
+  CircularProgress,
 } from '@material-ui/core';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import ListItem from '@material-ui/core/ListItem';
@@ -58,7 +58,7 @@ import { handleSelectedTab } from './actions/app';
 
 const drawerWidth = 240;
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     flexGrow: 1,
   },
@@ -245,14 +245,13 @@ class App extends Component {
   };
 
   render() {
-    if(this.props.groups.length === 0) {
+    if (this.props.groups.groupList.length === 0) {
       return (
         <div>
           {' '}
           <CircularProgress />
         </div>
       );
-
     }
     const { classes, theme } = this.props;
     const { sideBarActive } = this.state;
@@ -292,7 +291,7 @@ class App extends Component {
           component="nav"
           subheader={<ListSubheader component="div">Production</ListSubheader>}
         >
-          {this.props.groups[0].map(group => (
+          {this.props.groups.groupList.map((group) => (
             <Link
               key={'link' + group.id}
               to={'/group/' + group.id}
@@ -313,102 +312,104 @@ class App extends Component {
       <div className="App">
         <div>
           <MuiThemeProvider theme={dogTheme}>
-          <MuiPickersUtilsProvider utils={MomentUtils} theme={dogTheme}>
-            <div className={classes.appFrame}>
-              <AppBar
-                className={classNames(classes.appBar, {
-                  [classes.appBarShift]: sideBarActive,
-                  [classes[`appBarShift-left`]]: sideBarActive,
-                })}
-              >
-                <Toolbar disableGutters={!sideBarActive}>
-                  <IconButton
-                    color="inherit"
-                    aria-label="open drawer"
-                    onClick={this.handleDrawerOpen}
-                    className={classNames(
-                      classes.menuButton,
-                      sideBarActive && classes.hide
-                    )}
-                  >
-                    <MenuIcon />
-                  </IconButton>
-                  <Typography variant="h5" color="inherit">
-                    Dog Park
-                  </Typography>
-                  {
-                    <span>
-                      &nbsp;&nbsp;&nbsp;&nbsp;<img
-                        alt="guard_dog"
-                        className={classes.icon_img}
-                        src={guard_dog}
-                      />&nbsp;&nbsp;
-                    </span>
-                  }
-                  <Tabs
-                    className={classes.flex}
-                    value={this.props.selectedTab}
-                    onChange={this.handleTabChange}
-                    variant='scrollable'
-                    scrollButtons='auto'
-                  >
-                    <Tab label="Groups" />
-                    <Tab label="Profiles" />
-                    <Tab label="Services" />
-                    <Tab label="Hosts" />
-                    <Tab label="Zones" />
-                    <Tab label="Flan Scans" />
-                    <Tab label="Links" />
-                  </Tabs>
-                  {
-                    <span>
-                      <img
-                        alt="republic_logo"
-                        className={classNames(classes.logo_img, {
-                          [classes.logo_img_open]: sideBarActive,
-                        })}
-                        src={logo}
-                      />
-                    </span>
-                  }
-                </Toolbar>
-              </AppBar>
-              {drawer}
-              <main
-                className={classNames(
-                  classes.content,
-                  classes[`content-left`],
-                  {
-                    [classes.contentShift]: sideBarActive,
-                    [classes[`contentShift-left`]]: sideBarActive,
-                  }
-                )}
-              >
-                <div className={classes.drawerHeader} />
-                <Route exact={true} path="/" component={Groups} />
-                <Route exact={true} path="/groups" component={Groups} />
-                <Route path="/group/:id" component={Group} />
-                <Route path="/groupByName/:id" component={Group} />
-                <Route exact={true} path="/profiles" component={Profiles} />
-                <Route exact={true} path="/zones" component={Zones} />
-                <Route
-                  exact={true}
-                  path="/createGroup"
-                  component={CreateGroup}
-                />
-                <Route path="/profile/:id" component={Profile} />
-                <Route path="/zone/:id" component={Zone} />
-                <Route exact={true} path="/hosts" component={Hosts} />
-                <Route path="/host/:id" component={Host} />
-                <Route exact={true} path="/services" component={Services} />
-                <Route path="/service/:id" component={Service} />
-                <Route exact={true} path="/flanscans" component={FlanScan} />
-                <Route exact={true} path="/links" component={Links} />
-                <Route path="/link/:id" component={EnvLink} />
-                <Route exact={true} path="/link" component={EnvLink} />
-              </main>
-            </div>
-          </MuiPickersUtilsProvider>
+            <MuiPickersUtilsProvider utils={MomentUtils} theme={dogTheme}>
+              <div className={classes.appFrame}>
+                <AppBar
+                  className={classNames(classes.appBar, {
+                    [classes.appBarShift]: sideBarActive,
+                    [classes[`appBarShift-left`]]: sideBarActive,
+                  })}
+                >
+                  <Toolbar disableGutters={!sideBarActive}>
+                    <IconButton
+                      color="inherit"
+                      aria-label="open drawer"
+                      onClick={this.handleDrawerOpen}
+                      className={classNames(
+                        classes.menuButton,
+                        sideBarActive && classes.hide
+                      )}
+                    >
+                      <MenuIcon />
+                    </IconButton>
+                    <Typography variant="h5" color="inherit">
+                      Dog Park
+                    </Typography>
+                    {
+                      <span>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <img
+                          alt="guard_dog"
+                          className={classes.icon_img}
+                          src={guard_dog}
+                        />
+                        &nbsp;&nbsp;
+                      </span>
+                    }
+                    <Tabs
+                      className={classes.flex}
+                      value={this.props.selectedTab}
+                      onChange={this.handleTabChange}
+                      variant="scrollable"
+                      scrollButtons="auto"
+                    >
+                      <Tab label="Groups" />
+                      <Tab label="Profiles" />
+                      <Tab label="Services" />
+                      <Tab label="Hosts" />
+                      <Tab label="Zones" />
+                      <Tab label="Flan Scans" />
+                      <Tab label="Links" />
+                    </Tabs>
+                    {
+                      <span>
+                        <img
+                          alt="republic_logo"
+                          className={classNames(classes.logo_img, {
+                            [classes.logo_img_open]: sideBarActive,
+                          })}
+                          src={logo}
+                        />
+                      </span>
+                    }
+                  </Toolbar>
+                </AppBar>
+                {drawer}
+                <main
+                  className={classNames(
+                    classes.content,
+                    classes[`content-left`],
+                    {
+                      [classes.contentShift]: sideBarActive,
+                      [classes[`contentShift-left`]]: sideBarActive,
+                    }
+                  )}
+                >
+                  <div className={classes.drawerHeader} />
+                  <Route exact={true} path="/" component={Groups} />
+                  <Route exact={true} path="/groups" component={Groups} />
+                  <Route path="/group/:id" component={Group} />
+                  <Route path="/groupByName/:id" component={Group} />
+                  <Route exact={true} path="/profiles" component={Profiles} />
+                  <Route exact={true} path="/zones" component={Zones} />
+                  <Route
+                    exact={true}
+                    path="/createGroup"
+                    component={CreateGroup}
+                  />
+                  <Route path="/profile/:id" component={Profile} />
+                  <Route path="/zone/:id" component={Zone} />
+                  <Route exact={true} path="/hosts" component={Hosts} />
+                  <Route path="/host/:id" component={Host} />
+                  <Route exact={true} path="/services" component={Services} />
+                  <Route path="/service/:id" component={Service} />
+                  <Route exact={true} path="/flanscans" component={FlanScan} />
+                  <Route exact={true} path="/links" component={Links} />
+                  <Route path="/link/:id" component={EnvLink} />
+                  <Route exact={true} path="/link" component={EnvLink} />
+                </main>
+              </div>
+            </MuiPickersUtilsProvider>
           </MuiThemeProvider>
         </div>
       </div>
@@ -416,7 +417,7 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     groups: state.groups,
     hosts: state.hosts,
@@ -424,7 +425,7 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
     fetchGroups: () => dispatch(groupsFetchData()),
     fetchFlanIps: () => dispatch(flanIpsFetchData()),
@@ -433,7 +434,7 @@ const mapDispatchToProps = dispatch => {
     fetchHosts: () => dispatch(hostsFetchData()),
     fetchServices: () => dispatch(servicesFetchData()),
     fetchLinks: () => dispatch(linksFetchData()),
-    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
   };
 };
 

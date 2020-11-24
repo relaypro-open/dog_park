@@ -19,15 +19,15 @@ export const servicesIsLoading = handleAction(
 export const services = handleAction(
   'SERVICES_FETCH_DATA_SUCCESS',
   (state, action) => {
-    action.payload.push({'id': 'any','name': 'any'})
+    action.payload.push({ id: 'any', name: 'any' });
     const services = action.payload.sort((x, y) => {
-      if(x.name === 'any') {
+      if (x.name === 'any') {
         return -1;
-      } else if(y.name === 'any') {
+      } else if (y.name === 'any') {
         return 1;
-      } else if(x.name.toLowerCase() < y.name.toLowerCase()) {
+      } else if (x.name.toLowerCase() < y.name.toLowerCase()) {
         return -1;
-      } else if (x.name.toLowerCase() > y.name.toLowerCase()){
+      } else if (x.name.toLowerCase() > y.name.toLowerCase()) {
         return 1;
       } else {
         return 0;
@@ -37,12 +37,20 @@ export const services = handleAction(
     let serviceNames = {};
     let serviceIds = {};
 
-    services.forEach(srv => {
+    services.forEach((srv) => {
       serviceNames[srv.name] = srv.id;
       serviceIds[srv.id] = srv.name;
     });
 
-    return [services, serviceNames, serviceIds];
+    return {
+      serviceList: services,
+      serviceNames: serviceNames,
+      serviceIds: serviceIds,
+    };
   },
-  []
+  {
+    serviceList: [],
+    serviceNames: {},
+    serviceIds: {},
+  }
 );

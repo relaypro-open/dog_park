@@ -18,32 +18,25 @@ export const flanIps = handleAction(
   'FLAN_IPS_FETCH_DATA_SUCCESS',
   (state, action) => {
     let groups = {};
-    //const flanIps = action.payload.flanIps.sort((x, y) => {
-    //  if(x.name.toLowerCase() < y.name.toLowerCase()) {
-    //    return -1;
-    //  } else if (x.name.toLowerCase() > y.name.toLowerCase()){
-    //    return 1;
-    //  } else {
-    //    return 0;
-    //  }
-    //});
-    if (action.payload.hosts[0] !== []) {
-      action.payload.hosts[0].forEach(host => {
-        let groupHost = {}
-        if(action.payload.flanIps[host['name']] !== undefined) {
+
+    if (action.payload.hosts.hostList !== []) {
+      action.payload.hosts.hostList.forEach((host) => {
+        let groupHost = {};
+        console.log(action.payload.flanIps);
+        if (action.payload.flanIps[host['name']] !== undefined) {
           groupHost[host['name']] = action.payload.flanIps[host['name']];
         } else {
           groupHost[host['name']] = [];
         }
 
-        if(!(host.group in groups)) {
+        if (!(host.group in groups)) {
           groups[host.group] = [groupHost];
         } else {
           groups[host.group].push(groupHost);
         }
       });
-      return [action.payload.flanIps, groups];
+      return { hosts: action.payload.flanIps, groups: groups };
     }
   },
-  []
+  { hosts: {}, groups: {} }
 );

@@ -18,22 +18,24 @@ export const groups = handleAction(
   'GROUPS_FETCH_DATA_SUCCESS',
   (state, action) => {
     const groups = action.payload.groups.sort((x, y) => {
-      if(x.name.toLowerCase() < y.name.toLowerCase()) {
+      if (x.name.toLowerCase() < y.name.toLowerCase()) {
         return -1;
-      } else if (x.name.toLowerCase() > y.name.toLowerCase()){
+      } else if (x.name.toLowerCase() > y.name.toLowerCase()) {
         return 1;
       } else {
         return 0;
       }
     });
     if (action.payload.profiles !== {}) {
-      groups.map(group => {
-        if(action.payload.profiles[group.profile_name] !== undefined) {
+      groups.map((group) => {
+        if (action.payload.profiles[group.profile_name] !== undefined) {
           if (
-            action.payload.profiles[group.profile_name][0].id !== group.profile_id
+            action.payload.profiles[group.profile_name][0].id !==
+            group.profile_id
           ) {
             group['hasUpdated'] = true;
-            group['currentProfileId'] = action.payload.profiles[group.profile_name][0].id;
+            group['currentProfileId'] =
+              action.payload.profiles[group.profile_name][0].id;
           } else {
             group['hasUpdated'] = false;
             group['currentProfileId'] = group.profile_id;
@@ -44,13 +46,13 @@ export const groups = handleAction(
       let groupNames = {};
       let groupIds = {};
 
-      groups.forEach(grp => {
+      groups.forEach((grp) => {
         groupNames[grp.name] = grp.id;
         groupIds[grp.id] = grp.name;
       });
 
-      return [groups, groupNames, groupIds];
+      return { groupList: groups, groupNames: groupNames, groupIds: groupIds };
     }
   },
-  []
+  { groupList: [], groupNames: {}, groupIds: {} }
 );

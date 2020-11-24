@@ -8,12 +8,12 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Avatar
+  Avatar,
 } from '@material-ui/core';
 import GitChanges from './GitChanges';
 import { pure } from 'recompose';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     width: '100%',
     marginTop: theme.spacing(3),
@@ -30,10 +30,10 @@ const styles = theme => ({
   },
   low: {
     backgroundColor: '#34CDF9',
-  }
+  },
 });
 
-const GroupsTable = pure(props => {
+const GroupsTable = pure((props) => {
   const { classes, groups, flanIps } = props;
 
   return (
@@ -54,12 +54,12 @@ const GroupsTable = pure(props => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {groups.map(group => {
+          {groups.map((group) => {
             let profileStatus = '';
             let gitChanges = '';
             let groupHostCount = 0;
             let flanEventCount = 0;
-            let flanEvent = "";
+            let flanEvent = '';
             if (group.hasUpdated) {
               profileStatus = (
                 <font color="red">
@@ -68,37 +68,51 @@ const GroupsTable = pure(props => {
                 </font>
               );
               gitChanges = (
-                <GitChanges profile1={group.currentProfileId} profile2={group.profile_id} />
-              )
+                <GitChanges
+                  profile1={group.currentProfileId}
+                  profile2={group.profile_id}
+                />
+              );
             }
-            if (group.name in flanIps[1]) {
-              groupHostCount = flanIps[1][group.name].length;
-              if (flanIps[1][group.name].length > 0) {
-                flanIps[1][group.name].forEach(host => {
-                  host[Object.keys(host)[0]].forEach(app => {
+            if (group.name in flanIps.groups) {
+              groupHostCount = flanIps.groups[group.name].length;
+              if (flanIps.groups[group.name].length > 0) {
+                flanIps.groups[group.name].forEach((host) => {
+                  host[Object.keys(host)[0]].forEach((app) => {
                     flanEventCount += app['vulns'].length;
                   });
                 });
-              };
+              }
             }
 
             if (flanEventCount > 0) {
-              flanEvent = <Avatar aria-label="recipe" className={classes.high}>
-                    {flanEventCount}
-                  </Avatar>;
+              flanEvent = (
+                <Avatar aria-label="recipe" className={classes.high}>
+                  {flanEventCount}
+                </Avatar>
+              );
             }
             return (
               <TableRow
                 key={group.id}
                 hover
-                title={"Click to view group: " + group.name}
-                onClick={event => {
+                title={'Click to view group: ' + group.name}
+                onClick={(event) => {
                   props.history.push('/group/' + group.id);
                 }}
               >
                 <TableCell>{group.name}</TableCell>
                 <TableCell>{group.id}</TableCell>
-                <TableCell title={"Click to view profile: " + group.profile_name} Style="text-decoration:underline; cursor: pointer;" onClick={event => {event.stopPropagation(); props.history.push('/profile/' + group.profile_id)}}>{group.profile_name}</TableCell>
+                <TableCell
+                  title={'Click to view profile: ' + group.profile_name}
+                  Style="text-decoration:underline; cursor: pointer;"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    props.history.push('/profile/' + group.profile_id);
+                  }}
+                >
+                  {group.profile_name}
+                </TableCell>
                 <TableCell>{group.profile_id}</TableCell>
                 <TableCell>{group.profile_version}</TableCell>
                 <TableCell>{profileStatus}</TableCell>

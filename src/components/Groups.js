@@ -24,7 +24,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
@@ -69,7 +69,7 @@ class Groups extends Component {
     if (
       this.state.createGroupName === '' ||
       this.state.createGroupProfile === '' ||
-      this.state.createGroupName in this.props.groups[1]
+      this.state.createGroupName in this.props.groups.groupNames
     ) {
       this.setState({ groupErrorOpen: true });
       return;
@@ -87,7 +87,7 @@ class Groups extends Component {
         profile_name: this.state.createGroupProfile,
         profile_version: useLatest,
       })
-      .then(response => {
+      .then((response) => {
         if (response.status === 201) {
           let re = /\/api\/group\/(.+)/;
           this.setState({ isLoading: false });
@@ -98,7 +98,7 @@ class Groups extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(groupId => {
+      .then((groupId) => {
         this.setState({ createGroupOpen: false });
         this.setState({ createGroupName: '' });
         this.setState({ createGroupProfile: '' });
@@ -112,7 +112,7 @@ class Groups extends Component {
     this.setState({ createGroupOpen: true });
   };
 
-  handleCreateGroupButton = enabled => {
+  handleCreateGroupButton = (enabled) => {
     if (
       this.state.createGroupName !== '' &&
       this.state.createGroupProfile !== '' &&
@@ -128,7 +128,7 @@ class Groups extends Component {
     this.setState({ createGroupOpen: false });
   };
 
-  handleCreateGroupName = event => {
+  handleCreateGroupName = (event) => {
     const createGroupName = event.target.value;
     if (createGroupName !== '' && this.state.createGroupProfile !== '') {
       this.setState({ createGroupDisabled: false });
@@ -138,7 +138,7 @@ class Groups extends Component {
     this.setState({ createGroupName });
   };
 
-  handleCreateGroupProfile = event => {
+  handleCreateGroupProfile = (event) => {
     const createGroupProfile = event.target.value;
     if (this.state.createGroupName !== '' && createGroupProfile !== '') {
       this.setState({ createGroupDisabled: false });
@@ -157,12 +157,18 @@ class Groups extends Component {
   };
 
   render() {
-    if (this.props.hasErrored || this.props.profilesHasErrored ||
-        this.props.flanIpsHasErrored || this.props.hostsHasErrored) {
+    if (
+      this.props.hasErrored ||
+      this.props.profilesHasErrored ||
+      this.props.hostsHasErrored
+    ) {
       return <p>Sorry! There was an error loading the items</p>;
     }
-    if (this.props.isLoading || this.props.profilesIsLoading ||
-        this.props.flanIpsIsLoading || this.props.flanIps.length === 0) {
+    if (
+      this.props.isLoading ||
+      this.props.profilesIsLoading ||
+      this.props.flanIpsIsLoading
+    ) {
       return (
         <div>
           {' '}
@@ -173,14 +179,16 @@ class Groups extends Component {
 
     const { classes } = this.props;
 
-    const profiles = Object.keys(this.props.profiles).sort().map(profile => {
-      let profileId = this.props.profiles[profile][0].id;
-      return (
-        <MenuItem key={profileId} value={profile}>
-          {profile}
-        </MenuItem>
-      );
-    });
+    const profiles = Object.keys(this.props.profiles)
+      .sort()
+      .map((profile) => {
+        let profileId = this.props.profiles[profile][0].id;
+        return (
+          <MenuItem key={profileId} value={profile}>
+            {profile}
+          </MenuItem>
+        );
+      });
 
     let profileVersions = '';
     if (this.state.isUsingLatest === false) {
@@ -194,7 +202,10 @@ class Groups extends Component {
 
     return (
       <div>
-        <GroupsTable groups={this.props.groups[0]} flanIps={this.props.flanIps}/>
+        <GroupsTable
+          groups={this.props.groups.groupList}
+          flanIps={this.props.flanIps}
+        />
         <Fab
           color="secondary"
           aria-label="Add"
@@ -282,8 +293,9 @@ class Groups extends Component {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
-              You have not entered a valid/unused group name or defined a profile to use. Please
-              make sure you enter all fields and create a group name that does not already exist.
+              You have not entered a valid/unused group name or defined a
+              profile to use. Please make sure you enter all fields and create a
+              group name that does not already exist.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -297,7 +309,7 @@ class Groups extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     groups: state.groups,
     hasErrored: state.groupsHasErrored,
@@ -313,9 +325,9 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
     fetchProfiles: () => dispatch(profilesFetchData()),
     fetchGroups: () => dispatch(groupsFetchData()),
   };

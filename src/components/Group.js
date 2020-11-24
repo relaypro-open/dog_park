@@ -25,7 +25,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
@@ -95,7 +95,7 @@ class Group extends Component {
     this.props.handleSelectedTab(0);
   };
 
-  componentDidUpdate = prevProps => {
+  componentDidUpdate = (prevProps) => {
     if (this.props.match.params.id !== prevProps.match.params.id) {
       this.fetchGroup(this.props.match.params.id);
       this.fetchGroupHosts(this.props.match.params.id);
@@ -111,13 +111,12 @@ class Group extends Component {
     }
   };
 
-  fetchGroupByName = groupName => {
-
+  fetchGroupByName = (groupName) => {
     this.setState({ isLoading: true });
 
     api
       .get('group?name=' + groupName)
-      .then(response => {
+      .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           return response.data;
@@ -128,7 +127,7 @@ class Group extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(group => {
+      .then((group) => {
         this.groupId = group.id;
         this.setState(group);
         this.setState({ groupName: group.name });
@@ -153,19 +152,19 @@ class Group extends Component {
           this.setState({ groupProfileVersion: '' });
         }
         return group.id;
-      }).then(id => {
+      })
+      .then((id) => {
         this.fetchGroupHosts(id);
       })
       .catch(() => this.setState({ hasErrored: true }));
   };
 
-
-  fetchGroup = groupId => {
+  fetchGroup = (groupId) => {
     this.setState({ isLoading: true });
 
     api
       .get('group/' + groupId)
-      .then(response => {
+      .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           return response.data;
@@ -176,7 +175,7 @@ class Group extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(group => {
+      .then((group) => {
         this.setState(group);
         this.setState({ groupName: group.name });
         this.setState({ defaultGroupName: group.name });
@@ -200,18 +199,19 @@ class Group extends Component {
           this.setState({ groupProfileVersion: '' });
         }
         return group.id;
-      }).then(id => {
+      })
+      .then((id) => {
         this.fetchGroupHosts(id);
       })
       .catch(() => this.setState({ hasErrored: true }));
   };
 
-  fetchGroupHosts = groupId => {
+  fetchGroupHosts = (groupId) => {
     //this.setState({ isLoading: true });
 
     api
       .get('group/' + groupId + '/hosts')
-      .then(response => {
+      .then((response) => {
         if (response.status === 200) {
           //this.setState({ isLoading: false });
           return response.data;
@@ -222,14 +222,14 @@ class Group extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(group => {
+      .then((group) => {
         this.setState({ groupHosts: group });
       })
       .catch(() => this.setState({ hasErrored: true }));
   };
 
-  fetchHostGroup = hostId => {
-    return api.get('host/' + hostId)
+  fetchHostGroup = (hostId) => {
+    return api.get('host/' + hostId);
   };
 
   updateGroup = () => {
@@ -247,7 +247,7 @@ class Group extends Component {
         profile_name: this.state.groupProfileName,
         profile_id: this.props.profiles[this.state.groupProfileName][0].id,
       })
-      .then(response => {
+      .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           this.setState({ editGroupStatus: '' });
@@ -270,7 +270,7 @@ class Group extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(group => {
+      .then((group) => {
         this.setState({ snackBarOpen: true });
       })
       .catch(() => {
@@ -294,7 +294,7 @@ class Group extends Component {
         profile_name: this.state.groupProfileName,
         profile_id: this.props.profiles[this.state.groupProfileName][0].id,
       })
-      .then(response => {
+      .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           this.setState({ editGroupStatus: '' });
@@ -313,7 +313,7 @@ class Group extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(group => {})
+      .then((group) => {})
       .catch(() => {
         this.setState({ editGroupStatus: <div>An error has occurred!</div> });
         this.setState({ hasErrored: true });
@@ -331,7 +331,7 @@ class Group extends Component {
     });
     api
       .delete('/group/' + this.props.match.params.id)
-      .then(response => {
+      .then((response) => {
         if (response.status === 204) {
           this.setState({ isDeleting: false });
           this.setState({ deleteGroupStatus: <div>Deleted!</div> });
@@ -356,19 +356,19 @@ class Group extends Component {
     }
   };
 
-  handleNameInput = event => {
+  handleNameInput = (event) => {
     this.setState({ groupName: event.target.value });
   };
 
-  handleIdInput = event => {
+  handleIdInput = (event) => {
     this.setState({ groupId: event.target.value });
   };
 
-  handleProfileNameInput = event => {
+  handleProfileNameInput = (event) => {
     this.setState({ groupProfileName: event.target.value });
   };
 
-  handleProfileSelect = event => {
+  handleProfileSelect = (event) => {
     this.setState({ groupProfileName: event.target.value });
     if (event.target.value !== this.state.defaultProfileName) {
       this.setState({ saveButtonDisabled: false });
@@ -377,31 +377,31 @@ class Group extends Component {
     }
   };
 
-  handleProfileVersionInput = event => {
+  handleProfileVersionInput = (event) => {
     this.setState({ groupProfileVersion: event.target.value });
   };
 
-  handleEditButton = event => {
+  handleEditButton = (event) => {
     this.setState({ editGroupOpen: !this.state.editGroupOpen });
   };
 
-  handleSaveButton = event => {
+  handleSaveButton = (event) => {
     this.setState({ saveGroupOpen: !this.state.saveGroupOpen });
   };
 
-  handleDeleteButton = event => {
+  handleDeleteButton = (event) => {
     this.setState({ deleteGroupOpen: !this.state.deleteGroupOpen });
   };
 
-  handleCloseButton = event => {
+  handleCloseButton = (event) => {
     this.setState({ saveGroupOpen: false });
   };
 
-  handleDeleteCloseButton = event => {
+  handleDeleteCloseButton = (event) => {
     this.setState({ deleteGroupOpen: false });
   };
 
-  handleProfileDiffButton = event => {
+  handleProfileDiffButton = (event) => {
     const diffOutput = (
       <GitDiff
         profile1={this.state.defaultProfileId}
@@ -421,7 +421,7 @@ class Group extends Component {
     this.setState({ profileDiffOpen: !this.state.profileDiffOpen });
   };
 
-  handleProfileDiffCloseButton = event => {
+  handleProfileDiffCloseButton = (event) => {
     this.setState({ profileDiffOpen: false });
   };
 
@@ -433,21 +433,23 @@ class Group extends Component {
     this.setState({ snackBarOpen: false });
   };
 
-  handleNameInput = event => {
-    this.setState({groupName: event.target.value});
+  handleNameInput = (event) => {
+    this.setState({ groupName: event.target.value });
     if (event.target.value !== this.state.defaultGroupName) {
       this.setState({ saveButtonDisabled: false });
     } else {
       this.setState({ saveButtonDisabled: true });
     }
-  }
+  };
 
   render() {
     if (this.state.hasErrored && this.state.noExist) {
       return <p>This group no longer exists!</p>;
-    } else if (this.state.hasErrored || this.props.profilesHasErrored ||
-               this.props.hostsHasErrored ||
-               this.props.flanIpsHasErrored) {
+    } else if (
+      this.state.hasErrored ||
+      this.props.profilesHasErrored ||
+      this.props.hostsHasErrored
+    ) {
       return <p>Sorry! There was an error loading the items</p>;
     }
     if (
@@ -455,8 +457,7 @@ class Group extends Component {
       this.props.profilesIsLoading ||
       this.state.isDeleting ||
       this.props.hostsIsLoading ||
-      this.props.flanIpsIsLoading ||
-      this.props.flanIps.length === 0
+      this.props.flanIpsIsLoading
     ) {
       return (
         <div>
@@ -466,54 +467,58 @@ class Group extends Component {
       );
     }
 
-
     const { classes, hosts, flanIps } = this.props;
     let isDiff = '';
 
     let groupHosts = [];
 
-    this.state.groupHosts.forEach(host => {
-      if(!(host.name.includes(".phonebooth.net")) && !(host.name.includes(".phoneboothdev.info"))) {
-        if (host.name.includes("-qa-")) {
-          host.name = host.name + ".phoneboothdev.info";
-        } else if (host.name.includes("-pro-")) {
-          host.name = host.name + ".phonebooth.net";
+    this.state.groupHosts.forEach((host) => {
+      if (
+        !host.name.includes('.phonebooth.net') &&
+        !host.name.includes('.phoneboothdev.info')
+      ) {
+        if (host.name.includes('-qa-')) {
+          host.name = host.name + '.phoneboothdev.info';
+        } else if (host.name.includes('-pro-')) {
+          host.name = host.name + '.phonebooth.net';
         }
       }
-      groupHosts.push(hosts[1][host.name]);
+      groupHosts.push(hosts.hostObjects[host.name]);
     });
 
-    const profiles = Object.keys(this.props.profiles).sort().map(profile => {
-      let value = this.props.profiles[profile][0].id;
-      if (
-        this.state.groupProfileId !== value &&
-        profile === this.state.defaultProfileName
-      ) {
-        isDiff = (
-          <div>
-            <Typography variant="body1">
-              <strong>
-                The profile {this.state.groupProfileName} has been updated!
-              </strong>
-            </Typography>
-            <Button
-              onClick={this.handleProfileDiffButton}
-              variant="contained"
-              color="primary"
-            >
-              Review Changes
-            </Button>
-            <br />
-            <br />
-          </div>
+    const profiles = Object.keys(this.props.profiles)
+      .sort()
+      .map((profile) => {
+        let value = this.props.profiles[profile][0].id;
+        if (
+          this.state.groupProfileId !== value &&
+          profile === this.state.defaultProfileName
+        ) {
+          isDiff = (
+            <div>
+              <Typography variant="body1">
+                <strong>
+                  The profile {this.state.groupProfileName} has been updated!
+                </strong>
+              </Typography>
+              <Button
+                onClick={this.handleProfileDiffButton}
+                variant="contained"
+                color="primary"
+              >
+                Review Changes
+              </Button>
+              <br />
+              <br />
+            </div>
+          );
+        }
+        return (
+          <MenuItem key={profile} value={profile}>
+            {profile}
+          </MenuItem>
         );
-      }
-      return (
-        <MenuItem key={profile} value={profile}>
-          {profile}
-        </MenuItem>
-      );
-    });
+      });
 
     return (
       <div>
@@ -530,7 +535,8 @@ class Group extends Component {
             </Typography>
             <br />
             <Typography variant="body1">
-              <strong>Group ID:</strong> {this.state.groupId}    <strong>Created:</strong>  {this.state.groupCreated}
+              <strong>Group ID:</strong> {this.state.groupId}{' '}
+              <strong>Created:</strong> {this.state.groupCreated}
             </Typography>
             <br />
             <Typography variant="body1">
@@ -638,7 +644,10 @@ class Group extends Component {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
-              <span styles="in">Please review the differences before updating: {this.state.diffChanges}</span>
+              <span styles="in">
+                Please review the differences before updating:{' '}
+                {this.state.diffChanges}
+              </span>
             </DialogContentText>
             {this.state.diffOutput}
           </DialogContent>
@@ -685,7 +694,7 @@ class Group extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     profiles: state.profiles,
     profilesHasErrored: state.profilesHasErrored,
@@ -699,11 +708,11 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
     fetchProfiles: () => dispatch(profilesFetchData()),
     fetchGroups: () => dispatch(groupsFetchData()),
-    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
   };
 };
 
