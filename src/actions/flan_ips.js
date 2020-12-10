@@ -9,11 +9,11 @@ export const {
 } = createActions(
   {
     FLAN_IPS_FETCH_DATA_SUCCESS: (flanIps, hosts) => {
-      return { flanIps: flanIps, hosts: hosts};
+      return { flanIps: flanIps, hosts: hosts };
     },
   },
   'FLAN_IPS_IS_LOADING',
-  'FLAN_IPS_HAS_ERRORED',
+  'FLAN_IPS_HAS_ERRORED'
 );
 
 export function flanIpsFetchData() {
@@ -24,7 +24,7 @@ export function flanIpsFetchData() {
 
     flan_api
       .get('flan_ips')
-      .then(response => {
+      .then((response) => {
         if (response.status !== 200) {
           throw Error(response.statusText);
         }
@@ -32,7 +32,10 @@ export function flanIpsFetchData() {
         dispatch(flanIpsIsLoading(false));
         return response.data;
       })
-      .then(flanIps => dispatch(flanIpsFetchDataSuccess(flanIps, hosts)))
-      .catch(() => dispatch(flanIpsHasErrored(true)));
+      .then((flanIps) => dispatch(flanIpsFetchDataSuccess(flanIps, hosts)))
+      .catch(() => {
+        dispatch(flanIpsIsLoading(false));
+        dispatch(flanIpsHasErrored(true));
+      });
   };
 }
