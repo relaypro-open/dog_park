@@ -1,6 +1,6 @@
 import { api } from '../api';
 import { createActions } from 'redux-actions';
-import {flanIpsFetchData } from './flan_ips'
+import { flanIpsFetchData } from './flan_ips';
 
 export const {
   hostsHasErrored,
@@ -13,19 +13,19 @@ export const {
 );
 
 export function hostsFetchData() {
-  return dispatch => {
+  return (dispatch) => {
     dispatch(hostsIsLoading(true));
 
     api
       .get('hosts')
-      .then(response => {
+      .then((response) => {
         if (response.status !== 200) {
           throw Error(response.statusText);
         }
-        //dispatch(hostsIsLoading(false));
+        dispatch(hostsIsLoading(false));
         return response.data;
       })
-      .then(hosts => dispatch(hostsFetchDataSuccess(hosts)))
+      .then((hosts) => dispatch(hostsFetchDataSuccess(hosts)))
       .then(() => dispatch(flanIpsFetchData()))
       .catch(() => dispatch(hostsHasErrored(true)));
   };

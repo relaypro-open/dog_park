@@ -1,6 +1,5 @@
 import { flan_api } from '../flan_api';
 import { createActions } from 'redux-actions';
-import { hostsIsLoading } from './hosts';
 
 export const {
   flanIpsIsLoading,
@@ -28,7 +27,6 @@ export function flanIpsFetchData() {
         if (response.status !== 200) {
           throw Error(response.statusText);
         }
-        dispatch(hostsIsLoading(false));
         dispatch(flanIpsIsLoading(false));
         return response.data;
       })
