@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { api } from '../api';
-import { servicesFetchData } from '../actions/services';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRouter } from 'react-router-dom';
@@ -18,6 +17,13 @@ import {
   TableRow,
 } from '@material-ui/core';
 import { handleSelectedTab } from '../actions/app';
+import { groupsFetchData } from '../actions/groups';
+import { flanIpsFetchData } from '../actions/flan_ips';
+import { profilesFetchData } from '../actions/profiles';
+import { zonesFetchData } from '../actions/zones';
+import { hostsFetchData } from '../actions/hosts';
+import { servicesFetchData } from '../actions/services';
+import { linksFetchData } from '../actions/links';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -33,8 +39,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 
-
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
@@ -80,11 +85,11 @@ export class ServiceRow extends Component {
   //  }
   //}
 
-  handlePortsField = event => {
+  handlePortsField = (event) => {
     const ports = event.target.value;
     const portList = ports.split(',');
     const isValid = portList
-      .map(portString => {
+      .map((portString) => {
         const range = portString.split(':');
         if (range !== portString && range.length === 2) {
           return (
@@ -108,7 +113,7 @@ export class ServiceRow extends Component {
     this.portsField(this.props.sIndex, event.target.value, !isValid);
   };
 
-  handleProtocolSelect = event => {
+  handleProtocolSelect = (event) => {
     this.setState({ serviceProtocol: event.target.value });
     this.props.updateServiceProtocol(this.props.sIndex, event.target.value);
   };
@@ -206,7 +211,7 @@ class Service extends Component {
     this.props.handleSelectedTab(2);
   }
 
-  componentDidUpdate = prevProps => {
+  componentDidUpdate = (prevProps) => {
     if (this.props.location !== prevProps.location) {
       this.setState({ saveServiceOpen: false });
     }
@@ -216,7 +221,7 @@ class Service extends Component {
     this.setState({ isLoading: true });
     api
       .get('service/' + serviceId)
-      .then(response => {
+      .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           return response.data;
@@ -227,13 +232,13 @@ class Service extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(service => {
+      .then((service) => {
         this.setState({ serviceName: service.name });
         this.setState({ serviceId: service.id });
         if ('services' in service) {
           this.setState({ serviceServices: service.services });
           const serviceErrors = [];
-          service.services.map(service => {
+          service.services.map((service) => {
             serviceErrors.push(false);
             return true;
           });
@@ -260,12 +265,18 @@ class Service extends Component {
         name: this.state.serviceName,
         services: this.state.serviceServices,
       })
-      .then(response => {
+      .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           this.setState({ updateServiceStatus: '' });
           this.handleUpdateCloseButton();
           this.fetchService(this.state.serviceId);
+          this.props.fetchGroups();
+          this.props.fetchProfiles();
+          this.props.fetchZones();
+          this.props.fetchServices();
+          this.props.fetchHosts();
+          this.props.fetchLinks();
           this.setState({
             snackBarMsg:
               this.state.serviceName + ' has been modified successfully!',
@@ -275,7 +286,7 @@ class Service extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(service => {
+      .then((service) => {
         this.setState({ snackBarOpen: true });
       })
       .catch(() => {
@@ -297,31 +308,43 @@ class Service extends Component {
     });
     api
       .delete('/service/' + this.props.match.params.id)
-      .then(response => {
+      .then((response) => {
         if (response.status === 204) {
           this.setState({ isDeleting: false });
           this.setState({ deleteServiceStatus: <div>Deleted!</div> });
           this.fetchService(this.props.match.params.id);
+          this.props.fetchGroups();
+          this.props.fetchProfiles();
+          this.props.fetchZones();
           this.props.fetchServices();
+          this.props.fetchHosts();
+          this.props.fetchLinks();
         } else {
-          let error_msg = response.data.error_msg + ":" + response.data.profiles;
+          let error_msg =
+            response.data.error_msg + ':' + response.data.profiles;
           throw Error(error_msg);
         }
       })
       .catch((error) => {
         this.setState({
-          deleteServiceStatus: <div style={{color:"red"}}><br/><br/>{error.message}</div>,
+          deleteServiceStatus: (
+            <div style={{ color: 'red' }}>
+              <br />
+              <br />
+              {error.message}
+            </div>
+          ),
         });
         this.setState({ deleteHasErrored: true });
       });
   };
 
-  handleDeleteButton = event => {
+  handleDeleteButton = (event) => {
     this.setState({ deleteServiceOpen: !this.state.deleteServiceOpen });
   };
 
-  handleDeleteCloseButton = event => {
-    this.setState({deleteServiceStatus: ''});
+  handleDeleteCloseButton = (event) => {
+    this.setState({ deleteServiceStatus: '' });
     this.setState({ deleteServiceOpen: false });
   };
 
@@ -344,7 +367,7 @@ class Service extends Component {
     this.setState({ serviceServices: newState });
   };
 
-  handleRemoveService = index => {
+  handleRemoveService = (index) => {
     const serviceServices = update(this.state.serviceServices, {
       $unset: [index],
     });
@@ -359,7 +382,7 @@ class Service extends Component {
     this.setState({ serviceErrors });
   };
 
-  handleAddService = event => {
+  handleAddService = (event) => {
     this.setState({
       serviceServices: [
         ...this.state.serviceServices,
@@ -574,14 +597,20 @@ class Service extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {};
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
+    fetchGroups: () => dispatch(groupsFetchData()),
+    fetchFlanIps: () => dispatch(flanIpsFetchData()),
+    fetchProfiles: () => dispatch(profilesFetchData()),
+    fetchZones: () => dispatch(zonesFetchData()),
+    fetchHosts: () => dispatch(hostsFetchData()),
     fetchServices: () => dispatch(servicesFetchData()),
+    fetchLinks: () => dispatch(linksFetchData()),
   };
 };
 

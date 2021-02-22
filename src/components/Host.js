@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import { api } from '../api';
 import { groupsFetchData } from '../actions/groups';
+import { flanIpsFetchData } from '../actions/flan_ips';
+import { profilesFetchData } from '../actions/profiles';
+import { zonesFetchData } from '../actions/zones';
 import { hostsFetchData } from '../actions/hosts';
+import { servicesFetchData } from '../actions/services';
+import { linksFetchData } from '../actions/links';
 import { handleSelectedTab } from '../actions/app';
 import FlanApp from './FlanApp';
 import { connect } from 'react-redux';
@@ -171,8 +176,13 @@ class Host extends Component {
         this.setState({ createHostOpen: false });
         this.setState({ createHostName: '' });
         this.setState({ createHostGroup: '' });
-        this.props.history.push('/host/' + hostId);
+        this.props.fetchGroups();
+        this.props.fetchProfiles();
+        this.props.fetchZones();
+        this.props.fetchServices();
         this.props.fetchHosts();
+        this.props.fetchLinks();
+        this.props.history.push('/host/' + hostId);
       })
       .catch(() => this.setState({ hasErrored: true }));
   };
@@ -233,7 +243,12 @@ class Host extends Component {
           this.setState({ isDeleting: false });
           this.setState({ deleteHostStatus: <div>Deleted!</div> });
           this.fetchHost(this.props.match.params.id);
+          this.props.fetchGroups();
+          this.props.fetchProfiles();
+          this.props.fetchZones();
+          this.props.fetchServices();
           this.props.fetchHosts();
+          this.props.fetchLinks();
         } else {
           throw Error(response.statusText);
         }
@@ -551,7 +566,12 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchGroups: () => dispatch(groupsFetchData()),
+    fetchFlanIps: () => dispatch(flanIpsFetchData()),
+    fetchProfiles: () => dispatch(profilesFetchData()),
+    fetchZones: () => dispatch(zonesFetchData()),
     fetchHosts: () => dispatch(hostsFetchData()),
+    fetchServices: () => dispatch(servicesFetchData()),
+    fetchLinks: () => dispatch(linksFetchData()),
     handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
   };
 };

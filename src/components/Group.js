@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import { api } from '../api';
-import { profilesFetchData } from '../actions/profiles';
 import { groupsFetchData } from '../actions/groups';
+import { flanIpsFetchData } from '../actions/flan_ips';
+import { profilesFetchData } from '../actions/profiles';
+import { zonesFetchData } from '../actions/zones';
+import { hostsFetchData } from '../actions/hosts';
+import { servicesFetchData } from '../actions/services';
+import { linksFetchData } from '../actions/links';
 import { handleSelectedTab } from '../actions/app';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
@@ -261,6 +266,11 @@ class Group extends Component {
           this.handleCloseButton();
           this.fetchGroup(this.state.groupId);
           this.props.fetchGroups();
+          this.props.fetchProfiles();
+          this.props.fetchZones();
+          this.props.fetchServices();
+          this.props.fetchHosts();
+          this.props.fetchLinks();
           this.setState({
             snackBarMsg:
               this.state.groupName + ' has been modified successfully!',
@@ -308,6 +318,11 @@ class Group extends Component {
           this.handleProfileDiffCloseButton();
           this.fetchGroup(this.state.groupId);
           this.props.fetchGroups();
+          this.props.fetchProfiles();
+          this.props.fetchZones();
+          this.props.fetchServices();
+          this.props.fetchHosts();
+          this.props.fetchLinks();
           return response.data;
         } else {
           throw Error(response.statusText);
@@ -337,6 +352,11 @@ class Group extends Component {
           this.setState({ deleteGroupStatus: <div>Deleted!</div> });
           this.fetchGroup(this.props.match.params.id);
           this.props.fetchGroups();
+          this.props.fetchProfiles();
+          this.props.fetchZones();
+          this.props.fetchServices();
+          this.props.fetchHosts();
+          this.props.fetchLinks();
         } else {
           throw Error(response.statusText);
         }
@@ -710,8 +730,13 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    fetchProfiles: () => dispatch(profilesFetchData()),
     fetchGroups: () => dispatch(groupsFetchData()),
+    fetchFlanIps: () => dispatch(flanIpsFetchData()),
+    fetchProfiles: () => dispatch(profilesFetchData()),
+    fetchZones: () => dispatch(zonesFetchData()),
+    fetchHosts: () => dispatch(hostsFetchData()),
+    fetchServices: () => dispatch(servicesFetchData()),
+    fetchLinks: () => dispatch(linksFetchData()),
     handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
   };
 };

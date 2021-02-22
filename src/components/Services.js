@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { api } from '../api';
+import { groupsFetchData } from '../actions/groups';
+import { flanIpsFetchData } from '../actions/flan_ips';
+import { profilesFetchData } from '../actions/profiles';
+import { zonesFetchData } from '../actions/zones';
+import { hostsFetchData } from '../actions/hosts';
 import { servicesFetchData } from '../actions/services';
+import { linksFetchData } from '../actions/links';
+import { handleSelectedTab } from '../actions/app';
 import { withStyles } from '@material-ui/core/styles';
 import { CircularProgress } from '@material-ui/core';
 import ServicesTable from './ServicesTable';
-import { handleSelectedTab } from '../actions/app';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import Select from '@material-ui/core/Select';
@@ -96,7 +102,12 @@ class Services extends Component {
       .then((serviceId) => {
         this.setState({ createServiceOpen: false });
         this.setState({ createServiceName: '' });
+        this.props.fetchGroups();
+        this.props.fetchProfiles();
+        this.props.fetchZones();
         this.props.fetchServices();
+        this.props.fetchHosts();
+        this.props.fetchLinks();
         this.props.history.push('/service/' + serviceId);
       })
       .catch(() => this.setState({ hasErrored: true }));
@@ -274,7 +285,13 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
+    fetchGroups: () => dispatch(groupsFetchData()),
+    fetchFlanIps: () => dispatch(flanIpsFetchData()),
+    fetchProfiles: () => dispatch(profilesFetchData()),
+    fetchZones: () => dispatch(zonesFetchData()),
+    fetchHosts: () => dispatch(hostsFetchData()),
     fetchServices: () => dispatch(servicesFetchData()),
+    fetchLinks: () => dispatch(linksFetchData()),
   };
 };
 

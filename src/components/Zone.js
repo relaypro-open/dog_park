@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
 import { api } from '../api';
+import { groupsFetchData } from '../actions/groups';
+import { flanIpsFetchData } from '../actions/flan_ips';
+import { profilesFetchData } from '../actions/profiles';
 import { zonesFetchData } from '../actions/zones';
+import { hostsFetchData } from '../actions/hosts';
+import { servicesFetchData } from '../actions/services';
+import { linksFetchData } from '../actions/links';
+import { handleSelectedTab } from '../actions/app';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { withRouter } from 'react-router-dom';
@@ -17,7 +24,6 @@ import {
   TableHead,
   TableRow,
 } from '@material-ui/core';
-import { handleSelectedTab } from '../actions/app';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -31,8 +37,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 
-
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
@@ -76,7 +81,7 @@ export class V4ZoneAddress extends Component {
     }
   }
 
-  handleAddressField = event => {
+  handleAddressField = (event) => {
     if (
       ipRegex.v4({ exact: true }).test(event.target.value) ||
       cidrRegex.v4().test(event.target.value)
@@ -160,7 +165,7 @@ export class V6ZoneAddress extends Component {
     }
   }
 
-  handleAddressField = event => {
+  handleAddressField = (event) => {
     if (
       ipRegex.v6({ exact: true }).test(event.target.value) ||
       cidrRegex.v6().test(event.target.value)
@@ -221,7 +226,6 @@ export class V6ZoneAddress extends Component {
   }
 }
 
-
 class Zone extends Component {
   constructor(props) {
     super(props);
@@ -256,7 +260,7 @@ class Zone extends Component {
     this.setState({ isLoading: true });
     api
       .get('zone/' + zoneId)
-      .then(response => {
+      .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           return response.data;
@@ -267,7 +271,7 @@ class Zone extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(zone => {
+      .then((zone) => {
         this.setState({ zoneName: zone.name });
         this.setState({ zoneId: zone.id });
         if ('ipv4_addresses' in zone) {
@@ -321,12 +325,18 @@ class Zone extends Component {
         ipv4_addresses: this.state.v4ZoneAddresses,
         ipv6_addresses: this.state.v6ZoneAddresses,
       })
-      .then(response => {
+      .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           this.setState({ updateZoneStatus: '' });
           this.handleUpdateCloseButton();
           this.fetchZone(this.state.zoneId);
+          this.props.fetchGroups();
+          this.props.fetchProfiles();
+          this.props.fetchZones();
+          this.props.fetchServices();
+          this.props.fetchHosts();
+          this.props.fetchLinks();
           this.setState({
             snackBarMsg:
               this.state.zoneName + ' has been modified successfully!',
@@ -336,7 +346,7 @@ class Zone extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(zone => {
+      .then((zone) => {
         this.setState({ snackBarOpen: true });
       })
       .catch(() => {
@@ -356,12 +366,17 @@ class Zone extends Component {
     });
     api
       .delete('/zone/' + this.props.match.params.id)
-      .then(response => {
+      .then((response) => {
         if (response.status === 204) {
           this.setState({ isDeleting: false });
           this.setState({ deleteZoneStatus: <div>Deleted!</div> });
           this.fetchZone(this.props.match.params.id);
+          this.props.fetchGroups();
+          this.props.fetchProfiles();
           this.props.fetchZones();
+          this.props.fetchServices();
+          this.props.fetchHosts();
+          this.props.fetchLinks();
         } else {
           throw Error(response.statusText);
         }
@@ -372,11 +387,11 @@ class Zone extends Component {
       });
   };
 
-  handleDeleteButton = event => {
+  handleDeleteButton = (event) => {
     this.setState({ deleteZoneOpen: !this.state.deleteZoneOpen });
   };
 
-  handleDeleteCloseButton = event => {
+  handleDeleteCloseButton = (event) => {
     this.setState({ deleteZoneOpen: false });
   };
 
@@ -398,7 +413,7 @@ class Zone extends Component {
     this.setState({ areV6AddressesErrored });
   };
 
-  handleRemoveV4Address = event => {
+  handleRemoveV4Address = (event) => {
     const v4ZoneAddresses = [
       ...this.state.v4ZoneAddresses.slice(0, event.target.id),
       ...this.state.v4ZoneAddresses.slice(
@@ -421,7 +436,7 @@ class Zone extends Component {
     this.setState({ areV4AddressesErrored });
   };
 
-  handleRemoveV6Address = event => {
+  handleRemoveV6Address = (event) => {
     const v6ZoneAddresses = [
       ...this.state.v6ZoneAddresses.slice(0, event.target.id),
       ...this.state.v6ZoneAddresses.slice(
@@ -444,14 +459,14 @@ class Zone extends Component {
     this.setState({ areV6AddressesErrored });
   };
 
-  handleAddV4Address = event => {
+  handleAddV4Address = (event) => {
     this.setState({ v4ZoneAddresses: [...this.state.v4ZoneAddresses, ''] });
     this.setState({
       areV4AddressesErrored: [...this.state.areV4AddressesErrored, false],
     });
   };
 
-  handleAddV6Address = event => {
+  handleAddV6Address = (event) => {
     this.setState({ v6ZoneAddresses: [...this.state.v6ZoneAddresses, ''] });
     this.setState({
       areV6AddressesErrored: [...this.state.areV6AddressesErrored, false],
@@ -476,17 +491,22 @@ class Zone extends Component {
     };
     const v4IsErrored = this.state.areV4AddressesErrored.reduce(reducer);
     const v6IsErrored = this.state.areV6AddressesErrored.reduce(reducer);
-    if(v4IsErrored && v6IsErrored) {
+    if (v4IsErrored && v6IsErrored) {
       this.setState({ addressErrorOpen: true });
-    }
-    else if (v4IsErrored && !v6IsErrored) {
-      if(this.state.v4ZoneAddresses.length === 1 && this.state.v4ZoneAddresses[0] === '') {
+    } else if (v4IsErrored && !v6IsErrored) {
+      if (
+        this.state.v4ZoneAddresses.length === 1 &&
+        this.state.v4ZoneAddresses[0] === ''
+      ) {
         this.setState({ updateZoneOpen: true });
       } else {
         this.setState({ addressErrorOpen: true });
       }
     } else if (v6IsErrored && !v4IsErrored) {
-      if(this.state.v6ZoneAddresses.length === 1 && this.state.v6ZoneAddresses[0] === '') {
+      if (
+        this.state.v6ZoneAddresses.length === 1 &&
+        this.state.v6ZoneAddresses[0] === ''
+      ) {
         this.setState({ updateZoneOpen: true });
       } else {
         this.setState({ addressErrorOpen: true });
@@ -552,8 +572,8 @@ class Zone extends Component {
               </TableBody>
             </Table>
           </Paper>
-          <br/>
-          <br/>
+          <br />
+          <br />
           <Typography variant="h4">IPv6 Addresses</Typography>
           <Paper className={classes.root}>
             <Table>
@@ -699,14 +719,20 @@ class Zone extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {};
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
+    fetchGroups: () => dispatch(groupsFetchData()),
+    fetchFlanIps: () => dispatch(flanIpsFetchData()),
+    fetchProfiles: () => dispatch(profilesFetchData()),
     fetchZones: () => dispatch(zonesFetchData()),
+    fetchHosts: () => dispatch(hostsFetchData()),
+    fetchServices: () => dispatch(servicesFetchData()),
+    fetchLinks: () => dispatch(linksFetchData()),
   };
 };
 

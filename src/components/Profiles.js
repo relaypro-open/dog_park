@@ -2,7 +2,13 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { api } from '../api';
 import { withStyles } from '@material-ui/core/styles';
+import { groupsFetchData } from '../actions/groups';
+import { flanIpsFetchData } from '../actions/flan_ips';
 import { profilesFetchData } from '../actions/profiles';
+import { zonesFetchData } from '../actions/zones';
+import { hostsFetchData } from '../actions/hosts';
+import { servicesFetchData } from '../actions/services';
+import { linksFetchData } from '../actions/links';
 import { handleSelectedTab } from '../actions/app';
 import { CircularProgress, Button } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
@@ -15,7 +21,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 
-const styles = theme => ({
+const styles = (theme) => ({
   speedDialButton: {
     right: theme.spacing(3),
     bottom: theme.spacing(3),
@@ -43,9 +49,7 @@ class Profiles extends Component {
   }
 
   createProfile = () => {
-    if (
-      this.state.createProfileName in this.props.profiles
-    ) {
+    if (this.state.createProfileName in this.props.profiles) {
       this.setState({ profileErrorOpen: true });
     } else {
       this.setState({ isLoading: true });
@@ -90,7 +94,7 @@ class Profiles extends Component {
             ],
           },
         })
-        .then(response => {
+        .then((response) => {
           if (response.status === 201) {
             let re = /\/api\/profile\/(.+)/;
             this.setState({ isLoading: false });
@@ -101,16 +105,20 @@ class Profiles extends Component {
             throw Error(response.statusText);
           }
         })
-        .then(profileId => {
+        .then((profileId) => {
           this.setState({ createProfileOpen: false });
           this.setState({ createProfileName: '' });
           this.props.history.push('/profile/' + profileId);
+          this.props.fetchGroups();
           this.props.fetchProfiles();
+          this.props.fetchZones();
+          this.props.fetchServices();
+          this.props.fetchHosts();
+          this.props.fetchLinks();
         })
         .catch(() => this.setState({ hasErrored: true }));
-      }
+    }
   };
-
 
   handleProfileErrorButton = () => {
     this.setState({ profileErrorOpen: false });
@@ -124,7 +132,7 @@ class Profiles extends Component {
     this.setState({ createProfileOpen: false });
   };
 
-  handleCreateProfileName = event => {
+  handleCreateProfileName = (event) => {
     this.setState({ createProfileName: event.target.value });
   };
 
@@ -193,7 +201,8 @@ class Profiles extends Component {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
-              The profile name you entered already exists, please choose a different name.
+              The profile name you entered already exists, please choose a
+              different name.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -215,7 +224,7 @@ class Profiles extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     profiles: state.profiles,
     hasErrored: state.profilesHasErrored,
@@ -223,10 +232,16 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
+    fetchGroups: () => dispatch(groupsFetchData()),
+    fetchFlanIps: () => dispatch(flanIpsFetchData()),
     fetchProfiles: () => dispatch(profilesFetchData()),
-    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    fetchZones: () => dispatch(zonesFetchData()),
+    fetchHosts: () => dispatch(hostsFetchData()),
+    fetchServices: () => dispatch(servicesFetchData()),
+    fetchLinks: () => dispatch(linksFetchData()),
+    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
   };
 };
 

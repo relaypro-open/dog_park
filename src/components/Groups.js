@@ -2,8 +2,13 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { api } from '../api';
-import { profilesFetchData } from '../actions/profiles';
 import { groupsFetchData } from '../actions/groups';
+import { flanIpsFetchData } from '../actions/flan_ips';
+import { profilesFetchData } from '../actions/profiles';
+import { zonesFetchData } from '../actions/zones';
+import { hostsFetchData } from '../actions/hosts';
+import { servicesFetchData } from '../actions/services';
+import { linksFetchData } from '../actions/links';
 import { CircularProgress } from '@material-ui/core';
 import GroupsTable from './GroupsTable';
 import ProfileSelect from './ProfileSelect';
@@ -103,6 +108,11 @@ class Groups extends Component {
         this.setState({ createGroupName: '' });
         this.setState({ createGroupProfile: '' });
         this.props.fetchGroups();
+        this.props.fetchProfiles();
+        this.props.fetchZones();
+        this.props.fetchServices();
+        this.props.fetchHosts();
+        this.props.fetchLinks();
         this.props.history.push('/group/' + groupId);
       })
       .catch(() => this.setState({ hasErrored: true }));
@@ -328,8 +338,13 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
-    fetchProfiles: () => dispatch(profilesFetchData()),
     fetchGroups: () => dispatch(groupsFetchData()),
+    fetchFlanIps: () => dispatch(flanIpsFetchData()),
+    fetchProfiles: () => dispatch(profilesFetchData()),
+    fetchZones: () => dispatch(zonesFetchData()),
+    fetchHosts: () => dispatch(hostsFetchData()),
+    fetchServices: () => dispatch(servicesFetchData()),
+    fetchLinks: () => dispatch(linksFetchData()),
   };
 };
 
