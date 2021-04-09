@@ -37,8 +37,6 @@ import {
 import { SortableContainer } from 'react-sortable-hoc';
 import arrayMove from 'array-move';
 import update from 'immutability-helper';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
 
 const styles = (theme) => ({
   root: {
@@ -105,7 +103,6 @@ const TableBodySortable = SortableContainer(
     handleAddProfile,
     handleRemoveProfile,
     handleStatesSelection,
-    handleDockerSelection,
   }) => {
     return (
       <TableBody>
@@ -142,7 +139,6 @@ const TableBodySortable = SortableContainer(
               handleAddProfile={handleAddProfile}
               handleRemoveProfile={handleRemoveProfile}
               handleStatesSelection={handleStatesSelection}
-              handleDockerSelection={handleDockerSelection}
             />
           );
         })}
@@ -443,10 +439,6 @@ class Profile extends Component {
 
   handleDeleteButton = () => {
     this.setState({ deleteProfileOpen: true });
-  };
-
-  handleDockerSelection = (event) => {
-    this.setState({ docker: event.target.value });
   };
 
   handleActiveCheckbox = (index, value, ruleType) => {
@@ -1083,22 +1075,9 @@ class Profile extends Component {
                 handleAddProfile={this.handleAddProfile}
                 handleRemoveProfile={this.handleRemoveProfile}
                 handleStatesSelection={this.handleStatesSelection}
-                handleDockerSelection={this.handleDockerSelection}
               />
             </Table>
           </Paper>
-          <br />
-          <br />
-          <Typography variant="body1">
-            Docker Rules:{' '}
-            <Select
-              value={this.state.docker}
-              onChange={this.handleDockerSelection}
-            >
-              <MenuItem value={'true'}>true</MenuItem>
-              <MenuItem value={'false'}>false</MenuItem>
-            </Select>
-          </Typography>
           <br />
           <br />
           <Button
