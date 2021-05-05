@@ -33,7 +33,7 @@ const styles = (theme) => ({
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
-    maxWidth: 700,
+    maxWidth: '100%',
   },
   rightIcon: {
     marginLeft: theme.spacing(1),
@@ -242,7 +242,7 @@ class Host extends Component {
         if (response.status === 204) {
           this.setState({ isDeleting: false });
           this.setState({ deleteHostStatus: <div>Deleted!</div> });
-          this.fetchHost(this.props.match.params.id);
+          this.props.history.push('/hosts');
           this.props.fetchGroups();
           this.props.fetchProfiles();
           this.props.fetchZones();
@@ -425,10 +425,22 @@ class Host extends Component {
             <Select
               value={this.state.hostGroupName}
               onChange={this.handleGroupSelect}
-              fullWidth
             >
               {groups}
             </Select>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <Button
+              onClick={(event) => {
+                event.stopPropagation();
+                this.props.history.push(
+                  '/groupByName/' + this.state.hostGroupName
+                );
+              }}
+              variant="contained"
+              color="primary"
+            >
+              View Group
+            </Button>
             <br />
           </Paper>
         </form>

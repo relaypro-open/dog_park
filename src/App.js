@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
-import guard_dog from './dog-training.png';
-import logo from './republic_logo_white.png';
+import logo from './dog-segmented-green.network-200x200.png';
 import './App.css';
 import { withRouter, Link, Route } from 'react-router-dom';
 import { MuiThemeProvider, withStyles } from '@material-ui/core/styles';
@@ -100,6 +99,10 @@ const styles = (theme) => ({
     marginLeft: 12,
     marginRight: 20,
   },
+  dogTitle: {
+    minWidth: 'fit-content',
+    marginRight: 10,
+  },
   hide: {
     display: 'none',
   },
@@ -151,14 +154,14 @@ const styles = (theme) => ({
     width: 'auto',
   },
   logo_img: {
-    height: '30px',
+    height: '50px',
     width: 'auto',
     paddingRight: '24px',
   },
   logo_img_open: {
-    height: '30px',
+    height: '50px',
     width: 'auto',
-    paddingRight: '0px',
+    paddingRight: '12px',
   },
   flex: {
     flexGrow: 1,
@@ -183,8 +186,6 @@ class App extends Component {
 
   componentDidMount() {
     this.props.fetchProfiles();
-    //this.props.fetchFlanIps();
-    //this.props.fetchGroups();
     this.props.fetchZones();
     this.props.fetchServices();
     this.props.fetchHosts();
@@ -332,20 +333,13 @@ class App extends Component {
                     >
                       <MenuIcon />
                     </IconButton>
-                    <Typography variant="h5" color="inherit">
+                    <Typography
+                      variant="h5"
+                      color="inherit"
+                      className={classes.dogTitle}
+                    >
                       Dog Park
                     </Typography>
-                    {
-                      <span>
-                        &nbsp;&nbsp;&nbsp;&nbsp;
-                        <img
-                          alt="guard_dog"
-                          className={classes.icon_img}
-                          src={guard_dog}
-                        />
-                        &nbsp;&nbsp;
-                      </span>
-                    }
                     <Tabs
                       className={classes.flex}
                       value={this.props.selectedTab}
@@ -364,7 +358,7 @@ class App extends Component {
                     {
                       <span>
                         <img
-                          alt="republic_logo"
+                          alt="dog_logo"
                           className={classNames(classes.logo_img, {
                             [classes.logo_img_open]: sideBarActive,
                           })}

@@ -8,7 +8,7 @@ import FlanCVE from './FlanCVE';
 
 const styles = (theme) => ({
   root: {
-    width: '50%',
+    width: '100%',
   },
   media: {
     height: 0,

@@ -42,7 +42,7 @@ const styles = (theme) => ({
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
-    maxWidth: 700,
+    maxWidth: '100%',
   },
   button: {
     margin: theme.spacing(1),
@@ -370,7 +370,7 @@ class Zone extends Component {
         if (response.status === 204) {
           this.setState({ isDeleting: false });
           this.setState({ deleteZoneStatus: <div>Deleted!</div> });
-          this.fetchZone(this.props.match.params.id);
+          this.props.history.push('/zones');
           this.props.fetchGroups();
           this.props.fetchProfiles();
           this.props.fetchZones();

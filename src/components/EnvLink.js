@@ -7,12 +7,7 @@ import { withRouter } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { CircularProgress, Button } from '@material-ui/core';
 import Select from '@material-ui/core/Select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from '@material-ui/core';
+import { Table, TableBody, TableCell, TableRow } from '@material-ui/core';
 import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -28,12 +23,12 @@ import CloseIcon from '@material-ui/icons/Close';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
-    maxWidth: 700,
+    maxWidth: '100%',
   },
   rightIcon: {
     marginLeft: theme.spacing(1),
@@ -64,7 +59,7 @@ class EnvLink extends Component {
     classes: PropTypes.object.isRequired,
     linksHasErrored: PropTypes.bool.isRequired,
     linksIsLoading: PropTypes.bool.isRequired,
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -110,38 +105,40 @@ class EnvLink extends Component {
     this.props.handleSelectedTab(6);
   };
 
-  componentDidUpdate = prevProps => {
+  componentDidUpdate = (prevProps) => {
     if (this.props !== prevProps) {
-      this.setState({ isLoading: false,
-                      hasErrored: false,
-                      noExist: false,
-                      isDeleting: false,
-                      deleteHasErrored: false,
-                      editLinkStatus: '',
-                      deleteLinkStatus: '',
-                      saveButtonDisabled: false });
+      this.setState({
+        isLoading: false,
+        hasErrored: false,
+        noExist: false,
+        isDeleting: false,
+        deleteHasErrored: false,
+        editLinkStatus: '',
+        deleteLinkStatus: '',
+        saveButtonDisabled: false,
+      });
     }
   };
 
   fetchLink(linkId) {
     this.setState({ isLoading: true });
-    if(linkId !== undefined) {
-    api
-      .get('link/' + linkId)
-      .then(response => {
-        if (response.status === 200) {
-          this.setState({ isLoading: false });
-          return response.data;
-        } else if (response.status === 404) {
-          this.setState({ noExist: true });
-          throw Error(response.statusText);
-        } else {
-          throw Error(response.statusText);
-        }
-      })
-      .then(link => {
-        this.setState(link);
-        this.setState({ 
+    if (linkId !== undefined) {
+      api
+        .get('link/' + linkId)
+        .then((response) => {
+          if (response.status === 200) {
+            this.setState({ isLoading: false });
+            return response.data;
+          } else if (response.status === 404) {
+            this.setState({ noExist: true });
+            throw Error(response.statusText);
+          } else {
+            throw Error(response.statusText);
+          }
+        })
+        .then((link) => {
+          this.setState(link);
+          this.setState({
             linkName: link.name,
             linkId: link.id,
             linkConnectionType: link.connection_type,
@@ -157,18 +154,20 @@ class EnvLink extends Component {
             linkCACertFile: link.connection.ssl_options.cacertfile,
             linkKeyFile: link.connection.ssl_options.keyfile,
             linkCertFile: link.connection.ssl_options.certfile,
-            linkFailIfNoPeerCert: link.connection.ssl_options.fail_if_no_peer_cert,
-            linkServerNameIndication: link.connection.ssl_options.server_name_indication,
+            linkFailIfNoPeerCert:
+              link.connection.ssl_options.fail_if_no_peer_cert,
+            linkServerNameIndication:
+              link.connection.ssl_options.server_name_indication,
             linkVerify: link.connection.ssl_options.verify,
-        });
-      })
+          });
+        })
         .catch(() => this.setState({ hasErrored: true }));
     }
   }
 
   createLink = () => {
     this.setState({ isLoading: true });
-  
+
     api
       .post('link', {
         name: this.state.linkName,
@@ -190,10 +189,10 @@ class EnvLink extends Component {
             fail_if_no_peer_cert: this.state.linkFailIfNoPeerCert,
             server_name_indication: this.state.linkServerNameIndication,
             verify: this.state.linkVerify,
-          }
-        }
+          },
+        },
       })
-      .then(response => {
+      .then((response) => {
         if (response.status === 201) {
           let re = /\/api\/link\/(.+)/;
           this.setState({ isLoading: false });
@@ -242,10 +241,10 @@ class EnvLink extends Component {
             fail_if_no_peer_cert: this.state.linkFailIfNoPeerCert,
             server_name_indication: this.state.linkServerNameIndication,
             verify: this.state.linkVerify,
-          }
-        }
+          },
+        },
       })
-      .then(response => {
+      .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           this.setState({ editLinkStatus: '' });
@@ -280,7 +279,7 @@ class EnvLink extends Component {
     });
     api
       .delete('/link/' + this.props.match.params.id)
-      .then(response => {
+      .then((response) => {
         if (response.status === 204) {
           this.setState({ isDeleting: false });
           this.setState({ deleteLinkStatus: <div>Deleted!</div> });
@@ -296,107 +295,107 @@ class EnvLink extends Component {
       });
   };
 
-  handleNameInput = event => {
+  handleNameInput = (event) => {
     this.setState({ linkName: event.target.value });
   };
 
-  handleIdInput = event => {
+  handleIdInput = (event) => {
     this.setState({ linkId: event.target.value });
   };
 
-  handleLinkNameInput = event => {
+  handleLinkNameInput = (event) => {
     this.setState({ linkName: event.target.value });
   };
 
-  handleLinkEnabled = event => {
+  handleLinkEnabled = (event) => {
     this.setState({ linkEnabled: event.target.value });
   };
 
-  handleLinkAddressHandling = event => {
+  handleLinkAddressHandling = (event) => {
     this.setState({ linkAddressHandling: event.target.value });
   };
 
-  handleLinkFailIfNoPeerCert = event => {
+  handleLinkFailIfNoPeerCert = (event) => {
     this.setState({ linkFailIfNoPeerCert: event.target.value });
   };
 
-  handleLinkConnectionType = event => {
+  handleLinkConnectionType = (event) => {
     this.setState({ linkConnectionType: event.target.value });
   };
 
-  handleLinkDirection = event => {
+  handleLinkDirection = (event) => {
     this.setState({ linkDirection: event.target.value });
   };
 
-  handleLinkAddressHandling = event => {
+  handleLinkAddressHandling = (event) => {
     this.setState({ linkAddressHandling: event.target.value });
   };
 
-  handleLinkApiPort = event => {
+  handleLinkApiPort = (event) => {
     this.setState({ linkApiPort: Number(event.target.value) });
   };
 
-  handleLinkHost = event => {
+  handleLinkHost = (event) => {
     this.setState({ linkHost: event.target.value });
   };
 
-  handleLinkPassword = event => {
+  handleLinkPassword = (event) => {
     this.setState({ linkPassword: event.target.value });
   };
 
-  handleLinkPort = event => {
+  handleLinkPort = (event) => {
     this.setState({ linkPort: Number(event.target.value) });
   };
 
-  handleLinkUser = event => {
+  handleLinkUser = (event) => {
     this.setState({ linkUser: event.target.value });
   };
 
-  handleLinkVirtualHost = event => {
+  handleLinkVirtualHost = (event) => {
     this.setState({ linkVirtualHost: event.target.value });
   };
 
-  handleLinkCACertFile = event => {
+  handleLinkCACertFile = (event) => {
     this.setState({ linkCACertFile: event.target.value });
   };
 
-  handleLinkKeyFile = event => {
+  handleLinkKeyFile = (event) => {
     this.setState({ linkKeyFile: event.target.value });
   };
 
-  handleLinkCertFile = event => {
+  handleLinkCertFile = (event) => {
     this.setState({ linkCertFile: event.target.value });
   };
 
-  handleLinkVersionInput = event => {
+  handleLinkVersionInput = (event) => {
     this.setState({ linkVersion: event.target.value });
   };
 
-  handleLinkServerNameIndication = event => {
+  handleLinkServerNameIndication = (event) => {
     this.setState({ linkServerNameIndication: event.target.value });
   };
 
-  handleLinkVerify = event => {
+  handleLinkVerify = (event) => {
     this.setState({ linkVerify: event.target.value });
   };
 
-  handleEditButton = event => {
+  handleEditButton = (event) => {
     this.setState({ editLinkOpen: !this.state.editLinkOpen });
   };
 
-  handleSaveButton = event => {
+  handleSaveButton = (event) => {
     this.setState({ saveLinkOpen: !this.state.saveLinkOpen });
   };
 
-  handleDeleteButton = event => {
+  handleDeleteButton = (event) => {
     this.setState({ deleteLinkOpen: !this.state.deleteLinkOpen });
   };
 
-  handleCloseButton = event => {
+  handleCloseButton = (event) => {
     this.setState({ saveLinkOpen: false });
   };
 
-  handleDeleteCloseButton = event => {
+  handleDeleteCloseButton = (event) => {
     this.setState({ deleteLinkOpen: false });
   };
 
@@ -411,7 +410,7 @@ class EnvLink extends Component {
   render() {
     if (this.state.hasErrored && this.state.noExist) {
       return <p>This link no longer exists!</p>;
-    } else if (this.state.hasErrored || this.props.linksHasErrored ) {
+    } else if (this.state.hasErrored || this.props.linksHasErrored) {
       return <p>Sorry! There was an error loading the items</p>;
     }
     if (
@@ -440,25 +439,18 @@ class EnvLink extends Component {
 
     //let linkName = this.state.linkName;
     let buttonType = '';
-    if (this.state.linkId !== "") {
+    if (this.state.linkId !== '') {
       buttonType = (
-        <Button
-          onClick={this.updateLink}
-          variant="contained"
-          color="primary"
-        >
+        <Button onClick={this.updateLink} variant="contained" color="primary">
           Submit Change
-        </Button>)
+        </Button>
+      );
     } else {
       buttonType = (
-        <Button
-          onClick={this.createLink}
-          variant="contained"
-          color="primary"
-        >
+        <Button onClick={this.createLink} variant="contained" color="primary">
           Create Link
         </Button>
-      )
+      );
     }
 
     return (
@@ -475,7 +467,7 @@ class EnvLink extends Component {
                     <TextField
                       error={this.state.isErrored}
                       required
-                      key={'linkName' }
+                      key={'linkName'}
                       fullWidth
                       value={this.state.linkName}
                       margin="dense"
@@ -540,7 +532,7 @@ class EnvLink extends Component {
                       <strong>Connection Type:</strong>
                     </Typography>
                     <Select
-                      value= {this.state.linkConnectionType}
+                      value={this.state.linkConnectionType}
                       onChange={this.handleLinkConnectionType}
                       fullWidth
                     >
@@ -551,9 +543,9 @@ class EnvLink extends Component {
                 <TableRow>
                   <TableCell>
                     <Typography variant="body1">
-                        <strong>Connection</strong>
+                      <strong>Connection</strong>
                     </Typography>
-                    </TableCell>
+                  </TableCell>
                   <TableCell>
                     <Typography variant="body1">
                       <strong>Api Port:</strong>
@@ -561,7 +553,7 @@ class EnvLink extends Component {
                     <TextField
                       error={this.state.isErrored}
                       required
-                      key={'linkApiPort' }
+                      key={'linkApiPort'}
                       fullWidth
                       value={this.state.linkApiPort}
                       margin="dense"
@@ -574,12 +566,12 @@ class EnvLink extends Component {
                   <TableCell></TableCell>
                   <TableCell>
                     <Typography variant="body1">
-                      <strong>Host:</strong> 
+                      <strong>Host:</strong>
                     </Typography>
                     <TextField
                       error={this.state.isErrored}
                       required
-                      key={'linkHost' }
+                      key={'linkHost'}
                       fullWidth
                       value={this.state.linkHost}
                       margin="dense"
@@ -591,13 +583,13 @@ class EnvLink extends Component {
                   <TableCell></TableCell>
                   <TableCell>
                     <Typography variant="body1">
-                      <strong>Password:</strong> 
+                      <strong>Password:</strong>
                     </Typography>
                     <TextField
                       type="password"
                       error={this.state.isErrored}
                       required
-                      key={'linkPassword' }
+                      key={'linkPassword'}
                       fullWidth
                       value={this.state.linkPassword}
                       margin="dense"
@@ -609,12 +601,12 @@ class EnvLink extends Component {
                   <TableCell></TableCell>
                   <TableCell>
                     <Typography variant="body1">
-                      <strong>Port:</strong> 
+                      <strong>Port:</strong>
                     </Typography>
                     <TextField
                       error={this.state.isErrored}
                       required
-                      key={'linkPort' }
+                      key={'linkPort'}
                       fullWidth
                       value={this.state.linkPort}
                       margin="dense"
@@ -627,12 +619,12 @@ class EnvLink extends Component {
                   <TableCell></TableCell>
                   <TableCell>
                     <Typography variant="body1">
-                      <strong>User:</strong> 
+                      <strong>User:</strong>
                     </Typography>
                     <TextField
                       error={this.state.isErrored}
                       required
-                      key={'linkUser' }
+                      key={'linkUser'}
                       fullWidth
                       value={this.state.linkUser}
                       margin="dense"
@@ -645,12 +637,12 @@ class EnvLink extends Component {
                   <TableCell></TableCell>
                   <TableCell>
                     <Typography variant="body1">
-                      <strong>Virtual Host:</strong> 
+                      <strong>Virtual Host:</strong>
                     </Typography>
                     <TextField
                       error={this.state.isErrored}
                       required
-                      key={'linkVirtualHost' }
+                      key={'linkVirtualHost'}
                       fullWidth
                       value={this.state.linkVirtualHost}
                       margin="dense"
@@ -660,19 +652,19 @@ class EnvLink extends Component {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                    <TableCell>
-                      <Typography variant="body1">
-                        <strong>SSL Options</strong>
-                    </Typography>
-                    </TableCell>
                   <TableCell>
                     <Typography variant="body1">
-                      <strong>CA Cert File:</strong> 
+                      <strong>SSL Options</strong>
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body1">
+                      <strong>CA Cert File:</strong>
                     </Typography>
                     <TextField
                       error={this.state.isErrored}
                       required
-                      key={'linkCACertFile' }
+                      key={'linkCACertFile'}
                       fullWidth
                       value={this.state.linkCACertFile}
                       margin="dense"
@@ -690,7 +682,7 @@ class EnvLink extends Component {
                     <TextField
                       error={this.state.isErrored}
                       required
-                      key={'linkKeyFile' }
+                      key={'linkKeyFile'}
                       fullWidth
                       value={this.state.linkKeyFile}
                       margin="dense"
@@ -708,7 +700,7 @@ class EnvLink extends Component {
                     <TextField
                       error={this.state.isErrored}
                       required
-                      key={'linkCertFile' }
+                      key={'linkCertFile'}
                       fullWidth
                       value={this.state.linkCertFile}
                       margin="dense"
@@ -737,12 +729,12 @@ class EnvLink extends Component {
                   <TableCell></TableCell>
                   <TableCell>
                     <Typography variant="body1">
-                      <strong>Server Name Indication:</strong> 
+                      <strong>Server Name Indication:</strong>
                     </Typography>
                     <TextField
                       error={this.state.isErrored}
                       required
-                      key={'linkServerNameIndication' }
+                      key={'linkServerNameIndication'}
                       fullWidth
                       value={this.state.linkServerNameIndication}
                       margin="dense"
@@ -755,7 +747,7 @@ class EnvLink extends Component {
                   <TableCell></TableCell>
                   <TableCell>
                     <Typography variant="body1">
-                      <strong>Verify:</strong> 
+                      <strong>Verify:</strong>
                     </Typography>
                     <Select
                       value={this.state.linkVerify}
@@ -805,8 +797,7 @@ class EnvLink extends Component {
               Cancel
             </Button>
             {buttonType}
-                &nbsp;&nbsp;{this.state.editLinkStatus}
-
+            &nbsp;&nbsp;{this.state.editLinkStatus}
           </DialogActions>
         </Dialog>
         <Dialog
@@ -819,13 +810,10 @@ class EnvLink extends Component {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
-              WARNING!
-               Deleting a Link will delete the related External, 
-               causing all related profiles and iptables
-               with rules with this environment as source to fail.
-              WARNING!
-
-              Are you sure you want to delete: {this.state.linkName}?
+              WARNING! Deleting a Link will delete the related External, causing
+              all related profiles and iptables with rules with this environment
+              as source to fail. WARNING! Are you sure you want to delete:{' '}
+              {this.state.linkName}?
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -856,25 +844,24 @@ class EnvLink extends Component {
           }}
           message={<span id="message-id">{this.state.snackBarMsg}</span>}
           action={[
-          <IconButton
-            key="close"
-            aria-label="Close"
-            color="inherit"
-            className={classes.close}
-            onClick={this.handleSnackBarClose}
-          >
-            <CloseIcon />
-          </IconButton>,
+            <IconButton
+              key="close"
+              aria-label="Close"
+              color="inherit"
+              className={classes.close}
+              onClick={this.handleSnackBarClose}
+            >
+              <CloseIcon />
+            </IconButton>,
           ]}
         />
-        <br/>
-
+        <br />
       </div>
     );
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     links: state.links,
     linksHasErrored: state.linksHasErrored,
@@ -882,14 +869,14 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
     fetchLinks: () => dispatch(linksFetchData()),
   };
 };
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps,
+  mapDispatchToProps
 )(withRouter(withStyles(styles)(EnvLink)));

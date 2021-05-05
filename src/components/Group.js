@@ -35,7 +35,7 @@ const styles = (theme) => ({
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
-    maxWidth: 700,
+    maxWidth: '100%',
   },
   rightIcon: {
     marginLeft: theme.spacing(1),
@@ -350,7 +350,7 @@ class Group extends Component {
         if (response.status === 204) {
           this.setState({ isDeleting: false });
           this.setState({ deleteGroupStatus: <div>Deleted!</div> });
-          this.fetchGroup(this.props.match.params.id);
+          this.props.history.push('/groups');
           this.props.fetchGroups();
           this.props.fetchProfiles();
           this.props.fetchZones();
@@ -571,10 +571,23 @@ class Group extends Component {
             <Select
               value={this.state.groupProfileName}
               onChange={this.handleProfileSelect}
-              fullWidth
             >
               {profiles}
             </Select>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <Button
+              onClick={(event) => {
+                event.stopPropagation();
+                this.props.history.push(
+                  '/profile/' +
+                    this.props.profiles[this.state.groupProfileName][0].id
+                );
+              }}
+              variant="contained"
+              color="primary"
+            >
+              View Profile
+            </Button>
             <br />
           </Paper>
         </form>
