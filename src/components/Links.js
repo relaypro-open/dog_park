@@ -53,7 +53,7 @@ class Links extends Component {
     if (this.props.links === []) {
       this.props.fetchLinks();
     }
-    this.props.handleSelectedTab(6);
+    this.props.handleSelectedTab(7);
   }
 
   handleCreateLinkButton = () => {

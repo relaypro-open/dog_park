@@ -41,7 +41,8 @@ import Service from './components/Service';
 import Hosts from './components/Hosts';
 import Services from './components/Services';
 import Host from './components/Host';
-import FlanScan from './components/FlanScan';
+import Vulnerabilities from './components/Vulnerabilities';
+import Certificates from './components/Certificates';
 import Links from './components/Links';
 import EnvLink from './components/EnvLink';
 
@@ -218,9 +219,12 @@ class App extends Component {
         this.props.history.push('/zones');
         break;
       case 5:
-        this.props.history.push('/flanscans');
+        this.props.history.push('/vulnerabilities');
         break;
       case 6:
+        this.props.history.push('/certificates');
+        break;
+      case 7:
         this.props.history.push('/links');
         break;
       default:
@@ -352,7 +356,8 @@ class App extends Component {
                       <Tab label="Services" />
                       <Tab label="Hosts" />
                       <Tab label="Zones" />
-                      <Tab label="Flan Scans" />
+                      <Tab label="Vulnerabilities" />
+                      <Tab label="Certificates" />
                       <Tab label="Links" />
                     </Tabs>
                     {
@@ -397,7 +402,16 @@ class App extends Component {
                   <Route path="/host/:id" component={Host} />
                   <Route exact={true} path="/services" component={Services} />
                   <Route path="/service/:id" component={Service} />
-                  <Route exact={true} path="/flanscans" component={FlanScan} />
+                  <Route
+                    exact={true}
+                    path="/vulnerabilities"
+                    component={Vulnerabilities}
+                  />
+                  <Route
+                    exact={true}
+                    path="/certificates"
+                    component={Certificates}
+                  />
                   <Route exact={true} path="/links" component={Links} />
                   <Route path="/link/:id" component={EnvLink} />
                   <Route exact={true} path="/link" component={EnvLink} />

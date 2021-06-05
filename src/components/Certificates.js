@@ -9,6 +9,7 @@ import HostsTable from './HostsTable';
 import moment from 'moment';
 import { flan_api } from '../flan_api';
 import { CircularProgress, Typography } from '@material-ui/core';
+import FlanCert from './FlanCert';
 
 const styles = (theme) => ({
   root: {
@@ -35,7 +36,7 @@ const styles = (theme) => ({
   },
 });
 
-class FlanScan extends Component {
+class Certificates extends Component {
   constructor(props) {
     super(props);
 
@@ -49,7 +50,7 @@ class FlanScan extends Component {
   }
 
   componentDidMount() {
-    this.props.handleSelectedTab(5);
+    this.props.handleSelectedTab(6);
     this.fetchScans();
     //this.props.fetchGroups();
   }
@@ -62,7 +63,7 @@ class FlanScan extends Component {
     this.setState({ isLoading: true });
 
     flan_api
-      .get('/vulners_by_hostname')
+      .get('/certs_by_hostname')
       .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
@@ -111,18 +112,19 @@ class FlanScan extends Component {
 
     let output = [];
     Object.keys(scan).forEach((key) => {
-      let application = scan[key];
-      if ('locations' in application) {
-        application['hosts'] = [];
-        Object.keys(application['locations']).forEach((h) => {
+      let certificate = scan[key];
+      if ('locations' in certificate) {
+        certificate['hosts'] = [];
+        Object.keys(certificate['locations']).forEach((h) => {
           if (h in hosts.hostObjects) {
-            application['hosts'].push(hosts.hostObjects[h]);
+            certificate['hosts'].push(hosts.hostObjects[h]);
           }
         });
       }
-      application['name'] = key;
-      if ('vulns' in application) {
-        output.push(application);
+      certificate['name'] = key;
+      if ('certs' in certificate) {
+        certificate['cert'] = certificate['certs'][0];
+        output.push(certificate);
       }
     });
 
@@ -134,16 +136,10 @@ class FlanScan extends Component {
         <br />
         <br />
 
-        {output.map((app) => (
+        {output.map((cert) => (
           <div>
-            <Typography
-              variant="h4
-      "
-            >
-              <strong>{app.name}</strong>
-            </Typography>
-            <br />
-            <HostsTable hosts={app.hosts} flanIps={flanIps} />
+            <FlanCert key={'key_' + cert.name} cert={cert.cert} />
+            <HostsTable hosts={cert.hosts} flanIps={flanIps} />
             <br />
 
             <br />
@@ -176,7 +172,7 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withRouter(withStyles(styles)(FlanScan)));
+)(withRouter(withStyles(styles)(Certificates)));
 
 //      <FlanCVE key={'key_' + vuln.name} title={vuln.name} app={vuln.app} description={vuln.description} severity={vuln.severity} link={'https://nvd.nist.gov/vuln/detail/' + vuln.name} />
 //{app.vulns.map(vuln => (

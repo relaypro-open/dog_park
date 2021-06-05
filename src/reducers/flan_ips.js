@@ -22,7 +22,6 @@ export const flanIps = handleAction(
     if (action.payload.hosts.hostList !== []) {
       action.payload.hosts.hostList.forEach((host) => {
         let groupHost = {};
-        console.log(action.payload.flanIps);
         if (action.payload.flanIps[host['name']] !== undefined) {
           groupHost[host['name']] = action.payload.flanIps[host['name']];
         } else {

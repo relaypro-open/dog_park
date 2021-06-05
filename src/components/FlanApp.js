@@ -5,6 +5,7 @@ import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import FlanCVE from './FlanCVE';
+import FlanCert from './FlanCert';
 
 const styles = (theme) => ({
   root: {
@@ -38,6 +39,7 @@ class FlanApp extends Component {
       ip: props.ip,
       port: props.port,
       vulns: props.vulns,
+      certs: props.certs,
     };
   }
 
@@ -48,13 +50,15 @@ class FlanApp extends Component {
         ip: this.props.ip,
         port: this.props.port,
         vulns: this.props.vulns,
+        certs: this.props.certs,
       });
     }
   }
 
   render() {
     const { classes } = this.props;
-    const { app, port, vulns } = this.state;
+    const { app, port, vulns, certs } = this.state;
+    console.log(vulns, certs);
     return (
       <Card className={classes.root}>
         <CardHeader
@@ -73,9 +77,19 @@ class FlanApp extends Component {
         />
         <CardContent>
           <Typography variant="h6">
-            <strong>Flan CVEs:</strong>
+            <strong>Certificates:</strong>
           </Typography>
           <br />
+          {certs.map((cert) => (
+            <div>
+              <FlanCert key={'key_' + cert.name} cert={cert} />
+              <br />
+            </div>
+          ))}
+          <br />
+          <Typography variant="h6">
+            <strong>Flan CVEs:</strong>
+          </Typography>
           <br />
           {vulns.map((vuln) => (
             <div>

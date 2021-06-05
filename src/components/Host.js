@@ -540,11 +540,9 @@ class Host extends Component {
           ]}
         />
         <br />
-        <br />
         <Typography variant="subtitle1">
           <strong>Flan Discovered Apps</strong>
         </Typography>
-        <br />
         <br />
 
         {flanApps.map((a) => (
@@ -555,6 +553,7 @@ class Host extends Component {
               ip={a.ip}
               port={a.port}
               vulns={a.vulns}
+              certs={a.certs}
             />
             <br />
           </div>

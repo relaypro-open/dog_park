@@ -14,6 +14,7 @@ a centralized firewall management system.
 - [Build](#build-release)
 - [Deploy](#deploy)
 - [Run](#run)
+- [Architecture](#architecture)
 
 ## Runtime Dependencies
 
@@ -126,4 +127,10 @@ example nginx config:
 ## Run
 
 [http://localhost:3000](http://localhost:3000)
+
+## Architecture
+
+dog_park uses Redux to store much of it's global state information. When the page loads, calls are made to the "plural" api endpoints (hosts, groups, profiles, zones, services, and flan_ips) and the results are stored in the redux store. This means that once loaded, all of the information is available to the app and it allows the app to function without network delays. Any time you drill into a specific resource, their is an api call to receieve that information and then it is displayed. When a resource is created or updated, this will trigger a full refresh of the redux store to ensure that the data is up to date. 
+
+Currently, there is no mechanism for auto-refresh of data. So, if the page is left open for a long period of time, there is a possiblity that the data is stale and not in line with dog_trainer's state. Therefore, a full refresh is required. There is also nothing included that would indicate other users who are actively working with dog_park to make updates. So, theoretically there could be a situation where two different users are modifying the same resource and overwrite the other's changes.
 

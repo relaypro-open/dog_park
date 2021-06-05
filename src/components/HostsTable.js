@@ -30,6 +30,9 @@ const HostsTable = pure((props) => {
   const flanEventsStyle = {
     backgroundColor: '#FD6864',
   };
+  const certEventsStyle = {
+    backgroundColor: '#34CDF9',
+  };
 
   return (
     <Paper className={classes.root}>
@@ -40,7 +43,8 @@ const HostsTable = pure((props) => {
             <TableCell>Host Name</TableCell>
             <TableCell>Host Key</TableCell>
             <TableCell>Host Group</TableCell>
-            <TableCell>Flan Events</TableCell>
+            <TableCell>Vulnerabilities</TableCell>
+            <TableCell>Certificates</TableCell>
             <TableCell>Open Apps</TableCell>
           </TableRow>
         </TableHead>
@@ -64,9 +68,12 @@ const HostsTable = pure((props) => {
             let flanEventCount = 0;
             let openAppCount = 0;
             let flanEvent = '';
+            let certCount = 0;
+            let certEvent = '';
             if (host.name in flanIps.hosts) {
               flanIps.hosts[host.name].forEach((app) => {
                 flanEventCount += app['vulns'].length;
+                certCount += app['certs'].length;
                 openAppCount += 1;
               });
             }
@@ -74,6 +81,13 @@ const HostsTable = pure((props) => {
               flanEvent = (
                 <Avatar aria-label="recipe" style={flanEventsStyle}>
                   {flanEventCount}
+                </Avatar>
+              );
+            }
+            if (certCount > 0) {
+              certEvent = (
+                <Avatar aria-label="recipe" style={certEventsStyle}>
+                  {certCount}
                 </Avatar>
               );
             }
@@ -100,6 +114,7 @@ const HostsTable = pure((props) => {
                   {host.group}
                 </TableCell>
                 <TableCell>{flanEvent}</TableCell>
+                <TableCell>{certEvent}</TableCell>
                 <TableCell>{openAppCount}</TableCell>
               </TableRow>
             );
