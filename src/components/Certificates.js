@@ -8,7 +8,7 @@ import { handleSelectedTab } from '../actions/app';
 import HostsTable from './HostsTable';
 import moment from 'moment';
 import { flan_api } from '../flan_api';
-import { CircularProgress, Typography } from '@material-ui/core';
+import { CircularProgress } from '@material-ui/core';
 import FlanCert from './FlanCert';
 
 const styles = (theme) => ({
