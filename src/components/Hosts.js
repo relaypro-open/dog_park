@@ -33,6 +33,7 @@ class Hosts extends Component {
         <HostsTable
           hosts={this.props.hosts.hostList}
           flanIps={this.props.flanIps}
+          expand={true}
         />
         <br />
       </div>

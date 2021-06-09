@@ -9,6 +9,7 @@ import HostsTable from './HostsTable';
 import moment from 'moment';
 import { flan_api } from '../flan_api';
 import { CircularProgress, Typography } from '@material-ui/core';
+import FlanCVE from './FlanCVE';
 
 const styles = (theme) => ({
   root: {
@@ -126,6 +127,10 @@ class Vulnerabilities extends Component {
       }
     });
 
+    console.log(flanIps);
+    console.log(scan);
+    console.log(output);
+
     return (
       <div>
         <a href="https://us-east-1.console.aws.amazon.com/s3/buckets/flan-scans/?region=us-east-1&tab=overview">
@@ -136,16 +141,26 @@ class Vulnerabilities extends Component {
 
         {output.map((app) => (
           <div>
-            <Typography
-              variant="h4
-      "
-            >
+            <Typography variant="h6">
               <strong>{app.name}</strong>
             </Typography>
+            <div>
+              {app.vulns.map((vuln) => (
+                <div>
+                  <br />
+                  <FlanCVE
+                    key={'key_' + vuln.name}
+                    title={vuln.name}
+                    app={vuln.app}
+                    description={vuln.description}
+                    severity={vuln.severity}
+                    link={'https://vulners.com/cve/' + vuln.name}
+                  />
+                </div>
+              ))}
+            </div>
+            <HostsTable hosts={app.hosts} flanIps={flanIps} expand={false} />
             <br />
-            <HostsTable hosts={app.hosts} flanIps={flanIps} />
-            <br />
-
             <br />
           </div>
         ))}

@@ -35,7 +35,7 @@ const styles = (theme) => ({
 });
 
 const HostsTable = pure((props) => {
-  const { classes, hosts, flanIps } = props;
+  const { classes, hosts, flanIps, expand } = props;
 
   const flanEventsStyle = {
     backgroundColor: '#FD6864',
@@ -44,7 +44,7 @@ const HostsTable = pure((props) => {
     backgroundColor: '#34CDF9',
   };
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(expand);
 
   const handleClick = () => {
     setOpen(!open);

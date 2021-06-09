@@ -139,7 +139,7 @@ class Certificates extends Component {
         {output.map((cert) => (
           <div>
             <FlanCert key={'key_' + cert.name} cert={cert.cert} />
-            <HostsTable hosts={cert.hosts} flanIps={flanIps} />
+            <HostsTable hosts={cert.hosts} flanIps={flanIps} expand={false} />
             <br />
 
             <br />

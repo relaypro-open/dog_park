@@ -562,7 +562,7 @@ class Group extends Component {
             <Typography variant="body1">
               <strong>Group Hosts:</strong>
             </Typography>
-            <HostsTable hosts={groupHosts} flanIps={flanIps} />
+            <HostsTable hosts={groupHosts} flanIps={flanIps} expand={true} />
             <br />
             {isDiff}
             <Typography variant="body1">
