@@ -5,30 +5,17 @@ import { withStyles } from '@material-ui/core/styles';
 import { handleSelectedTab } from '../actions/app';
 //import { DatePicker } from "@material-ui/pickers";
 //import FlanCVE from './FlanCVE';
-import HostsTable from './HostsTable';
 import moment from 'moment';
 import { flan_api } from '../flan_api';
 import {
   CircularProgress,
-  Typography,
-  Avatar,
-  Collapse,
-  IconButton,
-  Paper,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
 } from '@material-ui/core';
-import {
-  CloudOff,
-  Check,
-  Error,
-  Help,
-  ExpandLess,
-  ExpandMore,
-} from '@material-ui/icons';
-import FlanCVE from './FlanCVE';
+import { Error } from '@material-ui/icons';
+import VulnerableApp from './VulnerableApp';
 
 const styles = (theme) => ({
   root: {
@@ -72,7 +59,6 @@ class Vulnerabilities extends Component {
       noExist: false,
       scan: {},
       selectedDate: moment(),
-      open: false,
       scanLocation: 'external',
     };
   }
@@ -120,10 +106,6 @@ class Vulnerabilities extends Component {
       .catch(() => this.setState({ hasErrored: true }));
   };
 
-  handleClick = () => {
-    this.setState({ open: !this.state.open });
-  };
-
   handleChange = (event) => {
     this.setState({ scanLocation: event.target.value });
   };
@@ -152,7 +134,7 @@ class Vulnerabilities extends Component {
       );
     }
 
-    const { scan, open, scanLocation } = this.state;
+    const { scan, scanLocation } = this.state;
 
     const { hosts, flanIps, classes } = this.props;
 
@@ -189,38 +171,7 @@ class Vulnerabilities extends Component {
         </FormControl>
         {output.map((app) => (
           <div>
-            <Paper className={classes.root}>
-              <IconButton aria-label="settings" onClick={this.handleClick}>
-                {open ? <ExpandLess /> : <ExpandMore />}
-              </IconButton>
-              <Typography variant="Heading1" color="textPrimary">
-                {app.name}
-              </Typography>
-              <Collapse in={open} timeout="auto" unmountOnExit>
-                <div>
-                  {app.vulns.map((vuln) => (
-                    <div>
-                      <br />
-                      <FlanCVE
-                        key={'key_' + vuln.name}
-                        title={vuln.name}
-                        app={vuln.app}
-                        description={vuln.description}
-                        severity={vuln.severity}
-                        link={'https://vulners.com/cve/' + vuln.name}
-                      />
-                    </div>
-                  ))}
-                </div>
-                <HostsTable
-                  hosts={app.hosts}
-                  flanIps={flanIps}
-                  expand={false}
-                />
-              </Collapse>
-            </Paper>
-            <br />
-            <br />
+            <VulnerableApp app={app} flanIps={flanIps} />
           </div>
         ))}
       </div>

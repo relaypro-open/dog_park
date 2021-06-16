@@ -58,7 +58,6 @@ class FlanApp extends Component {
   render() {
     const { classes } = this.props;
     const { app, port, vulns, certs } = this.state;
-    console.log(vulns, certs);
     return (
       <Card className={classes.root}>
         <CardHeader
