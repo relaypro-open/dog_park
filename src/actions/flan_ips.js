@@ -22,7 +22,7 @@ export function flanIpsFetchData() {
     const { hosts } = getState();
 
     flan_api
-      .get('flan_ips')
+      .get('internal/qa/flan_ips')
       .then((response) => {
         if (response.status !== 200) {
           throw Error(response.statusText);

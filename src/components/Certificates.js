@@ -8,7 +8,14 @@ import { handleSelectedTab } from '../actions/app';
 import HostsTable from './HostsTable';
 import moment from 'moment';
 import { flan_api } from '../flan_api';
-import { CircularProgress } from '@material-ui/core';
+import {
+  CircularProgress,
+  Paper,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@material-ui/core';
 import FlanCert from './FlanCert';
 
 const styles = (theme) => ({
@@ -16,7 +23,7 @@ const styles = (theme) => ({
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
-    maxWidth: 700,
+    maxWidth: '100%',
   },
   rightIcon: {
     marginLeft: theme.spacing(1),
@@ -34,6 +41,13 @@ const styles = (theme) => ({
   close: {
     padding: theme.spacing(0.5),
   },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
 });
 
 class Certificates extends Component {
@@ -46,24 +60,39 @@ class Certificates extends Component {
       noExist: false,
       scan: {},
       selectedDate: moment(),
+      scanLocation: 'external',
     };
   }
 
   componentDidMount() {
     this.props.handleSelectedTab(6);
     this.fetchScans();
-    //this.props.fetchGroups();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.scanLocation !== this.state.scanLocation) {
+      this.fetchScans();
+    }
   }
 
   handleDateChange = (event) => {
     this.setState({ selectedDate: event });
   };
 
+  handleChange = (event) => {
+    this.setState({ scanLocation: event.target.value });
+  };
+
   fetchScans = () => {
     this.setState({ isLoading: true });
 
     flan_api
-      .get('/certs_by_hostname')
+      .get(
+        this.state.scanLocation +
+          '/' +
+          process.env.REACT_APP_DOG_API_ENV +
+          '/certs_by_hostname'
+      )
       .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
@@ -106,9 +135,9 @@ class Certificates extends Component {
       );
     }
 
-    const { scan } = this.state;
+    const { scan, scanLocation } = this.state;
 
-    const { hosts, flanIps } = this.props;
+    const { hosts, flanIps, classes } = this.props;
 
     let output = [];
     Object.keys(scan).forEach((key) => {
@@ -130,18 +159,24 @@ class Certificates extends Component {
 
     return (
       <div>
-        <a href="https://us-east-1.console.aws.amazon.com/s3/buckets/flan-scans/?region=us-east-1&tab=overview">
-          Flan Scans
-        </a>
-        <br />
-        <br />
-
+        <FormControl className={classes.formControl}>
+          <InputLabel id="scan-location-input">Scan Location</InputLabel>
+          <Select
+            labelId="scan-location-input-label"
+            id="scan-location-input"
+            value={scanLocation}
+            onChange={this.handleChange}
+          >
+            <MenuItem value={'external'}>External</MenuItem>
+            <MenuItem value={'internal'}>Internal</MenuItem>
+          </Select>
+        </FormControl>
         {output.map((cert) => (
           <div>
-            <FlanCert key={'key_' + cert.name} cert={cert.cert} />
-            <HostsTable hosts={cert.hosts} flanIps={flanIps} expand={false} />
-            <br />
-
+            <Paper className={classes.root}>
+              <FlanCert key={'key_' + cert.name} cert={cert.cert} />
+              <HostsTable hosts={cert.hosts} flanIps={flanIps} expand={false} />
+            </Paper>
             <br />
           </div>
         ))}

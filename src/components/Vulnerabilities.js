@@ -8,7 +8,26 @@ import { handleSelectedTab } from '../actions/app';
 import HostsTable from './HostsTable';
 import moment from 'moment';
 import { flan_api } from '../flan_api';
-import { CircularProgress, Typography } from '@material-ui/core';
+import {
+  CircularProgress,
+  Typography,
+  Avatar,
+  Collapse,
+  IconButton,
+  Paper,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@material-ui/core';
+import {
+  CloudOff,
+  Check,
+  Error,
+  Help,
+  ExpandLess,
+  ExpandMore,
+} from '@material-ui/icons';
 import FlanCVE from './FlanCVE';
 
 const styles = (theme) => ({
@@ -16,7 +35,7 @@ const styles = (theme) => ({
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
-    maxWidth: 700,
+    maxWidth: '100%',
   },
   rightIcon: {
     marginLeft: theme.spacing(1),
@@ -34,6 +53,13 @@ const styles = (theme) => ({
   close: {
     padding: theme.spacing(0.5),
   },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
 });
 
 class Vulnerabilities extends Component {
@@ -46,13 +72,20 @@ class Vulnerabilities extends Component {
       noExist: false,
       scan: {},
       selectedDate: moment(),
+      open: false,
+      scanLocation: 'external',
     };
   }
 
   componentDidMount() {
     this.props.handleSelectedTab(5);
     this.fetchScans();
-    //this.props.fetchGroups();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.scanLocation !== this.state.scanLocation) {
+      this.fetchScans();
+    }
   }
 
   handleDateChange = (event) => {
@@ -63,7 +96,12 @@ class Vulnerabilities extends Component {
     this.setState({ isLoading: true });
 
     flan_api
-      .get('/vulners_by_hostname')
+      .get(
+        this.state.scanLocation +
+          '/' +
+          process.env.REACT_APP_DOG_API_ENV +
+          '/vulners_by_hostname'
+      )
       .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
@@ -80,6 +118,14 @@ class Vulnerabilities extends Component {
         this.setState({ scan: scan });
       })
       .catch(() => this.setState({ hasErrored: true }));
+  };
+
+  handleClick = () => {
+    this.setState({ open: !this.state.open });
+  };
+
+  handleChange = (event) => {
+    this.setState({ scanLocation: event.target.value });
   };
 
   render() {
@@ -106,9 +152,9 @@ class Vulnerabilities extends Component {
       );
     }
 
-    const { scan } = this.state;
+    const { scan, open, scanLocation } = this.state;
 
-    const { hosts, flanIps } = this.props;
+    const { hosts, flanIps, classes } = this.props;
 
     let output = [];
     Object.keys(scan).forEach((key) => {
@@ -127,39 +173,52 @@ class Vulnerabilities extends Component {
       }
     });
 
-    console.log(flanIps);
-    console.log(scan);
-    console.log(output);
-
     return (
       <div>
-        <a href="https://us-east-1.console.aws.amazon.com/s3/buckets/flan-scans/?region=us-east-1&tab=overview">
-          Flan Scans
-        </a>
-        <br />
-        <br />
-
+        <FormControl className={classes.formControl}>
+          <InputLabel id="scan-location-input">Scan Location</InputLabel>
+          <Select
+            labelId="scan-location-input-label"
+            id="scan-location-input"
+            value={scanLocation}
+            onChange={this.handleChange}
+          >
+            <MenuItem value={'external'}>External</MenuItem>
+            <MenuItem value={'internal'}>Internal</MenuItem>
+          </Select>
+        </FormControl>
         {output.map((app) => (
           <div>
-            <Typography variant="h6">
-              <strong>{app.name}</strong>
-            </Typography>
-            <div>
-              {app.vulns.map((vuln) => (
+            <Paper className={classes.root}>
+              <IconButton aria-label="settings" onClick={this.handleClick}>
+                {open ? <ExpandLess /> : <ExpandMore />}
+              </IconButton>
+              <Typography variant="Heading1" color="textPrimary">
+                {app.name}
+              </Typography>
+              <Collapse in={open} timeout="auto" unmountOnExit>
                 <div>
-                  <br />
-                  <FlanCVE
-                    key={'key_' + vuln.name}
-                    title={vuln.name}
-                    app={vuln.app}
-                    description={vuln.description}
-                    severity={vuln.severity}
-                    link={'https://vulners.com/cve/' + vuln.name}
-                  />
+                  {app.vulns.map((vuln) => (
+                    <div>
+                      <br />
+                      <FlanCVE
+                        key={'key_' + vuln.name}
+                        title={vuln.name}
+                        app={vuln.app}
+                        description={vuln.description}
+                        severity={vuln.severity}
+                        link={'https://vulners.com/cve/' + vuln.name}
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <HostsTable hosts={app.hosts} flanIps={flanIps} expand={false} />
+                <HostsTable
+                  hosts={app.hosts}
+                  flanIps={flanIps}
+                  expand={false}
+                />
+              </Collapse>
+            </Paper>
             <br />
             <br />
           </div>

@@ -540,6 +540,8 @@ class Host extends Component {
           ]}
         />
         <br />
+        <br />
+        <br />
         <Typography variant="subtitle1">
           <strong>Flan Discovered Apps</strong>
         </Typography>
