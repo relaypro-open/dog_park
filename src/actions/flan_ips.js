@@ -19,18 +19,18 @@ export function flanIpsFetchData() {
   return (dispatch, getState) => {
     dispatch(flanIpsIsLoading(true));
 
-    const { hosts } = getState();
+    const { hosts, scanLocation } = getState();
 
     flan_api
-      .get('internal/qa/flan_ips')
-      .then((response) => {
+      .get(scanLocation + '/' + process.env.REACT_APP_DOG_API_ENV + '/flan_ips')
+      .then(response => {
         if (response.status !== 200) {
           throw Error(response.statusText);
         }
         dispatch(flanIpsIsLoading(false));
         return response.data;
       })
-      .then((flanIps) => dispatch(flanIpsFetchDataSuccess(flanIps, hosts)))
+      .then(flanIps => dispatch(flanIpsFetchDataSuccess(flanIps, hosts)))
       .catch(() => {
         dispatch(flanIpsIsLoading(false));
         dispatch(flanIpsHasErrored(true));

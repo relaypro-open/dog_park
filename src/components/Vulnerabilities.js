@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { handleSelectedTab } from '../actions/app';
-//import { DatePicker } from "@material-ui/pickers";
-//import FlanCVE from './FlanCVE';
+import { handleSelectedScanLocation } from '../actions/app';
+import { flanIpsFetchData } from '../actions/flan_ips';
 import moment from 'moment';
 import { flan_api } from '../flan_api';
 import {
@@ -17,7 +17,7 @@ import {
 import { Error } from '@material-ui/icons';
 import VulnerableApp from './VulnerableApp';
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
@@ -59,7 +59,6 @@ class Vulnerabilities extends Component {
       noExist: false,
       scan: {},
       selectedDate: moment(),
-      scanLocation: 'external',
     };
   }
 
@@ -69,12 +68,13 @@ class Vulnerabilities extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.scanLocation !== this.state.scanLocation) {
+    if (prevProps.scanLocation !== this.props.scanLocation) {
+      this.props.fetchFlanIps();
       this.fetchScans();
     }
   }
 
-  handleDateChange = (event) => {
+  handleDateChange = event => {
     this.setState({ selectedDate: event });
   };
 
@@ -83,12 +83,12 @@ class Vulnerabilities extends Component {
 
     flan_api
       .get(
-        this.state.scanLocation +
+        this.props.scanLocation +
           '/' +
           process.env.REACT_APP_DOG_API_ENV +
           '/vulners_by_hostname'
       )
-      .then((response) => {
+      .then(response => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           return response.data;
@@ -100,14 +100,14 @@ class Vulnerabilities extends Component {
           throw Error(response.statusText);
         }
       })
-      .then((scan) => {
+      .then(scan => {
         this.setState({ scan: scan });
       })
       .catch(() => this.setState({ hasErrored: true }));
   };
 
-  handleChange = (event) => {
-    this.setState({ scanLocation: event.target.value });
+  handleChange = event => {
+    this.props.handleSelectedScanLocation(event.target.value);
   };
 
   render() {
@@ -134,16 +134,16 @@ class Vulnerabilities extends Component {
       );
     }
 
-    const { scan, scanLocation } = this.state;
+    const { scan } = this.state;
 
-    const { hosts, flanIps, classes } = this.props;
+    const { hosts, flanIps, classes, scanLocation } = this.props;
 
     let output = [];
-    Object.keys(scan).forEach((key) => {
+    Object.keys(scan).forEach(key => {
       let application = scan[key];
       if ('locations' in application) {
         application['hosts'] = [];
-        Object.keys(application['locations']).forEach((h) => {
+        Object.keys(application['locations']).forEach(h => {
           if (h in hosts.hostObjects) {
             application['hosts'].push(hosts.hostObjects[h]);
           }
@@ -169,7 +169,7 @@ class Vulnerabilities extends Component {
             <MenuItem value={'internal'}>Internal</MenuItem>
           </Select>
         </FormControl>
-        {output.map((app) => (
+        {output.map(app => (
           <div>
             <VulnerableApp app={app} flanIps={flanIps} />
           </div>
@@ -179,7 +179,7 @@ class Vulnerabilities extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     profilesHasErrored: state.profilesHasErrored,
     profilesIsLoading: state.profilesIsLoading,
@@ -189,12 +189,16 @@ const mapStateToProps = (state) => {
     flanIps: state.flanIps,
     flanIpsHasErrored: state.flanIpsHasErrored,
     flanIpsIsLoading: state.flanIpsIsLoading,
+    scanLocation: state.scanLocation,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    handleSelectedScanLocation: value =>
+      dispatch(handleSelectedScanLocation(value)),
+    fetchFlanIps: () => dispatch(flanIpsFetchData()),
   };
 };
 
@@ -202,22 +206,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(withRouter(withStyles(styles)(Vulnerabilities)));
-
-//      <FlanCVE key={'key_' + vuln.name} title={vuln.name} app={vuln.app} description={vuln.description} severity={vuln.severity} link={'https://nvd.nist.gov/vuln/detail/' + vuln.name} />
-//{app.vulns.map(vuln => (
-//  <div>
-//  <FlanCVE key={'key_' + vuln.name} title={vuln.name} app={vuln.app} description={vuln.description} severity={vuln.severity} link={'https://nvd.nist.gov/vuln/detail/' + vuln.name} />
-//  <br/>
-//  </div>
-//))}
-
-//<Fragment>
-// <DatePicker
-//   label="Choose Date to View:"
-//   value={this.state.selectedDate}
-//   onChange={this.handleDateChange}
-//   animateYearScrolling
-// />
-//</Fragment>
-//<br/>
-//<br/>

@@ -18,6 +18,10 @@ import {
   IconButton,
   Tooltip,
   CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@material-ui/core';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import ListItem from '@material-ui/core/ListItem';
@@ -55,10 +59,11 @@ import { hostsFetchData } from './actions/hosts';
 import { servicesFetchData } from './actions/services';
 import { linksFetchData } from './actions/links';
 import { handleSelectedTab } from './actions/app';
+import { handleSelectedScanLocation } from './actions/app';
 
 const drawerWidth = 240;
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {
     flexGrow: 1,
   },
@@ -167,6 +172,13 @@ const styles = (theme) => ({
   flex: {
     flexGrow: 1,
   },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
 });
 
 class App extends Component {
@@ -192,6 +204,16 @@ class App extends Component {
     this.props.fetchHosts();
     this.props.fetchLinks();
   }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.scanLocation !== this.props.scanLocation) {
+      this.props.fetchFlanIps();
+    }
+  }
+
+  handleChange = event => {
+    this.props.handleSelectedScanLocation(event.target.value);
+  };
 
   handleDrawerOpen = () => {
     this.setState({ sideBarActive: true });
@@ -258,7 +280,7 @@ class App extends Component {
         </div>
       );
     }
-    const { classes, theme } = this.props;
+    const { classes, theme, scanLocation } = this.props;
     const { sideBarActive } = this.state;
 
     const drawer = (
@@ -279,7 +301,7 @@ class App extends Component {
             )}
           </IconButton>
           <Typography variant="subtitle1" color="inherit">
-            Groups
+            Configs
           </Typography>
           <Tooltip id="tooltip-fab" title="Add Group">
             <IconButton
@@ -292,11 +314,24 @@ class App extends Component {
           </Tooltip>
         </div>
         <Divider />
+        <FormControl className={classes.formControl}>
+          <InputLabel id="scan-location-input">Scan Location</InputLabel>
+          <Select
+            labelId="scan-location-input-label"
+            id="scan-location-input"
+            value={scanLocation}
+            onChange={this.handleChange}
+          >
+            <MenuItem value={'external'}>External</MenuItem>
+            <MenuItem value={'internal'}>Internal</MenuItem>
+          </Select>
+        </FormControl>
+        <Divider />
         <List
           component="nav"
-          subheader={<ListSubheader component="div">Production</ListSubheader>}
+          subheader={<ListSubheader component="div">Groups</ListSubheader>}
         >
-          {this.props.groups.groupList.map((group) => (
+          {this.props.groups.groupList.map(group => (
             <Link
               key={'link' + group.id}
               to={'/group/' + group.id}
@@ -425,15 +460,16 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     groups: state.groups,
     hosts: state.hosts,
     selectedTab: state.selectedTab,
+    scanLocation: state.scanLocation,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
     fetchGroups: () => dispatch(groupsFetchData()),
     fetchFlanIps: () => dispatch(flanIpsFetchData()),
@@ -442,7 +478,9 @@ const mapDispatchToProps = (dispatch) => {
     fetchHosts: () => dispatch(hostsFetchData()),
     fetchServices: () => dispatch(servicesFetchData()),
     fetchLinks: () => dispatch(linksFetchData()),
-    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    handleSelectedScanLocation: value =>
+      dispatch(handleSelectedScanLocation(value)),
   };
 };
 
@@ -452,39 +490,3 @@ export default withRouter(
     mapDispatchToProps
   )(withStyles(styles, { withTheme: true })(App))
 );
-
-/*<SpeedDial
-  ariaLabel="SpeedDial example"
-  className={classes.speedDialButton}
-  icon={<SpeedDialIcon />}
-  onBlur={this.handleSpeedDialClose}
-  onClick={this.handleSpeedDialClick}
-  onClose={this.handleSpeedDialClose}
-  open={this.state.speedDialOpen}
-  >
-    <SpeedDialAction
-      icon={<AddIcon/>}
-      tooltipTitle={"Add Group"}
-      onClick={this.handleAddGroup}
-    />
-    <SpeedDialAction
-      icon={<AddIcon/>}
-      tooltipTitle={"Add Profile"}
-      onClick={this.handleSpeedDialClick}
-    />
-    <SpeedDialAction
-      icon={<AddIcon/>}
-      tooltipTitle={"Add Service"}
-      onClick={this.handleSpeedDialClick}
-    />
-    <SpeedDialAction
-      icon={<AddIcon/>}
-      tooltipTitle={"Add Host"}
-      onClick={this.handleSpeedDialClick}
-    />
-    <SpeedDialAction
-      icon={<AddIcon/>}
-      tooltipTitle={"Add Zone"}
-      onClick={this.handleSpeedDialClick}
-    />
-</SpeedDial>*/

@@ -1,7 +1,12 @@
 import { combineReducers } from 'redux';
 import { groupsIsLoading, groupsHasErrored, groups } from './groups';
-import { environmentsIsLoading, environmentsHasErrored, environments, environmentAdd } from './environments';
-import { selectedTab } from './app';
+import {
+  environmentsIsLoading,
+  environmentsHasErrored,
+  environments,
+  environmentAdd,
+} from './environments';
+import { selectedTab, scanLocation } from './app';
 import { hostsHasErrored, hostsIsLoading, hosts } from './hosts';
 import { flanIpsHasErrored, flanIpsIsLoading, flanIps } from './flan_ips';
 import { profilesHasErrored, profilesIsLoading, profiles } from './profiles';
@@ -41,6 +46,7 @@ export default combineReducers({
   profilesIsLoading,
   profiles,
   selectedTab,
+  scanLocation,
   servicesHasErrored,
   servicesIsLoading,
   services,

@@ -7,3 +7,11 @@ export const selectedTab = handleAction(
   },
   0
 );
+
+export const scanLocation = handleAction(
+  'HANDLE_SELECTED_SCAN_LOCATION',
+  (state, action) => {
+    return action.payload;
+  },
+  'external'
+);

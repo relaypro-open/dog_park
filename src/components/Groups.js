@@ -29,7 +29,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
@@ -67,7 +67,12 @@ class Groups extends Component {
 
   componentDidMount() {
     this.props.handleSelectedTab(0);
-    //this.props.fetchGroups();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.scanLocation !== this.props.scanLocation) {
+      this.props.fetchFlanIps();
+    }
   }
 
   createGroup = () => {
@@ -92,7 +97,7 @@ class Groups extends Component {
         profile_name: this.state.createGroupProfile,
         profile_version: useLatest,
       })
-      .then((response) => {
+      .then(response => {
         if (response.status === 201) {
           let re = /\/api\/group\/(.+)/;
           this.setState({ isLoading: false });
@@ -103,7 +108,7 @@ class Groups extends Component {
           throw Error(response.statusText);
         }
       })
-      .then((groupId) => {
+      .then(groupId => {
         this.setState({ createGroupOpen: false });
         this.setState({ createGroupName: '' });
         this.setState({ createGroupProfile: '' });
@@ -122,7 +127,7 @@ class Groups extends Component {
     this.setState({ createGroupOpen: true });
   };
 
-  handleCreateGroupButton = (enabled) => {
+  handleCreateGroupButton = enabled => {
     if (
       this.state.createGroupName !== '' &&
       this.state.createGroupProfile !== '' &&
@@ -138,7 +143,7 @@ class Groups extends Component {
     this.setState({ createGroupOpen: false });
   };
 
-  handleCreateGroupName = (event) => {
+  handleCreateGroupName = event => {
     const createGroupName = event.target.value;
     if (createGroupName !== '' && this.state.createGroupProfile !== '') {
       this.setState({ createGroupDisabled: false });
@@ -148,7 +153,7 @@ class Groups extends Component {
     this.setState({ createGroupName });
   };
 
-  handleCreateGroupProfile = (event) => {
+  handleCreateGroupProfile = event => {
     const createGroupProfile = event.target.value;
     if (this.state.createGroupName !== '' && createGroupProfile !== '') {
       this.setState({ createGroupDisabled: false });
@@ -191,7 +196,7 @@ class Groups extends Component {
 
     const profiles = Object.keys(this.props.profiles)
       .sort()
-      .map((profile) => {
+      .map(profile => {
         let profileId = this.props.profiles[profile][0].id;
         return (
           <MenuItem key={profileId} value={profile}>
@@ -319,7 +324,7 @@ class Groups extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     groups: state.groups,
     hasErrored: state.groupsHasErrored,
@@ -332,12 +337,13 @@ const mapStateToProps = (state) => {
     flanIpsIsLoading: state.flanIpsIsLoading,
     hostsHasErrored: state.hostsHasErrored,
     hostsIsLoading: state.hostsIsLoading,
+    scanLocation: state.scanLocation,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
     fetchGroups: () => dispatch(groupsFetchData()),
     fetchFlanIps: () => dispatch(flanIpsFetchData()),
     fetchProfiles: () => dispatch(profilesFetchData()),

@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { handleSelectedTab } from '../actions/app';
-//import { DatePicker } from "@material-ui/pickers";
-//import FlanCVE from './FlanCVE';
+import { handleSelectedScanLocation } from '../actions/app';
+import { flanIpsFetchData } from '../actions/flan_ips';
 import HostsTable from './HostsTable';
 import moment from 'moment';
 import { flan_api } from '../flan_api';
@@ -18,7 +18,7 @@ import {
 } from '@material-ui/core';
 import FlanCert from './FlanCert';
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
@@ -60,7 +60,6 @@ class Certificates extends Component {
       noExist: false,
       scan: {},
       selectedDate: moment(),
-      scanLocation: 'external',
     };
   }
 
@@ -70,17 +69,18 @@ class Certificates extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.scanLocation !== this.state.scanLocation) {
+    if (prevProps.scanLocation !== this.props.scanLocation) {
+      this.props.fetchFlanIps();
       this.fetchScans();
     }
   }
 
-  handleDateChange = (event) => {
+  handleDateChange = event => {
     this.setState({ selectedDate: event });
   };
 
-  handleChange = (event) => {
-    this.setState({ scanLocation: event.target.value });
+  handleChange = event => {
+    this.props.handleSelectedScanLocation(event.target.value);
   };
 
   fetchScans = () => {
@@ -88,12 +88,12 @@ class Certificates extends Component {
 
     flan_api
       .get(
-        this.state.scanLocation +
+        this.props.scanLocation +
           '/' +
           process.env.REACT_APP_DOG_API_ENV +
           '/certs_by_hostname'
       )
-      .then((response) => {
+      .then(response => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           return response.data;
@@ -105,7 +105,7 @@ class Certificates extends Component {
           throw Error(response.statusText);
         }
       })
-      .then((scan) => {
+      .then(scan => {
         this.setState({ scan: scan });
       })
       .catch(() => this.setState({ hasErrored: true }));
@@ -135,16 +135,16 @@ class Certificates extends Component {
       );
     }
 
-    const { scan, scanLocation } = this.state;
+    const { scan } = this.state;
 
-    const { hosts, flanIps, classes } = this.props;
+    const { hosts, flanIps, classes, scanLocation } = this.props;
 
     let output = [];
-    Object.keys(scan).forEach((key) => {
+    Object.keys(scan).forEach(key => {
       let certificate = scan[key];
       if ('locations' in certificate) {
         certificate['hosts'] = [];
-        Object.keys(certificate['locations']).forEach((h) => {
+        Object.keys(certificate['locations']).forEach(h => {
           if (h in hosts.hostObjects) {
             certificate['hosts'].push(hosts.hostObjects[h]);
           }
@@ -171,7 +171,7 @@ class Certificates extends Component {
             <MenuItem value={'internal'}>Internal</MenuItem>
           </Select>
         </FormControl>
-        {output.map((cert) => (
+        {output.map(cert => (
           <div>
             <Paper className={classes.root}>
               <FlanCert key={'key_' + cert.name} cert={cert.cert} />
@@ -185,7 +185,7 @@ class Certificates extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     profilesHasErrored: state.profilesHasErrored,
     profilesIsLoading: state.profilesIsLoading,
@@ -195,12 +195,16 @@ const mapStateToProps = (state) => {
     flanIps: state.flanIps,
     flanIpsHasErrored: state.flanIpsHasErrored,
     flanIpsIsLoading: state.flanIpsIsLoading,
+    scanLocation: state.scanLocation,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
+    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
+    handleSelectedScanLocation: value =>
+      dispatch(handleSelectedScanLocation(value)),
+    fetchFlanIps: () => dispatch(flanIpsFetchData()),
   };
 };
 
@@ -208,22 +212,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(withRouter(withStyles(styles)(Certificates)));
-
-//      <FlanCVE key={'key_' + vuln.name} title={vuln.name} app={vuln.app} description={vuln.description} severity={vuln.severity} link={'https://nvd.nist.gov/vuln/detail/' + vuln.name} />
-//{app.vulns.map(vuln => (
-//  <div>
-//  <FlanCVE key={'key_' + vuln.name} title={vuln.name} app={vuln.app} description={vuln.description} severity={vuln.severity} link={'https://nvd.nist.gov/vuln/detail/' + vuln.name} />
-//  <br/>
-//  </div>
-//))}
-
-//<Fragment>
-// <DatePicker
-//   label="Choose Date to View:"
-//   value={this.state.selectedDate}
-//   onChange={this.handleDateChange}
-//   animateYearScrolling
-// />
-//</Fragment>
-//<br/>
-//<br/>
