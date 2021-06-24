@@ -21,8 +21,8 @@ export const environmentAdd = handleAction(
   (state, action) => {
     const environment = action.payload;
     let newEnvironments = {};
-    let groupsList = [];
-    let zonesList = [];
+    let groupsObject = { groupList: [], groupNames: {}, groupIds: {} };
+    let zonesObject = { zoneList: [], zoneNames: {}, zoneIds: {} };
 
     if (
       state !== undefined &&
@@ -56,24 +56,24 @@ export const environmentAdd = handleAction(
     let groupObject = {};
     let zoneObject = {};
 
-    groupsList[0] = groups.map((group) => {
+    groupsObject['groupList'] = groups.map(group => {
       groupObject[group] = group;
       return { id: group, name: group };
     });
 
-    zonesList[0] = zones.map((zone) => {
+    zonesObject['zoneList'] = zones.map(zone => {
       zoneObject[zone] = zone;
       return { id: zone, name: zone };
     });
 
-    groupsList[1] = groupObject;
-    groupsList[2] = groupObject;
+    groupsObject['groupNames'] = groupObject;
+    groupsObject['groupIds'] = groupObject;
 
-    zonesList[1] = zoneObject;
-    zonesList[2] = zoneObject;
+    zonesObject['zoneNames'] = zoneObject;
+    zonesObject['zoneIds'] = zoneObject;
 
-    newEnvironments[environment.name]['groups'] = groupsList;
-    newEnvironments[environment.name]['zones'] = zonesList;
+    newEnvironments[environment.name]['groups'] = groupsObject;
+    newEnvironments[environment.name]['zones'] = zonesObject;
 
     return newEnvironments;
   },
