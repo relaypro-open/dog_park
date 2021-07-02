@@ -89,7 +89,13 @@ class Group extends Component {
   }
 
   componentDidMount = () => {
-    if (this.props.profiles === {}) {
+    if (
+      this.props.profiles ===
+      {
+        profileList: {},
+        profileIds: {},
+      }
+    ) {
       this.props.fetchProfiles();
     }
     if (this.props.match.path === '/groupByName/:id') {
@@ -250,14 +256,16 @@ class Group extends Component {
       .put('/group/' + this.state.groupId, {
         name: this.state.groupName,
         profile_name: this.state.groupProfileName,
-        profile_id: this.props.profiles[this.state.groupProfileName][0].id,
+        profile_id: this.props.profiles.profileList[
+          this.state.groupProfileName
+        ][0].id,
       })
       .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           this.setState({ editGroupStatus: '' });
           this.setState({
-            defaultProfileId: this.props.profiles[
+            defaultProfileId: this.props.profiles.profileList[
               this.state.groupProfileName
             ][0].id,
           });
@@ -302,14 +310,16 @@ class Group extends Component {
       .put('/group/' + this.state.groupId, {
         name: this.state.groupName,
         profile_name: this.state.groupProfileName,
-        profile_id: this.props.profiles[this.state.groupProfileName][0].id,
+        profile_id: this.props.profiles.profileList[
+          this.state.groupProfileName
+        ][0].id,
       })
       .then((response) => {
         if (response.status === 200) {
           this.setState({ isLoading: false });
           this.setState({ editGroupStatus: '' });
           this.setState({
-            defaultProfileId: this.props.profiles[
+            defaultProfileId: this.props.profiles.profileList[
               this.state.groupProfileName
             ][0].id,
           });
@@ -357,12 +367,29 @@ class Group extends Component {
           this.props.fetchServices();
           this.props.fetchHosts();
           this.props.fetchLinks();
+        } else if (response.status === 500) {
+          console.log(response);
+          let error_msg = Object.entries(response.data.errors).map(
+            ([key, value]) => {
+              return `${key}: ${value.map((entry) => {
+                return this.props.profiles.profileIds[entry];
+              })}`;
+            }
+          );
+          throw Error(error_msg);
         } else {
           throw Error(response.statusText);
         }
       })
-      .catch(() => {
-        this.setState({ deleteGroupStatus: <div>An error has occurred!</div> });
+      .catch((error) => {
+        this.setState({
+          deleteGroupStatus: (
+            <div style={{ color: 'red' }}>
+              <br />
+              {error.message}
+            </div>
+          ),
+        });
         this.setState({ deleteHasErrored: true });
       });
   };
@@ -370,7 +397,7 @@ class Group extends Component {
   checkProfileDiff = () => {
     if (
       this.state.defaultProfileId !==
-      this.props.profiles[this.state.groupProfileName][0].id
+      this.props.profiles.profileList[this.state.groupProfileName][0].id
     ) {
       this.setState({ isProfileDiff: true });
     }
@@ -410,7 +437,7 @@ class Group extends Component {
   };
 
   handleDeleteButton = (event) => {
-    this.setState({ deleteGroupOpen: !this.state.deleteGroupOpen });
+    this.setState({ deleteGroupOpen: true });
   };
 
   handleCloseButton = (event) => {
@@ -418,6 +445,7 @@ class Group extends Component {
   };
 
   handleDeleteCloseButton = (event) => {
+    this.setState({ deleteGroupStatus: '' });
     this.setState({ deleteGroupOpen: false });
   };
 
@@ -425,14 +453,18 @@ class Group extends Component {
     const diffOutput = (
       <GitDiff
         profile1={this.state.defaultProfileId}
-        profile2={this.props.profiles[this.state.groupProfileName][0].id}
+        profile2={
+          this.props.profiles.profileList[this.state.groupProfileName][0].id
+        }
       />
     );
 
     const diffChanges = (
       <GitChanges
         profile1={this.state.defaultProfileId}
-        profile2={this.props.profiles[this.state.groupProfileName][0].id}
+        profile2={
+          this.props.profiles.profileList[this.state.groupProfileName][0].id
+        }
       />
     );
 
@@ -475,7 +507,6 @@ class Group extends Component {
     if (
       this.state.isLoading ||
       this.props.profilesIsLoading ||
-      this.state.isDeleting ||
       this.props.hostsIsLoading ||
       this.props.flanIpsIsLoading
     ) {
@@ -506,10 +537,10 @@ class Group extends Component {
       groupHosts.push(hosts.hostObjects[host.name]);
     });
 
-    const profiles = Object.keys(this.props.profiles)
+    const profiles = Object.keys(this.props.profiles.profileList)
       .sort()
       .map((profile) => {
-        let value = this.props.profiles[profile][0].id;
+        let value = this.props.profiles.profileList[profile][0].id;
         if (
           this.state.groupProfileId !== value &&
           profile === this.state.defaultProfileName
@@ -580,7 +611,9 @@ class Group extends Component {
                 event.stopPropagation();
                 this.props.history.push(
                   '/profile/' +
-                    this.props.profiles[this.state.groupProfileName][0].id
+                    this.props.profiles.profileList[
+                      this.state.groupProfileName
+                    ][0].id
                 );
               }}
               variant="contained"
@@ -641,11 +674,12 @@ class Group extends Component {
           aria-labelledby="form-dialog-title"
         >
           <DialogTitle id="form-dialog-title">
-            Confirm delete of: {this.state.groupName}?
+            Confirm delete of: {this.state.groupName}
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
               Are you sure you want to delete: {this.state.groupName}?
+              {this.state.deleteGroupStatus}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -660,7 +694,6 @@ class Group extends Component {
               Delete
               <DeleteIcon className={classes.rightIcon} />
             </Button>
-            &nbsp;&nbsp;{this.state.deleteGroupStatus}
           </DialogActions>
         </Dialog>
 

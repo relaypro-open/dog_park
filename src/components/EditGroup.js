@@ -40,7 +40,7 @@ class EditGroup extends Component {
     this.setState({ hasErrored: false });
   };
 
-  componentDidUpdate = prevProps => {
+  componentDidUpdate = (prevProps) => {
     if (this.props !== prevProps) {
       this.setState({ groupName: this.props.groupName });
       this.setState({ groupProfileName: this.props.groupProfileId });
@@ -61,10 +61,12 @@ class EditGroup extends Component {
     });
     api
       .put('/group/' + this.props.groupId, {
-        profile_name: this.props.profiles[this.state.groupProfileName],
+        profile_name: this.props.profiles.profileList[
+          this.state.groupProfileName
+        ],
         profile_id: this.state.groupProfileName,
       })
-      .then(response => {
+      .then((response) => {
         if (response.status === 204) {
           this.setState({ isLoading: false });
           this.setState({ editGroupStatus: <div>Updated!</div> });
@@ -86,7 +88,7 @@ class EditGroup extends Component {
     this.props.editGroupOpen(false);
   };
 
-  handleProfileSelect = event => {
+  handleProfileSelect = (event) => {
     this.setState({ groupProfileId: event.target.value });
   };
 
@@ -95,14 +97,16 @@ class EditGroup extends Component {
   };
 
   render() {
-    const profiles = Object.keys(this.props.profiles).map(profile => {
-      let profileName = this.props.profiles[profile];
-      return (
-        <MenuItem key={profile} value={profile}>
-          {profileName}
-        </MenuItem>
-      );
-    });
+    const profiles = Object.keys(this.props.profiles.profileList).map(
+      (profile) => {
+        let profileName = this.props.profiles.profileList[profile];
+        return (
+          <MenuItem key={profile} value={profile}>
+            {profileName}
+          </MenuItem>
+        );
+      }
+    );
 
     return (
       <div>

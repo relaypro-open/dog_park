@@ -10,6 +10,6 @@ export const api = axios.create({
   },
   withCredentials: false,
   validateStatus: function(status) {
-    return status >= 200 && status < 500; // default
+    return status >= 200 && status < 501; // default
   },
 });

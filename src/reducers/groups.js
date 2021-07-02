@@ -26,16 +26,18 @@ export const groups = handleAction(
         return 0;
       }
     });
-    if (action.payload.profiles !== {}) {
+    if (action.payload.profiles.profileList !== {}) {
       groups.map((group) => {
-        if (action.payload.profiles[group.profile_name] !== undefined) {
+        if (
+          action.payload.profiles.profileList[group.profile_name] !== undefined
+        ) {
           if (
-            action.payload.profiles[group.profile_name][0].id !==
+            action.payload.profiles.profileList[group.profile_name][0].id !==
             group.profile_id
           ) {
             group['hasUpdated'] = true;
             group['currentProfileId'] =
-              action.payload.profiles[group.profile_name][0].id;
+              action.payload.profiles.profileList[group.profile_name][0].id;
           } else {
             group['hasUpdated'] = false;
             group['currentProfileId'] = group.profile_id;

@@ -21,14 +21,18 @@ export const profiles = handleAction(
   'PROFILES_FETCH_DATA_SUCCESS',
   (state, action) => {
     let profiles = {};
+    let profileIds = {};
 
-    action.payload.map(profile => {
+    action.payload.map((profile) => {
       let tempProfile = {};
       tempProfile = {
         id: profile.id,
         name: profile.name,
         created: profile.created,
       };
+
+      profileIds[profile.id] = profile.name;
+
       if (profile.name in profiles) {
         profiles[profile.name].push(tempProfile);
       } else {
@@ -37,7 +41,7 @@ export const profiles = handleAction(
       return true;
     });
 
-    Object.values(profiles).map(profile => {
+    Object.values(profiles).map((profile) => {
       profile.sort((a, b) => {
         let tsA = moment(a.created);
         let tsB = moment(b.created);
@@ -53,7 +57,13 @@ export const profiles = handleAction(
       return true;
     });
 
-    return profiles;
+    return {
+      profileList: profiles,
+      profileIds: profileIds,
+    };
   },
-  {}
+  {
+    profileList: {},
+    profileIds: {},
+  }
 );

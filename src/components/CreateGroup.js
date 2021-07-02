@@ -14,7 +14,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
@@ -54,7 +54,8 @@ class CreateGroup extends Component {
     this.setState({
       createGroupProgress: (
         <span>
-          &nbsp;&nbsp;<CircularProgress size={20} />
+          &nbsp;&nbsp;
+          <CircularProgress size={20} />
         </span>
       ),
     });
@@ -69,10 +70,12 @@ class CreateGroup extends Component {
     api
       .post('group', {
         name: this.state.groupName,
-        profile_name: this.props.profiles[this.state.selectedProfile],
+        profile_name: this.props.profiles.profileList[
+          this.state.selectedProfile
+        ],
         profile_version: 'latest',
       })
-      .then(response => {
+      .then((response) => {
         if (response.status === 201) {
           let re = /\/api\/group\/(.+)/;
           this.setState({ isLoading: false });
@@ -83,7 +86,7 @@ class CreateGroup extends Component {
           throw Error(response.statusText);
         }
       })
-      .then(groupId => {
+      .then((groupId) => {
         this.props.history.push('/group/' + groupId);
         this.props.fetchGroups();
       })
@@ -95,14 +98,16 @@ class CreateGroup extends Component {
   }
 
   render() {
-    const profiles = Object.keys(this.props.profiles).sort().map(profile => {
-      let profileName = this.props.profiles[profile];
-      return (
-        <MenuItem key={profile} value={profile}>
-          {profileName}
-        </MenuItem>
-      );
-    });
+    const profiles = Object.keys(this.props.profiles.profileList)
+      .sort()
+      .map((profile) => {
+        let profileName = this.props.profiles.profileList[profile];
+        return (
+          <MenuItem key={profile} value={profile}>
+            {profileName}
+          </MenuItem>
+        );
+      });
 
     return (
       <div>
@@ -157,13 +162,13 @@ class CreateGroup extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     profiles: state.profiles,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
     fetchGroups: () => dispatch(groupsFetchData()),
   };

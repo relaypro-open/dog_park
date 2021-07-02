@@ -398,8 +398,15 @@ class Profile extends Component {
             };
           });
           this.props.history.push('/profiles');
-        } else {
-          let error_msg = response.data.error_msg + ':' + response.data.groups;
+        } else if (response.status === 500) {
+          console.log(response);
+          let error_msg = Object.entries(response.data.errors).map(
+            ([key, value]) => {
+              return `${key}: ${value.map((entry) => {
+                return this.props.groups.groupIds[entry];
+              })}`;
+            }
+          );
           throw Error(error_msg);
         }
       })
@@ -407,7 +414,6 @@ class Profile extends Component {
         this.setState({
           deleteProfileStatus: (
             <div style={{ color: 'red' }}>
-              <br />
               <br />
               {error.message}
             </div>
@@ -1096,7 +1102,7 @@ class Profile extends Component {
           <br />
           <Typography variant="subtitle1">Revision History</Typography>
           <ProfileHistory
-            profiles={this.props.profiles[this.state.profileName]}
+            profiles={this.props.profiles.profileList[this.state.profileName]}
           />
 
           <Dialog

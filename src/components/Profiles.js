@@ -42,14 +42,20 @@ class Profiles extends Component {
   }
 
   componentDidMount() {
-    if (this.props.profiles === {}) {
+    if (
+      this.props.profiles ===
+      {
+        profileList: {},
+        profileIds: {},
+      }
+    ) {
       this.props.fetchProfiles();
     }
     this.props.handleSelectedTab(1);
   }
 
   createProfile = () => {
-    if (this.state.createProfileName in this.props.profiles) {
+    if (this.state.createProfileName in this.props.profiles.profileList) {
       this.setState({ profileErrorOpen: true });
     } else {
       this.setState({ isLoading: true });
@@ -149,11 +155,11 @@ class Profiles extends Component {
       );
     }
 
-    const { classes } = this.props;
+    const { classes, profiles } = this.props;
 
     return (
       <div>
-        <ProfilesTable profiles={this.props.profiles} />
+        <ProfilesTable profiles={profiles.profileList} />
 
         <Dialog
           open={this.state.createProfileOpen}
