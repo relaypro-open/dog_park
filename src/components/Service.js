@@ -319,10 +319,17 @@ class Service extends Component {
           this.props.fetchServices();
           this.props.fetchHosts();
           this.props.fetchLinks();
-        } else {
-          let error_msg =
-            response.data.error_msg + ':' + response.data.profiles;
+        } else if (response.status === 500) {
+          let error_msg = Object.entries(response.data.errors).map(
+            ([key, value]) => {
+              return `${key}: ${value.map((entry) => {
+                return this.props.profiles.profileIds[entry];
+              })}`;
+            }
+          );
           throw Error(error_msg);
+        } else {
+          throw Error(response.statusText);
         }
       })
       .catch((error) => {
@@ -330,8 +337,7 @@ class Service extends Component {
           deleteServiceStatus: (
             <div style={{ color: 'red' }}>
               <br />
-              <br />
-              {error.message}
+              {'Error: ' + error.message}
             </div>
           ),
         });
@@ -598,7 +604,9 @@ class Service extends Component {
 }
 
 const mapStateToProps = (state) => {
-  return {};
+  return {
+    profiles: state.profiles,
+  };
 };
 
 const mapDispatchToProps = (dispatch) => {

@@ -368,7 +368,6 @@ class Group extends Component {
           this.props.fetchHosts();
           this.props.fetchLinks();
         } else if (response.status === 500) {
-          console.log(response);
           let error_msg = Object.entries(response.data.errors).map(
             ([key, value]) => {
               return `${key}: ${value.map((entry) => {
@@ -386,7 +385,7 @@ class Group extends Component {
           deleteGroupStatus: (
             <div style={{ color: 'red' }}>
               <br />
-              {error.message}
+              {'Error: ' + error.message}
             </div>
           ),
         });
@@ -637,7 +636,6 @@ class Group extends Component {
           Delete
           <DeleteIcon className={classes.rightIcon} />
         </Button>
-        {this.state.deleteGroupStatus}
 
         <Dialog
           open={this.state.saveGroupOpen}

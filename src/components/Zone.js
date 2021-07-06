@@ -377,12 +377,28 @@ class Zone extends Component {
           this.props.fetchServices();
           this.props.fetchHosts();
           this.props.fetchLinks();
+        } else if (response.status === 500) {
+          let error_msg = Object.entries(response.data.errors).map(
+            ([key, value]) => {
+              return `${key}: ${value.map((entry) => {
+                return this.props.profiles.profileIds[entry];
+              })}`;
+            }
+          );
+          throw Error(error_msg);
         } else {
           throw Error(response.statusText);
         }
       })
-      .catch(() => {
-        this.setState({ deleteZoneStatus: <div>An error has occurred!</div> });
+      .catch((error) => {
+        this.setState({
+          deleteZoneStatus: (
+            <div style={{ color: 'red' }}>
+              <br />
+              {'Error: ' + error.message}
+            </div>
+          ),
+        });
         this.setState({ deleteHasErrored: true });
       });
   };
@@ -625,6 +641,7 @@ class Zone extends Component {
           <DialogContent>
             <DialogContentText>
               Are you sure you want to delete: {this.state.zoneName}?
+              {this.state.deleteZoneStatus}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -639,7 +656,6 @@ class Zone extends Component {
               Delete
               <DeleteIcon className={classes.rightIcon} />
             </Button>
-            &nbsp;&nbsp;{this.state.deleteZoneStatus}
           </DialogActions>
         </Dialog>
         <Dialog
@@ -720,7 +736,22 @@ class Zone extends Component {
 }
 
 const mapStateToProps = (state) => {
-  return {};
+  return {
+    profiles: state.profiles,
+    profiles: state.profiles,
+
+    profiles: state.profiles,
+
+    profiles: state.profiles,
+
+    profiles: state.profiles,
+
+    profiles: state.profiles,
+
+    profiles: state.profiles,
+
+    profiles: state.profiles,
+  };
 };
 
 const mapDispatchToProps = (dispatch) => {

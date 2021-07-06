@@ -415,7 +415,7 @@ class Profile extends Component {
           deleteProfileStatus: (
             <div style={{ color: 'red' }}>
               <br />
-              {error.message}
+              {'Error: ' + error.message}
             </div>
           ),
         });
