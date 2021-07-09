@@ -319,11 +319,19 @@ class Zone extends Component {
         </div>
       ),
     });
+    let ipv4_addresses = this.state.v4ZoneAddresses;
+    let ipv6_addresses = this.state.v6ZoneAddresses;
+    if (ipv4_addresses[ipv4_addresses.length - 1] === '') {
+      ipv4_addresses.pop();
+    }
+    if (ipv6_addresses[ipv6_addresses.length - 1] === '') {
+      ipv6_addresses.pop();
+    }
     api
       .put('/zone/' + this.state.zoneId, {
         name: this.state.zoneName,
-        ipv4_addresses: this.state.v4ZoneAddresses,
-        ipv6_addresses: this.state.v6ZoneAddresses,
+        ipv4_addresses,
+        ipv6_addresses,
       })
       .then((response) => {
         if (response.status === 200) {
