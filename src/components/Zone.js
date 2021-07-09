@@ -746,19 +746,6 @@ class Zone extends Component {
 const mapStateToProps = (state) => {
   return {
     profiles: state.profiles,
-    profiles: state.profiles,
-
-    profiles: state.profiles,
-
-    profiles: state.profiles,
-
-    profiles: state.profiles,
-
-    profiles: state.profiles,
-
-    profiles: state.profiles,
-
-    profiles: state.profiles,
   };
 };
 
