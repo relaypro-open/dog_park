@@ -13,8 +13,20 @@ const styles = (theme) => ({
     marginTop: theme.spacing(3),
     overflowX: 'auto',
   },
+  items: {
+    ...theme.mixins.gutters(),
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
+    maxWidth: '100%',
+  },
   table: {
     width: '100%',
+  },
+  updateable: {
+    color: 'green',
+  },
+  notUpdateable: {
+    color: 'red',
   },
 });
 
@@ -27,6 +39,25 @@ const VulnerableApp = pure((props) => {
     setOpen(!open);
   };
 
+  let updateable = '';
+
+  if (app.is_updateable) {
+    updateable = (
+      <Typography variant="Heading1" className={classes.updateable}>
+        {' - There is a newer version of this app available.'}
+      </Typography>
+    );
+  } else if (
+    app.name.toLowerCase().includes('openssh') &&
+    app.name.includes('ubuntu')
+  ) {
+    updateable = (
+      <Typography variant="Heading1" className={classes.notUpdateable}>
+        {' - This is the latest version of the app!'}
+      </Typography>
+    );
+  }
+
   return (
     <Paper className={classes.root}>
       <IconButton aria-label="settings" onClick={handleClick}>
@@ -35,8 +66,10 @@ const VulnerableApp = pure((props) => {
       <Typography variant="Heading1" color="textPrimary">
         {app.name}
       </Typography>
+      {updateable}
       <Collapse in={open} timeout="auto" unmountOnExit>
-        <div>
+        <div className={classes.items}>
+          <HostsTable hosts={app.hosts} flanIps={flanIps} expand={false} />
           {app.vulns.map((vuln) => (
             <div>
               <br />
@@ -51,7 +84,6 @@ const VulnerableApp = pure((props) => {
             </div>
           ))}
         </div>
-        <HostsTable hosts={app.hosts} flanIps={flanIps} expand={false} />
       </Collapse>
     </Paper>
   );
