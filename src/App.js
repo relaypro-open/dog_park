@@ -47,6 +47,7 @@ import Services from './components/Services';
 import Host from './components/Host';
 import Vulnerabilities from './components/Vulnerabilities';
 import Certificates from './components/Certificates';
+import AWSCertificates from './components/AWSCertificates';
 import Links from './components/Links';
 import EnvLink from './components/EnvLink';
 
@@ -63,7 +64,7 @@ import { handleSelectedScanLocation } from './actions/app';
 
 const drawerWidth = 240;
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     flexGrow: 1,
   },
@@ -211,7 +212,7 @@ class App extends Component {
     }
   }
 
-  handleChange = event => {
+  handleChange = (event) => {
     this.props.handleSelectedScanLocation(event.target.value);
   };
 
@@ -247,6 +248,9 @@ class App extends Component {
         this.props.history.push('/certificates');
         break;
       case 7:
+        this.props.history.push('/aws_certificates');
+        break;
+      case 8:
         this.props.history.push('/links');
         break;
       default:
@@ -331,7 +335,7 @@ class App extends Component {
           component="nav"
           subheader={<ListSubheader component="div">Groups</ListSubheader>}
         >
-          {this.props.groups.groupList.map(group => (
+          {this.props.groups.groupList.map((group) => (
             <Link
               key={'link' + group.id}
               to={'/group/' + group.id}
@@ -393,6 +397,7 @@ class App extends Component {
                       <Tab label="Zones" />
                       <Tab label="Vulnerabilities" />
                       <Tab label="Certificates" />
+                      <Tab label="AWS Certificates" />
                       <Tab label="Links" />
                     </Tabs>
                     {
@@ -447,6 +452,11 @@ class App extends Component {
                     path="/certificates"
                     component={Certificates}
                   />
+                  <Route
+                    exact={true}
+                    path="/aws_certificates"
+                    component={AWSCertificates}
+                  />
                   <Route exact={true} path="/links" component={Links} />
                   <Route path="/link/:id" component={EnvLink} />
                   <Route exact={true} path="/link" component={EnvLink} />
@@ -460,7 +470,7 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     groups: state.groups,
     hosts: state.hosts,
@@ -469,7 +479,7 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
     fetchGroups: () => dispatch(groupsFetchData()),
     fetchFlanIps: () => dispatch(flanIpsFetchData()),
@@ -478,8 +488,8 @@ const mapDispatchToProps = dispatch => {
     fetchHosts: () => dispatch(hostsFetchData()),
     fetchServices: () => dispatch(servicesFetchData()),
     fetchLinks: () => dispatch(linksFetchData()),
-    handleSelectedTab: value => dispatch(handleSelectedTab(value)),
-    handleSelectedScanLocation: value =>
+    handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
+    handleSelectedScanLocation: (value) =>
       dispatch(handleSelectedScanLocation(value)),
   };
 };

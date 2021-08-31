@@ -5,18 +5,15 @@ import { withStyles } from '@material-ui/core/styles';
 import { handleSelectedTab } from '../actions/app';
 import { handleSelectedScanLocation } from '../actions/app';
 import { flanIpsFetchData } from '../actions/flan_ips';
-import HostsTable from './HostsTable';
-import moment from 'moment';
 import { flan_api } from '../flan_api';
 import {
   CircularProgress,
-  Paper,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
 } from '@material-ui/core';
-import FlanCert from './FlanCert';
+import FlanAWSCert from './FlanAWSCert';
 
 const styles = (theme) => ({
   root: {
@@ -50,7 +47,7 @@ const styles = (theme) => ({
   },
 });
 
-class Certificates extends Component {
+class AWSCertificates extends Component {
   constructor(props) {
     super(props);
 
@@ -59,28 +56,24 @@ class Certificates extends Component {
       isLoading: false,
       noExist: false,
       scan: {},
-      selectedDate: moment(),
+      region: 'us-east-1',
     };
   }
 
   componentDidMount() {
-    this.props.handleSelectedTab(6);
+    this.props.handleSelectedTab(7);
     this.fetchScans();
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.scanLocation !== this.props.scanLocation) {
+    if (prevState.region !== this.state.region) {
       this.props.fetchFlanIps();
       this.fetchScans();
     }
   }
 
-  handleDateChange = (event) => {
-    this.setState({ selectedDate: event });
-  };
-
-  handleChange = (event) => {
-    this.props.handleSelectedScanLocation(event.target.value);
+  handleRegionChange = (event) => {
+    this.setState({ region: event.target.value });
   };
 
   fetchScans = () => {
@@ -88,10 +81,10 @@ class Certificates extends Component {
 
     flan_api
       .get(
-        this.props.scanLocation +
-          '/' +
+        'internal/' +
           process.env.REACT_APP_DOG_API_ENV +
-          '/certs_by_hostname'
+          '/aws_certs_' +
+          this.state.region
       )
       .then((response) => {
         if (response.status === 200) {
@@ -124,8 +117,7 @@ class Certificates extends Component {
       this.state.isLoading ||
       this.props.profilesIsLoading ||
       this.props.hostsIsLoading ||
-      this.props.flanIpsIsLoading ||
-      Object.keys(this.props.flanIps.hosts).length === 0
+      this.props.flanIpsIsLoading
     ) {
       return (
         <div>
@@ -135,51 +127,34 @@ class Certificates extends Component {
       );
     }
 
-    const { scan } = this.state;
+    const { scan, region } = this.state;
 
-    const { hosts, flanIps, classes, scanLocation } = this.props;
-
-    let output = [];
-    Object.keys(scan).forEach((key) => {
-      let certificate = scan[key];
-      if ('locations' in certificate) {
-        certificate['hosts'] = [];
-        Object.keys(certificate['locations']).forEach((h) => {
-          if (h in hosts.hostObjects) {
-            certificate['hosts'].push(hosts.hostObjects[h]);
-          }
-        });
-      }
-      certificate['name'] = key;
-      if ('certs' in certificate) {
-        certificate['cert'] = certificate['certs'][0];
-        output.push(certificate);
-      }
-    });
+    const { classes } = this.props;
 
     return (
       <div>
         <FormControl className={classes.formControl}>
-          <InputLabel id="scan-location-input">Scan Location</InputLabel>
+          <InputLabel id="scan-location-input">Scan Region</InputLabel>
           <Select
             labelId="scan-location-input-label"
             id="scan-location-input"
-            value={scanLocation}
-            onChange={this.handleChange}
+            value={region}
+            onChange={this.handleRegionChange}
           >
-            <MenuItem value={'external'}>External</MenuItem>
-            <MenuItem value={'internal'}>Internal</MenuItem>
+            <MenuItem value={'us-east-1'}>us-east-1</MenuItem>
+            <MenuItem value={'us-east-2'}>us-east-2</MenuItem>
+            <MenuItem value={'us-west-1'}>us-west-1</MenuItem>
+            <MenuItem value={'us-west-2'}>us-west-2</MenuItem>
           </Select>
         </FormControl>
-        {output.map((cert) => (
-          <div>
-            <Paper className={classes.root}>
-              <FlanCert key={'key_' + cert.name} cert={cert.cert} />
-              <HostsTable hosts={cert.hosts} flanIps={flanIps} expand={false} />
-            </Paper>
-            <br />
-          </div>
-        ))}
+        {Object.keys(scan)
+          .sort()
+          .map((cert) => (
+            <div>
+              <FlanAWSCert key={'key_' + cert} lb={cert} cert={scan[cert]} />
+              <br />
+            </div>
+          ))}
       </div>
     );
   }
@@ -195,7 +170,6 @@ const mapStateToProps = (state) => {
     flanIps: state.flanIps,
     flanIpsHasErrored: state.flanIpsHasErrored,
     flanIpsIsLoading: state.flanIpsIsLoading,
-    scanLocation: state.scanLocation,
   };
 };
 
@@ -211,4 +185,4 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withRouter(withStyles(styles)(Certificates)));
+)(withRouter(withStyles(styles)(AWSCertificates)));
