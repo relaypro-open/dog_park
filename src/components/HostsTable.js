@@ -55,8 +55,8 @@ const HostsTable = pure((props) => {
       <IconButton aria-label="settings" onClick={handleClick}>
         {open ? <ExpandLess /> : <ExpandMore />}
       </IconButton>
-      <Typography variant="Heading1" color="textPrimary">
-        Host List
+      <Typography variant="subtitle1" color="textPrimary">
+        <strong>Host List</strong>
       </Typography>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <Table className={classes.table}>
@@ -128,7 +128,7 @@ const HostsTable = pure((props) => {
                   <TableCell>{host.hostkey}</TableCell>
                   <TableCell
                     title={'Click to view group: ' + host.group}
-                    Style="text-decoration:underline; cursor: pointer;"
+                    //Style="text-decoration:underline; cursor: pointer;"
                     onClick={(event) => {
                       event.stopPropagation();
                       props.history.push('/groupByName/' + host.group);
