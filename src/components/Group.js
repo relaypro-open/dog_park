@@ -29,6 +29,19 @@ import GitChanges from './GitChanges';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import Ec2SecurityGroupRow from './Ec2SecurityGroupRow';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from '@material-ui/core';
+import { SortableContainer } from 'react-sortable-hoc';
+import update from 'immutability-helper';
 
 const styles = (theme) => ({
   root: {
@@ -55,6 +68,37 @@ const styles = (theme) => ({
   },
 });
 
+const TableBodySortable = SortableContainer(
+  ({
+    children,
+    handleRegionInput,
+    handleSecurityGroupInput,
+    handleAddSecurityGroup,
+    handleRemoveSecurityGroup
+  }) => {
+    return (
+      <TableBody>
+        {children.map((row, index) => {
+          return (
+            <Ec2SecurityGroupRow
+              index={index}
+              key={'Ec2SecuritGroupTable' + index}
+              pIndex={index}
+              data={row}
+              handleRegionInput={handleRegionInput}
+              handleSecurityGroupInput={handleSecurityGroupInput}
+              handleAddSecurityGroup={handleAddSecurityGroup}
+              handleRemoveSecurityGroup={handleRemoveSecurityGroup}
+            />
+          );
+        })}
+      </TableBody>
+    );
+  }
+);
+
+TableBodySortable.muiName = 'TableBody';
+
 class Group extends Component {
   constructor(props) {
     super(props);
@@ -71,12 +115,13 @@ class Group extends Component {
       groupProfileId: '',
       groupProfileVersion: '',
       groupHosts: [],
+      groupEc2SecurityGroups: [],
       saveGroupOpen: false,
       isDeleting: false,
       deleteHasErrored: false,
       deleteGroupStatus: '',
       deleteGroupOpen: false,
-      saveButtonDisabled: true,
+      saveButtonDisabled: false,
       defaultGroupName: '',
       defaultProfileName: '',
       defaultProfileId: '',
@@ -110,6 +155,7 @@ class Group extends Component {
     if (this.props.match.params.id !== prevProps.match.params.id) {
       this.fetchGroup(this.props.match.params.id);
       this.fetchGroupHosts(this.props.match.params.id);
+      this.fetchGroupEc2SecurityGroups(this.props.match.params.id);
       this.props.handleSelectedTab(0);
       this.setState({ isLoading: false });
       this.setState({ hasErrored: false });
@@ -162,6 +208,11 @@ class Group extends Component {
         } else {
           this.setState({ groupProfileVersion: '' });
         }
+        if ('ec2_security_group_ids' in group) {
+          this.setState({ groupEc2SecurityGroups: group.ec2_security_group_ids });
+        } else {
+          this.setState({ groupEc2SecurityGroups: [] });
+        }
         return group.id;
       })
       .then((id) => {
@@ -209,6 +260,11 @@ class Group extends Component {
         } else {
           this.setState({ groupProfileVersion: '' });
         }
+        if ('ec2_security_group_ids' in group) {
+          this.setState({ groupEc2SecurityGroups: group.ec2_security_group_ids });
+        } else {
+          this.setState({ groupEc2SecurityGroups: [] });
+        }
         return group.id;
       })
       .then((id) => {
@@ -239,6 +295,28 @@ class Group extends Component {
       .catch(() => this.setState({ hasErrored: true }));
   };
 
+  fetchGroupEc2SecurityGroups = (groupId) => {
+    //this.setState({ isLoading: true });
+
+    api
+      .get('group/' + groupId + '/ec2_security_group_ids')
+      .then((response) => {
+        if (response.status === 200) {
+          //this.setState({ isLoading: false });
+          return response.data;
+        } else if (response.status === 404) {
+          this.setState({ noExist: true });
+          throw Error(response.statusText);
+        } else {
+          throw Error(response.statusText);
+        }
+      })
+      .then((ids) => {
+        this.setState({ groupEc2SecurityGroups: ids });
+      })
+      .catch(() => this.setState({ hasErrored: true }));
+  };
+
   fetchHostGroup = (hostId) => {
     return api.get('host/' + hostId);
   };
@@ -259,6 +337,7 @@ class Group extends Component {
         profile_id: this.props.profiles.profileList[
           this.state.groupProfileName
         ][0].id,
+        ec2_security_group_ids: this.state.groupEc2SecurityGroups,
       })
       .then((response) => {
         if (response.status === 200) {
@@ -270,7 +349,7 @@ class Group extends Component {
             ][0].id,
           });
           this.setState({ defaultProfileName: this.state.groupProfileName });
-          this.setState({ saveButtonDisabled: true });
+          this.setState({ saveButtonDisabled: false });
           this.handleCloseButton();
           this.fetchGroup(this.state.groupId);
           this.props.fetchGroups();
@@ -426,6 +505,10 @@ class Group extends Component {
   handleProfileVersionInput = (event) => {
     this.setState({ groupProfileVersion: event.target.value });
   };
+  
+  handleEc2SecurityGroups = (event) => {
+    this.setState({ groupEc2SecurityGroups: event.target.value });
+  };
 
   handleEditButton = (event) => {
     this.setState({ editGroupOpen: !this.state.editGroupOpen });
@@ -493,6 +576,54 @@ class Group extends Component {
     }
   };
 
+  handleRegionInput = (index, region, value) => {
+    let newState = [];
+      newState = update(this.state.groupEc2SecurityGroups, {
+        [index]: { region: { $set: region } },
+      });
+      console.log(newState);
+      this.setState({ groupEc2SecurityGroups: newState });
+  };
+  
+  handleSecurityGroupInput = (index, sgid, value) => {
+    let newState = [];
+      console.log(index);
+      console.log(sgid);
+      console.log(value);
+      //console.log(this.state.groupEc2SecurityGroups);
+      newState = update(this.state.groupEc2SecurityGroups, {
+        [index]: { sgid: { $set: sgid } },
+      });
+      console.log(newState);
+      this.setState({ groupEc2SecurityGroups: newState });
+  };
+  
+  handleAddSecurityGroup = (index) => {
+      let newState = this.state.groupEc2SecurityGroups.splice(0);
+      newState.splice(this.state.groupEc2SecurityGroups.length + 1, 0, {
+            region: '',
+            sgid: '',
+      });
+      console.log(newState);
+
+      this.setState({ groupEc2SecurityGroups: newState });
+  };
+
+  handleRemoveSecurityGroup = (index) => {
+    let newState = [];
+      newState = update(this.state.groupEc2SecurityGroups, { $unset: [index] });
+      newState.splice(index, 1);
+      //if (newState.length === 0) {
+      //  newState.push({
+      //      region: '',
+      //      sgid: '',
+      //  });
+      //}
+      console.log(newState);
+
+      this.setState({ groupEc2SecurityGroups : newState });
+  };
+
   render() {
     if (this.state.hasErrored && this.state.noExist) {
       return <p>This group no longer exists!</p>;
@@ -522,6 +653,7 @@ class Group extends Component {
 
     let groupHosts = [];
 
+    //console.log("groupHosts: " + this.state.groupHosts);
     this.state.groupHosts.forEach((host) => {
       if (
         !host.name.includes('.phonebooth.net') &&
@@ -535,6 +667,14 @@ class Group extends Component {
       }
       groupHosts.push(hosts.hostObjects[host.name]);
     });
+
+    let groupEc2Sgs = [];
+   
+    //console.log("groupEc2SecurityGroups: " + this.state.groupEc2SecurityGroups);
+    this.state.groupEc2SecurityGroups.forEach((mapping) => {
+      groupEc2Sgs.push(mapping);
+    });
+    //console.log("groupEc2Sgs: " + groupEc2Sgs);
 
     const profiles = Object.keys(this.props.profiles.profileList)
       .sort()
@@ -569,6 +709,7 @@ class Group extends Component {
           </MenuItem>
         );
       });
+    //console.log("this.state.groupEc2SecurityGroups" + this.state.groupEc2SecurityGroups);
 
     return (
       <div>
@@ -594,6 +735,39 @@ class Group extends Component {
             </Typography>
             <HostsTable hosts={groupHosts} flanIps={flanIps} expand={true} />
             <br />
+            <Typography variant="subtitle1">
+              <strong>Ec2 Security Groups:</strong>&nbsp;&nbsp;
+            </Typography>
+          <Paper className={classes.root}>
+            <Table className={classes.table}>
+              <TableHead>
+                <TableRow>
+                  <TableCell padding="none">Region</TableCell>
+                  <TableCell padding="none">Security Group Id</TableCell>
+                  <TableCell padding="none">
+                    <Fab
+                      size="small"
+                      color="secondary"
+                      aria-label="Add"
+                      className={classes.button}
+                      onMouseDown={this.handleAddSecurityGroup}
+                    >
+                      <AddIcon />
+                    </Fab>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBodySortable
+                children={this.state.groupEc2SecurityGroups}
+                handleRegionInput={this.handleRegionInput}
+                handleSecurityGroupInput={this.handleSecurityGroupInput}
+                handleAddSecurityGroup={this.handleAddSecurityGroup}
+                handleRemoveSecurityGroup={this.handleRemoveSecurityGroup}
+              />
+            </Table>
+          </Paper>
+          <br />
+
             {isDiff}
             <Typography variant="body1">
               <strong>Group Profile:</strong>
@@ -748,7 +922,7 @@ class Group extends Component {
               color="inherit"
               className={classes.close}
               onClick={this.handleSnackBarClose}
-            >
+              size="medium">
               <CloseIcon />
             </IconButton>,
           ]}

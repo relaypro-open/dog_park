@@ -43,6 +43,7 @@ const DragHandle = SortableHandle(() => (
 class ProfileRow extends Component {
   constructor(props) {
     super(props);
+    console.log(props);
 
     let { groups, zones, environments, environmentAdd, services, data } = props;
 
