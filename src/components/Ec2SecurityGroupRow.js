@@ -1,21 +1,11 @@
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
-//import Menu from '@material-ui/core/Menu';
-//import MenuItem from '@material-ui/core/MenuItem';
-//import Checkbox from '@material-ui/core/Checkbox';
-//import MenuIcon from '@material-ui/icons/Menu';
-//import FormControlLabel from '@material-ui/core/FormControlLabel';
-//import Select from '@material-ui/core/Select';
 import Fab from '@material-ui/core/Fab';
 import { TableCell, TableRow } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
-//import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
-//import { SortableElement, SortableHandle } from 'react-sortable-hoc';
 import { SortableElement } from 'react-sortable-hoc';
 import debounce from 'lodash/debounce';
-//import Autocomplete from '@material-ui/lab/Autocomplete';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 
