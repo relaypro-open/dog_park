@@ -53,6 +53,18 @@ const styles = (theme) => ({
   },
 });
 
+function StringList(props) {
+      const strings = props.strings;
+      const listItems = strings.map((string) =>
+              <li key={string}>
+                {string}
+              </li>
+            );
+      return (
+              <ul>{listItems}</ul>
+            );
+}
+
 class Host extends Component {
   constructor(props) {
     super(props);
@@ -72,6 +84,10 @@ class Host extends Component {
       hostProvider: '',
       hostUpdateType: '',
       hostVersion: '',
+      hostEc2AvailabilityZone: '',
+      hostEc2InstanceId: '',
+      hostEc2OwnerId: '',
+      hostEc2SecurityGroupIds: [],
       hostGroupName: '',
       hostGroupId: '',
       hostGroupVersion: '',
@@ -142,6 +158,10 @@ class Host extends Component {
           hostProvider: host.provider,
           hostUpdateType: host.updatetype,
           hostVersion: host.version,
+          hostEc2AvailabilityZone: host.ec2_availability_zone,
+          hostEc2InstanceId: host.ec2_instance_id,
+          hostEc2OwnerId: host.ec2_owner_id,
+          hostEc2SecurityGroupIds: host.ec2_security_group_ids
         });
         if ('group' in host) {
           this.setState({ hostGroupName: host.group });
@@ -374,6 +394,30 @@ class Host extends Component {
       default:
         activeIcon = <Help />;
     }
+      
+    let ec2Detail = '';
+    if (this.state.hostProvider === "ec2") {
+        ec2Detail = (
+                <React.Fragment>
+                    <Typography variant="body2">
+                      <strong>ec2 Availablility Zone:</strong> {this.state.hostEc2AvailabilityZone}
+                    </Typography>
+                    <br />
+                    <Typography variant="body2">
+                      <strong>ec2 Owner Id:</strong> {this.state.hostEc2OwnerId}
+                    </Typography>
+                    <br />
+                    <Typography variant="body2">
+                      <strong>ec2 Instance Id:</strong> {this.state.hostEc2InstanceId}
+                    </Typography>
+                    <br />
+                    <Typography variant="body2">
+                      <strong>ec2 Security Group Ids:</strong>
+                          <StringList strings={this.state.hostEc2SecurityGroupIds} />
+                    </Typography>
+                </React.Fragment>
+        )
+    }
 
     return (
       <div>
@@ -411,6 +455,7 @@ class Host extends Component {
               <strong>Provider:</strong> {this.state.hostProvider}
             </Typography>
             <br />
+            {ec2Detail}
             <Typography variant="body1">
               <strong>Update Type:</strong> {this.state.hostUpdateType}
             </Typography>
