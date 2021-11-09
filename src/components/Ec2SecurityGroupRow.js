@@ -16,6 +16,8 @@ import RemoveIcon from '@material-ui/icons/Remove';
 import { SortableElement } from 'react-sortable-hoc';
 import debounce from 'lodash/debounce';
 //import Autocomplete from '@material-ui/lab/Autocomplete';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const styles = theme => ({
   root: {
@@ -121,11 +123,16 @@ class Ec2SecurityGroupRow extends Component {
       <React.Fragment>
         <TableRow style={{ zIndex: 10000000 }}>
           <TableCell>
-            <TextField
-              margin="none"
-              value={region}
-              onChange={this.handleRegionInput}
-            />
+                    <Select
+                      value={region}
+                      onChange={this.handleRegionInput}
+                      fullWidth
+                    >
+                      <MenuItem value={'us-east-1'}>us-east-1</MenuItem>
+                      <MenuItem value={'us-east-2'}>us-east-2</MenuItem>
+                      <MenuItem value={'us-west-1'}>us-west-1</MenuItem>
+                      <MenuItem value={'us-west-2'}>us-west-1</MenuItem>
+                    </Select>
           </TableCell>
           <TableCell>
             <TextField
