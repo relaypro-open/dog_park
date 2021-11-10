@@ -121,7 +121,24 @@ class Ec2SecurityGroupRow extends Component {
                       <MenuItem value={'us-east-1'}>us-east-1</MenuItem>
                       <MenuItem value={'us-east-2'}>us-east-2</MenuItem>
                       <MenuItem value={'us-west-1'}>us-west-1</MenuItem>
-                      <MenuItem value={'us-west-2'}>us-west-1</MenuItem>
+                      <MenuItem value={'us-west-2'}>us-west-2</MenuItem>
+                      <MenuItem value={'af-south-1'}>af-south-1</MenuItem>
+                      <MenuItem value={'ap-east-1'}>ap-east-1</MenuItem>
+                      <MenuItem value={'ap-south-1'}>ap-south-1</MenuItem>
+                      <MenuItem value={'ap-northeast-3'}>ap-northeast-3</MenuItem>
+                      <MenuItem value={'ap-northeast-2'}>ap-northeast-2</MenuItem>
+                      <MenuItem value={'ap-southeast-1'}>ap-southeast-1</MenuItem>
+                      <MenuItem value={'ap-southeast-2'}>ap-southeast-2</MenuItem>
+                      <MenuItem value={'ap-northeast-1'}>ap-northeast-1</MenuItem>
+                      <MenuItem value={'ca-central-1'}>ca-central-1</MenuItem>
+                      <MenuItem value={'eu-central-1'}>eu-central-1</MenuItem>
+                      <MenuItem value={'eu-west-1'}>eu-west-1</MenuItem>
+                      <MenuItem value={'eu-west-2'}>eu-west-2</MenuItem>
+                      <MenuItem value={'eu-south-1'}>eu-south-1</MenuItem>
+                      <MenuItem value={'eu-west-3'}>eu-west-3</MenuItem>
+                      <MenuItem value={'eu-north-1'}>eu-north-1</MenuItem>
+                      <MenuItem value={'me-south-1'}>me-south-1</MenuItem>
+                      <MenuItem value={'sa-east-1'}>sa-east-1</MenuItem>
                     </Select>
           </TableCell>
           <TableCell>
