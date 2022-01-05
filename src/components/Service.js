@@ -94,7 +94,7 @@ export class ServiceRow extends Component {
         if (range !== portString && range.length === 2) {
           return (
             validator.isPort(range[0]) &&
-            validator.isInt(range[1]) &&
+            validator.isPort(range[1]) &&
             parseInt(range[0], 10) < parseInt(range[1], 10)
           );
         } else {
