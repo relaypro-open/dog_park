@@ -42,7 +42,7 @@ export const hosts = handleAction(
           h.name = h.name + '.phonebooth.net';
         }
       }
-      hostsObject[h.name] = h;
+      hostsObject[h.id] = h;
     });
 
     return { hostList: hosts, hostObjects: hostsObject };

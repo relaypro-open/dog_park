@@ -665,7 +665,7 @@ class Group extends Component {
           host.name = host.name + '.phonebooth.net';
         }
       }
-      groupHosts.push(hosts.hostObjects[host.name]);
+      groupHosts.push(hosts.hostObjects[host.id]);
     });
 
     let groupEc2Sgs = [];
