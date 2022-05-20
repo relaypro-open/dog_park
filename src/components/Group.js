@@ -598,9 +598,9 @@ class Group extends Component {
       this.setState({ groupEc2SecurityGroups: newState });
   };
   
-  handleAddSecurityGroup = (index) => {
+  handleAddSecurityGroup = () => {
       let newState = this.state.groupEc2SecurityGroups.splice(0);
-      newState.splice(this.state.groupEc2SecurityGroups.length + 1, 0, {
+      newState.splice(newState.length + 1, 0, {
             region: '',
             sgid: '',
       });
