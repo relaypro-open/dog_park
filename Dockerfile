@@ -24,6 +24,7 @@ RUN REACT_APP_DOG_API_HOST='http://dog' yarn build
 
 
 FROM nginx AS deploy
+COPY nginx.default.conf /etc/nginx/conf.d/default.conf
 COPY --from=release /data/build /usr/share/nginx/html
 EXPOSE 3030
 
