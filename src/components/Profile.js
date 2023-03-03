@@ -262,7 +262,6 @@ class Profile extends Component {
 
           if (inboundRules.length === 0) {
             inboundRules.push({
-              order: 1,
               active: false,
               states: [],
               environments: [],
@@ -286,7 +285,6 @@ class Profile extends Component {
           }
           if (outboundRules.length === 0) {
             outboundRules.push({
-              order: 1,
               active: false,
               states: [],
               environments: [],
@@ -333,14 +331,6 @@ class Profile extends Component {
 
     let inboundRules = this.state.inboundRules.slice(0);
     let outboundRules = this.state.outboundRules.slice(0);
-
-    inboundRules.forEach((rule, index) => {
-      rule['order'] = index + 1;
-    });
-
-    outboundRules.forEach((rule, index) => {
-      rule['order'] = index + 1;
-    });
 
     api
       .put('profile/' + this.state.profileId, {
@@ -745,7 +735,6 @@ class Profile extends Component {
     if (ruleType === 'inbound') {
       let newState = this.state.inboundRules.splice(0);
       newState.splice(index + 1, 0, {
-        order: 1,
         active: false,
         states: [],
         environments: [],
@@ -765,16 +754,12 @@ class Profile extends Component {
         //recentMask: '',
         //seconds: '',
         //hitCount: '',
-      });
-      newState.forEach((rule, index) => {
-        rule['order'] = index + 1;
       });
 
       this.setState({ inboundRules: newState });
     } else {
       let newState = this.state.outboundRules.splice(0);
       newState.splice(index + 1, 0, {
-        order: 1,
         active: false,
         states: [],
         environments: [],
@@ -794,10 +779,6 @@ class Profile extends Component {
         //recentMask: '',
         //seconds: '',
         //hitCount: '',
-      });
-
-      newState.forEach((rule, index) => {
-        rule['order'] = index + 1;
       });
 
       this.setState({ outboundRules: newState });
@@ -811,7 +792,6 @@ class Profile extends Component {
       newState.splice(index, 1);
       if (newState.length === 0) {
         newState.push({
-          order: 1,
           active: false,
           states: [],
           environments: [],
@@ -833,10 +813,6 @@ class Profile extends Component {
           //hitCount: '',
         });
       }
-
-      newState.forEach((rule, index) => {
-        rule['order'] = index + 1;
-      });
 
       this.setState({ inboundRules: newState });
     } else {
@@ -844,7 +820,6 @@ class Profile extends Component {
       newState.splice(index, 1);
       if (newState.length === 0) {
         newState.push({
-          order: 1,
           active: false,
           states: [],
           environments: [],
@@ -866,10 +841,6 @@ class Profile extends Component {
           //hitCount: '',
         });
       }
-
-      newState.forEach((rule, index) => {
-        rule['order'] = index + 1;
-      });
 
       this.setState({ outboundRules: newState });
     }
