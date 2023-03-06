@@ -260,6 +260,7 @@ class ProfileRow extends Component {
         groupId = 'any';
         groupName = 'any';
         break;
+      case 'GROUP':
       case 'ROLE':
         sourceSelect = groups.groupList;
         sourceReverse = groups.groupNames;
@@ -740,7 +741,8 @@ class ProfileRow extends Component {
               disabled={!active}
             >
               <MenuItem value={'ANY'}>any</MenuItem>
-              <MenuItem value={'ROLE'}>group</MenuItem>
+              <MenuItem value={'GROUP'}>group</MenuItem>
+              <MenuItem style={{ pointerEvents: 'none' }} value={'ROLE'}>role</MenuItem>
               <MenuItem value={'ZONE'}>zone</MenuItem>
             </Select>
           </TableCell>
