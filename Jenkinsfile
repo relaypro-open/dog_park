@@ -5,7 +5,7 @@ pipeline {
     agent { 
         dockerfile {
             filename 'Dockerfile.jenkins'
-            args '-it --entrypoint=/usr/bin/env sh'
+            args '-it --entrypoint=sh'
         }
     }
 
