@@ -2,7 +2,10 @@
 
 pipeline {
    
-    agent { dockerfile true }
+    agent { 
+        dockerfile true
+        filename 'Dockerfile.jenkins'
+    }
 
     environment {
         // job environment variables
