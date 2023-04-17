@@ -3,8 +3,9 @@
 pipeline {
    
     agent { 
-        dockerfile true
-        filename 'Dockerfile.jenkins'
+        dockerfile {
+            filename 'Dockerfile.jenkins'
+        }
     }
 
     environment {
