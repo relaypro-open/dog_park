@@ -4,5 +4,6 @@ FROM node:lts-stretch as base
 WORKDIR /data
 # copy project file
 
+RUN which bash
 RUN mkdir dog_park
-CMD ["bash"]
+CMD ["/bin/bash"]
