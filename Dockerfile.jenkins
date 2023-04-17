@@ -5,4 +5,4 @@ WORKDIR /data
 # copy project file
 
 RUN mkdir dog_park
-CMD /bin/bash -c "sleep infinity"
+CMD ["bash"]
