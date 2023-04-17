@@ -1,0 +1,7 @@
+# ---- Base Node ----
+FROM chekote/node as base
+# set working directory
+WORKDIR /data
+# copy project file
+
+RUN mkdir dog_park
