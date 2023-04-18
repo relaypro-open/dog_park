@@ -1,18 +1,12 @@
 pipeline {
-    agent { label 'docker' }
+    agent { 
+        dockerfile {
+            filename 'Dockerfile'
+            args '-i --entrypoint='
+        }
+    }
 
     stages {
-        stage('Build') {
-            steps {
-                sh 'BUILD_ID="${BUILD_ID}" REACT_APP_DOG_API_HOST="${ENV}" make build'
-            }
-
-            post {
-                success {
-                    archiveArtifacts '*.tar.gz'
-                }
-            }
-        }
         stage('Upload artifact to S3') {
             steps {
                 withAWS(profile: 'default') {
