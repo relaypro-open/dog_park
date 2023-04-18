@@ -2,6 +2,13 @@ PACKAGE=dog_park
 
 all: build-react package
 
+.PHONY: build
+build: clean docker-build package
+
+.PHONY: docker-build
+docker-build:
+	@(docker build --rm -t dog_park_build .)
+
 build-react:
 	test -d dog_park || mkdir dog_park
 	yarn install
