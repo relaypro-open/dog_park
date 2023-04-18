@@ -25,7 +25,6 @@ pipeline {
         stage('Build') {
             steps {
                 sh """#!/bin/bash -x
-                cd $HOME
                 echo "HOME: $HOME"
                 echo "USER: $USER"
                 echo "PWD: $PWD"
