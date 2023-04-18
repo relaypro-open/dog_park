@@ -3,7 +3,7 @@ pipeline {
         dockerfile {
             filename 'Dockerfile'
             args '-i --entrypoint='
-    	    additionalBuildArgs '--name dog_park_build'
+    	    additionalBuildArgs '-t dog_park_build'
         }
     }
 
