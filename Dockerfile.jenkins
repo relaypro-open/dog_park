@@ -5,6 +5,4 @@ FROM chekote/node as base
 WORKDIR /data
 # copy project file
 
-RUN which bash
 RUN mkdir dog_park
-CMD ["/bin/bash"]
