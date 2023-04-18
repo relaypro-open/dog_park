@@ -1,5 +1,6 @@
 # ---- Base Node ----
-FROM node:lts-stretch as base
+#FROM node:lts-stretch as base
+FROM chekote/node as base
 # set working directory
 WORKDIR /data
 # copy project file
