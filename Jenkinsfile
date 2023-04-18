@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'BUILD_ID="${BUILD_ID}" REACT_APP_DOG_API_HOST="${REACT_APP_DOG_API_HOST}" BUILD_ENV="${BUILD_ENV}" make build'
+                sh 'BUILD_ID="${BUILD_ID}" REACT_APP_DOG_API_HOST="${BUILD_ENV}" BUILD_ENV="${BUILD_ENV}" make build'
             }
 
             post {
