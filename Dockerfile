@@ -21,4 +21,4 @@ COPY --from=dependencies /data/node_modules ./node_modules
 COPY . .
 RUN REACT_APP_DOG_API_ENV="qa" REACT_APP_DOG_API_HOST='https://dog-qa.relaydev.sh' yarn build
 
-CMD ["/bin/bash"]
+#CMD ["/bin/bash"]
