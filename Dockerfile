@@ -19,7 +19,7 @@ FROM base AS release
 COPY --from=dependencies /data/node_modules ./node_modules
 # copy app sources
 COPY . .
-RUN REACT_APP_DOG_API_ENV="qa" REACT_APP_DOG_API_HOST='https://dog-qa.relaydev.sh' yarn build
+RUN REACT_APP_DOG_API_ENV="qa" REACT_APP_DOG_API_HOST='http://192.168.178.42' yarn build
 
 #CMD ["/bin/sh"]
 
