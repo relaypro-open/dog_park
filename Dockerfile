@@ -21,4 +21,9 @@ COPY --from=dependencies /data/node_modules ./node_modules
 COPY . .
 RUN REACT_APP_DOG_API_ENV="qa" REACT_APP_DOG_API_HOST='https://dog-qa.relaydev.sh' yarn build
 
-#CMD ["/bin/bash"]
+#CMD ["/bin/sh"]
+
+FROM nginx AS deploy
+COPY nginx.default.conf /etc/nginx/conf.d/default.conf
+COPY --from=release /data/build /usr/share/nginx/html
+EXPOSE 3030
