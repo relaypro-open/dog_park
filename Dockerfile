@@ -1,5 +1,5 @@
 # ---- Base Node ----
-FROM chekote/node as base
+FROM chekote/node:12.14.1 as base
 # set working directory
 WORKDIR /data
 # copy project file
