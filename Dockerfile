@@ -1,5 +1,5 @@
 # ---- Base Node ----
-FROM chekote/node as base
+FROM chekote/node:12.14.1 as base
 # set working directory
 WORKDIR /data
 # copy project file
@@ -21,4 +21,4 @@ COPY --from=dependencies /data/node_modules ./node_modules
 COPY . .
 RUN REACT_APP_DOG_API_ENV="qa" REACT_APP_DOG_API_HOST='https://dog-qa.relaydev.sh' yarn build
 
-CMD ["/bin/bash"]
+#CMD ["/bin/bash"]
