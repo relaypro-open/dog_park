@@ -26,6 +26,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import IptablesView from './IptablesView';
+import HclView from './HclView';
 import TextField from '@material-ui/core/TextField';
 import {
   Table,
@@ -174,6 +175,7 @@ class Profile extends Component {
       snackBarMsg: '',
       iptablesOutput: '',
       iptablesViewOpen: false,
+      hclViewOpen: false,
       docker: false,
     };
   }
@@ -872,6 +874,15 @@ class Profile extends Component {
     this.setState({ iptablesViewOpen: !this.state.iptablesViewOpen });
   };
 
+  handleHclViewButton = (event) => {
+    const hclOutput = (
+      <HclView id={this.state.profileId} />
+    );
+
+    this.setState({ hclOutput });
+    this.setState({ hclViewOpen: !this.state.hclViewOpen });
+  };
+
   handleCloneButton = (event) => {
     this.setState({ cloneProfileName: this.state.profileName + '_clone' });
     this.setState({ cloneProfileOpen: !this.state.cloneProfileOpen });
@@ -887,6 +898,10 @@ class Profile extends Component {
 
   handleIptablesViewCloseButton = (event) => {
     this.setState({ iptablesViewOpen: false });
+  };
+  
+  handleHclViewCloseButton = (event) => {
+    this.setState({ hclViewOpen: false });
   };
 
   render() {
@@ -939,6 +954,17 @@ class Profile extends Component {
               Clone Profile
             </Button>
             <Button
+              className={classes.button}
+              style={{ marginLeft: 'auto' }}
+              onClick={this.handleHclViewButton}
+              variant="contained"
+              color="primary"
+            >
+              View Hcl
+            </Button>
+            <Button
+              className={classes.button}
+              style={{ marginLeft: 'auto' }}
               onClick={this.handleIptablesViewButton}
               variant="contained"
               color="primary"
@@ -1129,6 +1155,25 @@ class Profile extends Component {
               >
                 Delete
                 <DeleteIcon className={classes.rightIcon} />
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            maxWidth={false}
+            fullWidth={false}
+            open={this.state.hclViewOpen}
+            onClose={this.handleHclViewCloseButton}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogContent>
+              {this.state.hclOutput}
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={this.handleHclViewCloseButton}
+                color="primary"
+              >
+                Close
               </Button>
             </DialogActions>
           </Dialog>
