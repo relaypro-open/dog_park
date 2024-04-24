@@ -1,5 +1,5 @@
 # ---- Base Node ----
-FROM chekote/node as base
+FROM chekote/node:10.16.2-alpine as base
 
 ARG REACT_APP_DOG_API_ENV="local" 
 ENV REACT_APP_DOG_API_ENV=$REACT_APP_DOG_API_ENV
@@ -27,7 +27,8 @@ COPY --from=dependencies /data/node_modules ./node_modules
 # copy app sources
 COPY . .
 #RUN NODE_OPTIONS=--openssl-legacy-provider REACT_APP_DOG_API_HOST='http://dog' yarn build
-RUN NODE_OPTIONS=--openssl-legacy-provider REACT_APP_DOG_API_ENV=${REACT_APP_DOG_API_ENV} REACT_APP_DOG_API_HOST=${REACT_APP_DOG_API_HOST} yarn build
+#RUN NODE_OPTIONS=--openssl-legacy-provider REACT_APP_DOG_API_ENV=${REACT_APP_DOG_API_ENV} REACT_APP_DOG_API_HOST=${REACT_APP_DOG_API_HOST} yarn build
+RUN REACT_APP_DOG_API_ENV=${REACT_APP_DOG_API_ENV} REACT_APP_DOG_API_HOST=${REACT_APP_DOG_API_HOST} yarn build
 RUN cd build; tar --exclude="build/service-worker.js" -czvf /tmp/dog_park-${REACT_APP_DOG_API_ENV}.tar.gz *
 
 FROM scratch AS tar
