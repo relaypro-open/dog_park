@@ -1,5 +1,5 @@
 # ---- Base Node ----
-FROM chekote/node:10.16.2-alpine as base
+FROM docker.io/chekote/node:10.16.2-alpine as base
 
 ARG REACT_APP_DOG_API_ENV="local" 
 ENV REACT_APP_DOG_API_ENV=$REACT_APP_DOG_API_ENV
