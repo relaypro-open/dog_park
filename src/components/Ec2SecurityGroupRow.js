@@ -104,7 +104,7 @@ class Ec2SecurityGroupRow extends Component {
 
     const {
         region,
-        sgid 
+        sgid
     } = this.state;
 
     console.log(this.props);
@@ -125,6 +125,7 @@ class Ec2SecurityGroupRow extends Component {
                       <MenuItem value={'af-south-1'}>af-south-1</MenuItem>
                       <MenuItem value={'ap-east-1'}>ap-east-1</MenuItem>
                       <MenuItem value={'ap-south-1'}>ap-south-1</MenuItem>
+                      <MenuItem value={'ap-south-2'}>ap-south-2</MenuItem>
                       <MenuItem value={'ap-northeast-3'}>ap-northeast-3</MenuItem>
                       <MenuItem value={'ap-northeast-2'}>ap-northeast-2</MenuItem>
                       <MenuItem value={'ap-southeast-1'}>ap-southeast-1</MenuItem>
