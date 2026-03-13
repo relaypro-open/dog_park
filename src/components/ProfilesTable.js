@@ -47,7 +47,7 @@ const ProfilesTable = React.memo(props => {
               >
                 <TableCell>{profile}</TableCell>
                 <TableCell>{profiles[profile][0].id}</TableCell>
-                <TableCell>{new Date(profiles[profile][0].created * 1000).toISOString()}</TableCell>
+                <TableCell>{(() => { const d = new Date(profiles[profile][0].created * 1000); return isNaN(d.getTime()) ? String(profiles[profile][0].created ?? '') : d.toISOString(); })()}</TableCell>
               </TableRow>
             );
           })}

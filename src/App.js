@@ -5,9 +5,7 @@ import logo from './dog-segmented-green.network-200x200.png';
 import './App.css';
 import { Routes, Route, Link } from 'react-router-dom';
 import withRouter from './withRouter';
-import { ThemeProvider } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
-import { dogTheme } from './styles/muiTheme';
 import {
   AppBar,
   Toolbar,
@@ -62,10 +60,14 @@ const styles = (theme) => ({
   appFrame: {
     height: '100%',
     zIndex: 1,
-    overflow: 'scroll',
+    overflow: 'hidden',
     position: 'relative',
     display: 'flex',
     width: '100%',
+  },
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
   },
   appBar: {
     position: 'fixed',
@@ -254,6 +256,7 @@ class App extends Component {
 
     const drawer = (
       <Drawer
+        className={classes.drawer}
         variant="persistent"
         anchor="left"
         open={sideBarActive}
@@ -307,8 +310,7 @@ class App extends Component {
     return (
       <div className="App">
         <div>
-          <ThemeProvider theme={dogTheme}>
-            <div className={classes.appFrame}>
+          <div className={classes.appFrame}>
                 <AppBar
                   className={classNames(classes.appBar, {
                     [classes.appBarShift]: sideBarActive,
@@ -340,6 +342,8 @@ class App extends Component {
                       onChange={this.handleTabChange}
                       variant="scrollable"
                       scrollButtons="auto"
+                      textColor="inherit"
+                      indicatorColor="secondary"
                     >
                       <Tab label="Groups" />
                       <Tab label="Profiles" />
@@ -393,7 +397,6 @@ class App extends Component {
                   </Routes>
                 </main>
             </div>
-          </ThemeProvider>
         </div>
       </div>
     );

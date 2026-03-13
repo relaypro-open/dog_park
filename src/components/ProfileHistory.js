@@ -46,7 +46,8 @@ const ProfileHistory = props => {
         </TableHead>
         <TableBody>
           {profiles.map(profile => {
-            const createdTime = new Date(profile.created * 1000).toLocaleString();
+            const _d = new Date(profile.created * 1000);
+            const createdTime = isNaN(_d.getTime()) ? String(profile.created ?? '') : _d.toLocaleString();
             return (
               <TableRow
                 key={'history' + profile.id}

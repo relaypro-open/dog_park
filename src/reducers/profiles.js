@@ -36,10 +36,10 @@ export function profiles(
 
   Object.values(profilesMap).map((profile) => {
     profile.sort((a, b) => {
-      let tsA = new Date(a.created);
-      let tsB = new Date(b.created);
-      if (tsA.getTime() < tsB.getTime()) return 1;
-      if (tsA.getTime() > tsB.getTime()) return -1;
+      let tsA = (a.created || 0) * 1000;
+      let tsB = (b.created || 0) * 1000;
+      if (tsA < tsB) return 1;
+      if (tsA > tsB) return -1;
       return 0;
     });
     return true;

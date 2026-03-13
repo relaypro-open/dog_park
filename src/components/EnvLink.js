@@ -101,7 +101,7 @@ class EnvLink extends Component {
 
   componentDidMount = () => {
     this.fetchLink(this.props.match.params.id);
-    this.props.handleSelectedTab(6);
+    this.props.handleSelectedTab(5);
   };
 
   componentDidUpdate = (prevProps) => {
