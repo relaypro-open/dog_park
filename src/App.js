@@ -18,10 +18,6 @@ import {
   IconButton,
   Tooltip,
   CircularProgress,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
 } from '@material-ui/core';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import ListItem from '@material-ui/core/ListItem';
@@ -45,22 +41,17 @@ import Service from './components/Service';
 import Hosts from './components/Hosts';
 import Services from './components/Services';
 import Host from './components/Host';
-import Vulnerabilities from './components/Vulnerabilities';
-import Certificates from './components/Certificates';
-import AWSCertificates from './components/AWSCertificates';
 import Links from './components/Links';
 import EnvLink from './components/EnvLink';
 
 //redux store
 import { groupsFetchData } from './actions/groups';
-import { flanIpsFetchData } from './actions/flan_ips';
 import { profilesFetchData } from './actions/profiles';
 import { zonesFetchData } from './actions/zones';
 import { hostsFetchData } from './actions/hosts';
 import { servicesFetchData } from './actions/services';
 import { linksFetchData } from './actions/links';
 import { handleSelectedTab } from './actions/app';
-import { handleSelectedScanLocation } from './actions/app';
 
 const drawerWidth = 240;
 
@@ -173,13 +164,6 @@ const styles = (theme) => ({
   flex: {
     flexGrow: 1,
   },
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
 });
 
 class App extends Component {
@@ -205,16 +189,6 @@ class App extends Component {
     this.props.fetchHosts();
     this.props.fetchLinks();
   }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.scanLocation !== this.props.scanLocation) {
-      this.props.fetchFlanIps();
-    }
-  }
-
-  handleChange = (event) => {
-    this.props.handleSelectedScanLocation(event.target.value);
-  };
 
   handleDrawerOpen = () => {
     this.setState({ sideBarActive: true });
@@ -242,15 +216,6 @@ class App extends Component {
         this.props.history.push('/zones');
         break;
       case 5:
-        this.props.history.push('/vulnerabilities');
-        break;
-      case 6:
-        this.props.history.push('/certificates');
-        break;
-      case 7:
-        this.props.history.push('/aws_certificates');
-        break;
-      case 8:
         this.props.history.push('/links');
         break;
       default:
@@ -284,7 +249,7 @@ class App extends Component {
         </div>
       );
     }
-    const { classes, theme, scanLocation } = this.props;
+    const { classes, theme } = this.props;
     const { sideBarActive } = this.state;
 
     const drawer = (
@@ -317,19 +282,6 @@ class App extends Component {
             </IconButton>
           </Tooltip>
         </div>
-        <Divider />
-        <FormControl className={classes.formControl}>
-          <InputLabel id="scan-location-input">Scan Location</InputLabel>
-          <Select
-            labelId="scan-location-input-label"
-            id="scan-location-input"
-            value={scanLocation}
-            onChange={this.handleChange}
-          >
-            <MenuItem value={'external'}>External</MenuItem>
-            <MenuItem value={'internal'}>Internal</MenuItem>
-          </Select>
-        </FormControl>
         <Divider />
         <List
           component="nav"
@@ -395,9 +347,6 @@ class App extends Component {
                       <Tab label="Services" />
                       <Tab label="Hosts" />
                       <Tab label="Zones" />
-                      <Tab label="Vulnerabilities" />
-                      <Tab label="Certificates" />
-                      <Tab label="AWS Certificates" />
                       <Tab label="Links" />
                     </Tabs>
                     {
@@ -442,21 +391,6 @@ class App extends Component {
                   <Route path="/host/:id" component={Host} />
                   <Route exact={true} path="/services" component={Services} />
                   <Route path="/service/:id" component={Service} />
-                  <Route
-                    exact={true}
-                    path="/vulnerabilities"
-                    component={Vulnerabilities}
-                  />
-                  <Route
-                    exact={true}
-                    path="/certificates"
-                    component={Certificates}
-                  />
-                  <Route
-                    exact={true}
-                    path="/aws_certificates"
-                    component={AWSCertificates}
-                  />
                   <Route exact={true} path="/links" component={Links} />
                   <Route path="/link/:id" component={EnvLink} />
                   <Route exact={true} path="/link" component={EnvLink} />
@@ -475,22 +409,18 @@ const mapStateToProps = (state) => {
     groups: state.groups,
     hosts: state.hosts,
     selectedTab: state.selectedTab,
-    scanLocation: state.scanLocation,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchGroups: () => dispatch(groupsFetchData()),
-    fetchFlanIps: () => dispatch(flanIpsFetchData()),
     fetchProfiles: () => dispatch(profilesFetchData()),
     fetchZones: () => dispatch(zonesFetchData()),
     fetchHosts: () => dispatch(hostsFetchData()),
     fetchServices: () => dispatch(servicesFetchData()),
     fetchLinks: () => dispatch(linksFetchData()),
     handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
-    handleSelectedScanLocation: (value) =>
-      dispatch(handleSelectedScanLocation(value)),
   };
 };
 

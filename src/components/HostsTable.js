@@ -8,7 +8,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Avatar,
   Collapse,
   IconButton,
   Typography,
@@ -35,14 +34,7 @@ const styles = (theme) => ({
 });
 
 const HostsTable = pure((props) => {
-  const { classes, hosts, flanIps, expand } = props;
-
-  const flanEventsStyle = {
-    backgroundColor: '#FD6864',
-  };
-  const certEventsStyle = {
-    backgroundColor: '#34CDF9',
-  };
+  const { classes, hosts, expand } = props;
 
   const [open, setOpen] = React.useState(expand);
 
@@ -66,9 +58,6 @@ const HostsTable = pure((props) => {
               <TableCell>Host Name</TableCell>
               <TableCell>Host Key</TableCell>
               <TableCell>Host Group</TableCell>
-              <TableCell>Vulnerabilities</TableCell>
-              <TableCell>Certificates</TableCell>
-              <TableCell>Open Apps</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -87,32 +76,6 @@ const HostsTable = pure((props) => {
                   break;
                 default:
                   activeIcon = <Help />;
-              }
-              let flanEventCount = 0;
-              let openAppCount = 0;
-              let flanEvent = '';
-              let certCount = 0;
-              let certEvent = '';
-              if (host.name in flanIps.hosts) {
-                flanIps.hosts[host.name].forEach((app) => {
-                  flanEventCount += app['vulns'].length;
-                  certCount += app['certs'].length;
-                  openAppCount += 1;
-                });
-              }
-              if (flanEventCount > 0) {
-                flanEvent = (
-                  <Avatar aria-label="recipe" style={flanEventsStyle}>
-                    {flanEventCount}
-                  </Avatar>
-                );
-              }
-              if (certCount > 0) {
-                certEvent = (
-                  <Avatar aria-label="recipe" style={certEventsStyle}>
-                    {certCount}
-                  </Avatar>
-                );
               }
               return (
                 <TableRow
@@ -136,9 +99,6 @@ const HostsTable = pure((props) => {
                   >
                     {host.group}
                   </TableCell>
-                  <TableCell>{flanEvent}</TableCell>
-                  <TableCell>{certEvent}</TableCell>
-                  <TableCell>{openAppCount}</TableCell>
                 </TableRow>
               );
             })}

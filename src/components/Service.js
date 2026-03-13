@@ -18,7 +18,6 @@ import {
 } from '@material-ui/core';
 import { handleSelectedTab } from '../actions/app';
 import { groupsFetchData } from '../actions/groups';
-import { flanIpsFetchData } from '../actions/flan_ips';
 import { profilesFetchData } from '../actions/profiles';
 import { zonesFetchData } from '../actions/zones';
 import { hostsFetchData } from '../actions/hosts';
@@ -613,7 +612,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
     fetchGroups: () => dispatch(groupsFetchData()),
-    fetchFlanIps: () => dispatch(flanIpsFetchData()),
+
     fetchProfiles: () => dispatch(profilesFetchData()),
     fetchZones: () => dispatch(zonesFetchData()),
     fetchHosts: () => dispatch(hostsFetchData()),

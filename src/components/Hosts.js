@@ -19,7 +19,7 @@ class Hosts extends Component {
     if (this.props.hasErrored) {
       return <p>Sorry! There was an error loading the items</p>;
     }
-    if (this.props.isLoading || this.props.flanIpsIsLoading) {
+    if (this.props.isLoading) {
       return (
         <div>
           {' '}
@@ -32,7 +32,6 @@ class Hosts extends Component {
       <div>
         <HostsTable
           hosts={this.props.hosts.hostList}
-          flanIps={this.props.flanIps}
           expand={true}
         />
         <br />
@@ -46,9 +45,6 @@ const mapStateToProps = (state) => {
     hosts: state.hosts,
     hasErrored: state.hostsHasErrored,
     isLoading: state.hostsIsLoading,
-    flanIps: state.flanIps,
-    flanIpsHasErrored: state.flanIpsHasErrored,
-    flanIpsIsLoading: state.flanIpsIsLoading,
   };
 };
 

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { api } from '../api';
 import { groupsFetchData } from '../actions/groups';
-import { flanIpsFetchData } from '../actions/flan_ips';
 import { profilesFetchData } from '../actions/profiles';
 import { zonesFetchData } from '../actions/zones';
 import { hostsFetchData } from '../actions/hosts';
@@ -637,8 +636,7 @@ class Group extends Component {
     if (
       this.state.isLoading ||
       this.props.profilesIsLoading ||
-      this.props.hostsIsLoading ||
-      this.props.flanIpsIsLoading
+      this.props.hostsIsLoading
     ) {
       return (
         <div>
@@ -648,7 +646,7 @@ class Group extends Component {
       );
     }
 
-    const { classes, hosts, flanIps } = this.props;
+    const { classes, hosts } = this.props;
     let isDiff = '';
 
     let groupHosts = [];
@@ -733,7 +731,7 @@ class Group extends Component {
             <Typography variant="body1">
               <strong>Group Hosts:</strong>
             </Typography>
-            <HostsTable hosts={groupHosts} flanIps={flanIps} expand={true} />
+            <HostsTable hosts={groupHosts} expand={true} />
             <br />
             <Typography variant="subtitle1">
               <strong>Ec2 Security Groups:</strong>&nbsp;&nbsp;
@@ -940,16 +938,12 @@ const mapStateToProps = (state) => {
     hosts: state.hosts,
     hostsHasErrored: state.hostsHasErrored,
     hostsIsLoading: state.hostsIsLoading,
-    flanIps: state.flanIps,
-    flanIpsHasErrored: state.flanIpsHasErrored,
-    flanIpsIsLoading: state.flanIpsIsLoading,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchGroups: () => dispatch(groupsFetchData()),
-    fetchFlanIps: () => dispatch(flanIpsFetchData()),
     fetchProfiles: () => dispatch(profilesFetchData()),
     fetchZones: () => dispatch(zonesFetchData()),
     fetchHosts: () => dispatch(hostsFetchData()),

@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { api } from '../api';
 import { groupsFetchData } from '../actions/groups';
-import { flanIpsFetchData } from '../actions/flan_ips';
 import { profilesFetchData } from '../actions/profiles';
 import { zonesFetchData } from '../actions/zones';
 import { hostsFetchData } from '../actions/hosts';
@@ -67,12 +66,6 @@ class Groups extends Component {
 
   componentDidMount() {
     this.props.handleSelectedTab(0);
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.scanLocation !== this.props.scanLocation) {
-      this.props.fetchFlanIps();
-    }
   }
 
   createGroup = () => {
@@ -181,8 +174,7 @@ class Groups extends Component {
     }
     if (
       this.props.isLoading ||
-      this.props.profilesIsLoading ||
-      this.props.flanIpsIsLoading
+      this.props.profilesIsLoading
     ) {
       return (
         <div>
@@ -221,7 +213,6 @@ class Groups extends Component {
       <div>
         <GroupsTable
           groups={this.props.groups.groupList}
-          flanIps={this.props.flanIps}
         />
         <Fab
           color="secondary"
@@ -334,12 +325,8 @@ const mapStateToProps = (state) => {
     profiles: state.profiles,
     profilesHasErrored: state.profilesHasErrored,
     profilesIsLoading: state.profilesIsLoading,
-    flanIps: state.flanIps,
-    flanIpsHasErrored: state.flanIpsHasErrored,
-    flanIpsIsLoading: state.flanIpsIsLoading,
     hostsHasErrored: state.hostsHasErrored,
     hostsIsLoading: state.hostsIsLoading,
-    scanLocation: state.scanLocation,
   };
 };
 
@@ -347,7 +334,6 @@ const mapDispatchToProps = (dispatch) => {
   return {
     handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
     fetchGroups: () => dispatch(groupsFetchData()),
-    fetchFlanIps: () => dispatch(flanIpsFetchData()),
     fetchProfiles: () => dispatch(profilesFetchData()),
     fetchZones: () => dispatch(zonesFetchData()),
     fetchHosts: () => dispatch(hostsFetchData()),

@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import { api } from '../api';
 import { groupsFetchData } from '../actions/groups';
-import { flanIpsFetchData } from '../actions/flan_ips';
 import { profilesFetchData } from '../actions/profiles';
 import { zonesFetchData } from '../actions/zones';
 import { hostsFetchData } from '../actions/hosts';
 import { servicesFetchData } from '../actions/services';
 import { linksFetchData } from '../actions/links';
 import { handleSelectedTab } from '../actions/app';
-import FlanApp from './FlanApp';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
@@ -341,8 +339,7 @@ class Host extends Component {
     if (
       this.state.isLoading ||
       this.props.groupsIsLoading ||
-      this.state.isDeleting ||
-      this.props.flanIpsIsLoading
+      this.state.isDeleting
     ) {
       return (
         <div>
@@ -352,7 +349,7 @@ class Host extends Component {
       );
     }
 
-    const { classes, flanIps } = this.props;
+    const { classes } = this.props;
 
     const groups = this.props.groups.groupList.map((group) => {
       return (
@@ -361,23 +358,6 @@ class Host extends Component {
         </MenuItem>
       );
     });
-
-    let flanApps = [];
-    let hostName = this.state.hostName;
-
-    if (
-      !hostName.includes('.phonebooth.net') &&
-      !hostName.includes('.phoneboothdev.info')
-    ) {
-      if (hostName.includes('-qa-')) {
-        hostName = hostName + '.phoneboothdev.info';
-      } else if (hostName.includes('-pro-')) {
-        hostName = hostName + '.phonebooth.net';
-      }
-    }
-    if (hostName in flanIps.hosts) {
-      flanApps = flanIps.hosts[hostName];
-    }
 
     let activeIcon = null;
 
@@ -584,27 +564,6 @@ class Host extends Component {
             </IconButton>,
           ]}
         />
-        <br />
-        <br />
-        <br />
-        <Typography variant="subtitle1">
-          <strong>Flan Discovered Apps</strong>
-        </Typography>
-        <br />
-
-        {flanApps.map((a) => (
-          <div>
-            <FlanApp
-              key={'appkey_' + a.app}
-              app={a.app}
-              ip={a.ip}
-              port={a.port}
-              vulns={a.vulns}
-              certs={a.certs}
-            />
-            <br />
-          </div>
-        ))}
       </div>
     );
   }
@@ -615,16 +574,12 @@ const mapStateToProps = (state) => {
     groups: state.groups,
     groupsHasErrored: state.groupsHasErrored,
     groupsIsLoading: state.groupsIsLoading,
-    flanIps: state.flanIps,
-    flanIpsHasErrored: state.flanIpsHasErrored,
-    flanIpsIsLoading: state.flanIpsIsLoading,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchGroups: () => dispatch(groupsFetchData()),
-    fetchFlanIps: () => dispatch(flanIpsFetchData()),
     fetchProfiles: () => dispatch(profilesFetchData()),
     fetchZones: () => dispatch(zonesFetchData()),
     fetchHosts: () => dispatch(hostsFetchData()),

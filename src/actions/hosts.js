@@ -1,6 +1,5 @@
 import { api } from '../api';
 import { createActions } from 'redux-actions';
-import { flanIpsFetchData } from './flan_ips';
 
 export const {
   hostsHasErrored,
@@ -26,7 +25,6 @@ export function hostsFetchData() {
         return response.data;
       })
       .then((hosts) => dispatch(hostsFetchDataSuccess(hosts)))
-      .then(() => dispatch(flanIpsFetchData()))
       .catch(() => dispatch(hostsHasErrored(true)));
   };
 }

@@ -66,8 +66,6 @@ Copy tar to web server system, extract to web root
 
 - Protect with an authentication proxy: [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/)
 - Configure your web server to proxy /api to dog_trainer at [http://localhost:7070/api/](http://localhost:7070/api/)
-- Create a directory /opt/flan_api
-- ```echo "[]" > /opt/flan/flan_api/flan_ips```
 
 example nginx config:
 
@@ -101,20 +99,6 @@ example nginx config:
         proxy_set_header   X-Forwarded-Proto $scheme;
     }
 
-    location /flan_api/ {
-        root /opt/flan;
-        # pass information via X-User and X-Email headers to backend,
-        # requires running with --set-xauthrequest flag
-        auth_request_set $user   $upstream_http_x_auth_request_user;
-        auth_request_set $email  $upstream_http_x_auth_request_email;
-        proxy_set_header X-User  $user;
-        proxy_set_header X-Email $email;
-    
-        # if you enabled --cookie-refresh, this is needed for it to work with auth_request
-        auth_request_set $auth_cookie $upstream_http_set_cookie;
-        add_header Set-Cookie $auth_cookie;
-    }
-
     location / {
         root   /opt/dog_park;
         index  index.html index.htm;
@@ -130,7 +114,7 @@ example nginx config:
 
 ## Architecture
 
-dog_park uses Redux to store much of it's global state information. When the page loads, calls are made to the "plural" api endpoints (hosts, groups, profiles, zones, services, and flan_ips) and the results are stored in the redux store. This means that once loaded, all of the information is available to the app and it allows the app to function without network delays. Any time you drill into a specific resource, their is an api call to receieve that information and then it is displayed. When a resource is created or updated, this will trigger a full refresh of the redux store to ensure that the data is up to date. 
+dog_park uses Redux to store much of it's global state information. When the page loads, calls are made to the "plural" api endpoints (hosts, groups, profiles, zones, services, and links) and the results are stored in the redux store. This means that once loaded, all of the information is available to the app and it allows the app to function without network delays. Any time you drill into a specific resource, their is an api call to receieve that information and then it is displayed. When a resource is created or updated, this will trigger a full refresh of the redux store to ensure that the data is up to date. 
 
 Currently, there is no mechanism for auto-refresh of data. So, if the page is left open for a long period of time, there is a possiblity that the data is stale and not in line with dog_trainer's state. Therefore, a full refresh is required. There is also nothing included that would indicate other users who are actively working with dog_park to make updates. So, theoretically there could be a situation where two different users are modifying the same resource and overwrite the other's changes.
 
