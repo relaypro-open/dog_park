@@ -23,19 +23,18 @@ a centralized firewall management system.
 
 ## Build Dependencies
 
-- nodejs 12.x
-- yarn 1.16.x
+- nodejs 22.x+
+- yarn 1.16.x+
 
 - Ubuntu:
 
 ```bash
 #nodejs
+curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+apt install nodejs
 
-curl -sL https://deb.nodesource.com/setup_12.x | bash -
-apt install nodejs 
 #yarn
-
-npm install --global yarn@1.16.0
+npm install --global yarn
 ```
 
 ## Deploy Configuration
@@ -52,10 +51,10 @@ ansible.sh
 ## Build
 
 ```bash
-#REACT_APP_DOG_API must match certificate address if using https
-REACT_APP_DOG_API_HOST='http://localhost:3000' yarn build dev
-cd _build
-tar cd dog_park.tgz *
+#VITE_DOG_API_HOST must match certificate address if using https
+VITE_DOG_API_HOST='http://localhost:3000' yarn build
+cd dist
+tar -czvf dog_park.tgz *
 ```
 
 ## Deploy

@@ -47,9 +47,9 @@ class ProfileRow extends Component {
 
     let { groups, zones, environments, environmentAdd, services, data } = props;
 
-    let checkedNew: false;
-    let checkedEstablished: false;
-    let checkedRelated: false;
+    let checkedNew = false;
+    let checkedEstablished = false;
+    let checkedRelated = false;
 
     data.states.map(state => {
       switch (state) {
@@ -164,9 +164,9 @@ class ProfileRow extends Component {
             environmentAdd,
             environments,
           } = props;
-          let checkedNew: false;
-          let checkedEstablished: false;
-          let checkedRelated: false;
+          let checkedNew = false;
+          let checkedEstablished = false;
+          let checkedRelated = false;
 
           data.states.map(state => {
             switch (state) {

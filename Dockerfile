@@ -1,12 +1,12 @@
 # ---- Base Node ----
-FROM docker.io/chekote/node:10.16.2-alpine as base
+FROM node:22-alpine as base
 
-ARG REACT_APP_DOG_API_ENV="local" 
-ENV REACT_APP_DOG_API_ENV=$REACT_APP_DOG_API_ENV
-ARG REACT_APP_DOG_API_HOST="http://dog"
-ENV REACT_APP_DOG_API_HOST=$REACT_APP_DOG_API_HOST
+ARG VITE_DOG_API_ENV="local"
+ENV VITE_DOG_API_ENV=$VITE_DOG_API_ENV
+ARG VITE_DOG_API_HOST="http://dog"
+ENV VITE_DOG_API_HOST=$VITE_DOG_API_HOST
 
-# set working director
+# set working directory
 WORKDIR /data
 # copy project file
 COPY package.json .
@@ -26,15 +26,13 @@ FROM base AS release
 COPY --from=dependencies /data/node_modules ./node_modules
 # copy app sources
 COPY . .
-#RUN NODE_OPTIONS=--openssl-legacy-provider REACT_APP_DOG_API_HOST='http://dog' yarn build
-#RUN NODE_OPTIONS=--openssl-legacy-provider REACT_APP_DOG_API_ENV=${REACT_APP_DOG_API_ENV} REACT_APP_DOG_API_HOST=${REACT_APP_DOG_API_HOST} yarn build
-RUN REACT_APP_DOG_API_ENV=${REACT_APP_DOG_API_ENV} REACT_APP_DOG_API_HOST=${REACT_APP_DOG_API_HOST} yarn build
-RUN cd build; tar --exclude="build/service-worker.js" -czvf /tmp/dog_park-${REACT_APP_DOG_API_ENV}.tar.gz *
+RUN VITE_DOG_API_ENV=${VITE_DOG_API_ENV} VITE_DOG_API_HOST=${VITE_DOG_API_HOST} yarn build
+RUN cd dist; tar -czvf /tmp/dog_park-${VITE_DOG_API_ENV}.tar.gz *
 
 FROM scratch AS tar
-COPY --from=release /tmp/dog_park-*.tar.gz / 
+COPY --from=release /tmp/dog_park-*.tar.gz /
 
 
 FROM nginx AS deploy
-COPY --from=release /data/build /usr/share/nginx/html
+COPY --from=release /data/dist /usr/share/nginx/html
 EXPOSE 3030
