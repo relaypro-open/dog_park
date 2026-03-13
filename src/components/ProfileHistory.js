@@ -1,5 +1,4 @@
 import React from 'react';
-import moment from 'moment';
 import { withStyles } from '@mui/styles';
 import withRouter from '../withRouter';
 import {
@@ -47,7 +46,7 @@ const ProfileHistory = props => {
         </TableHead>
         <TableBody>
           {profiles.map(profile => {
-            const createdTime = moment(profile.created * 1000).format('llll');
+            const createdTime = new Date(profile.created * 1000).toLocaleString();
             return (
               <TableRow
                 key={'history' + profile.id}

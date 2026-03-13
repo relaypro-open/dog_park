@@ -1,5 +1,4 @@
 import { handleAction } from 'redux-actions';
-import moment from 'moment';
 
 export const profilesHasErrored = handleAction(
   'PROFILES_HAS_ERRORED',
@@ -43,12 +42,12 @@ export const profiles = handleAction(
 
     Object.values(profiles).map((profile) => {
       profile.sort((a, b) => {
-        let tsA = moment(a.created);
-        let tsB = moment(b.created);
+        let tsA = new Date(a.created);
+        let tsB = new Date(b.created);
 
-        if (tsA.valueOf() < tsB.valueOf()) {
+        if (tsA.getTime() < tsB.getTime()) {
           return 1;
-        } else if (tsA.valueOf() > tsB.valueOf()) {
+        } else if (tsA.getTime() > tsB.getTime()) {
           return -1;
         } else {
           return 0;

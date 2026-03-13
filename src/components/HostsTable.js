@@ -20,7 +20,7 @@ import {
   ExpandLess,
   ExpandMore,
 } from '@mui/icons-material';
-import { pure } from 'recompose';
+
 
 const styles = (theme) => ({
   root: {
@@ -33,7 +33,7 @@ const styles = (theme) => ({
   },
 });
 
-const HostsTable = pure((props) => {
+const HostsTable = React.memo((props) => {
   const { classes, hosts, expand } = props;
 
   const [open, setOpen] = React.useState(expand);

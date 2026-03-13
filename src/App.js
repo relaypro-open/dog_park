@@ -7,8 +7,6 @@ import { Routes, Route, Link } from 'react-router-dom';
 import withRouter from './withRouter';
 import { ThemeProvider } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { dogTheme } from './styles/muiTheme';
 import {
   AppBar,
@@ -310,8 +308,7 @@ class App extends Component {
       <div className="App">
         <div>
           <ThemeProvider theme={dogTheme}>
-            <LocalizationProvider dateAdapter={AdapterMoment}>
-              <div className={classes.appFrame}>
+            <div className={classes.appFrame}>
                 <AppBar
                   className={classNames(classes.appBar, {
                     [classes.appBarShift]: sideBarActive,
@@ -395,8 +392,7 @@ class App extends Component {
                     <Route path="/link" element={<EnvLink />} />
                   </Routes>
                 </main>
-              </div>
-            </LocalizationProvider>
+            </div>
           </ThemeProvider>
         </div>
       </div>

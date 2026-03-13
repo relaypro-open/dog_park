@@ -10,7 +10,7 @@ import {
   Paper,
 } from '@mui/material';
 import GitChanges from './GitChanges';
-import { pure } from 'recompose';
+
 
 const styles = (theme) => ({
   root: {
@@ -23,7 +23,7 @@ const styles = (theme) => ({
   },
 });
 
-const GroupsTable = pure((props) => {
+const GroupsTable = React.memo((props) => {
   const { classes, groups } = props;
 
   return (

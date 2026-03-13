@@ -39,7 +39,6 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import { SortableContainer } from 'react-sortable-hoc';
 import update from 'immutability-helper';
 
 const styles = (theme) => ({
@@ -66,36 +65,28 @@ const styles = (theme) => ({
   },
 });
 
-const TableBodySortable = SortableContainer(
-  ({
-    children,
-    handleRegionInput,
-    handleSecurityGroupInput,
-    handleAddSecurityGroup,
-    handleRemoveSecurityGroup
-  }) => {
-    return (
-      <TableBody>
-        {children.map((row, index) => {
-          return (
-            <Ec2SecurityGroupRow
-              index={index}
-              key={'Ec2SecuritGroupTable' + index}
-              pIndex={index}
-              data={row}
-              handleRegionInput={handleRegionInput}
-              handleSecurityGroupInput={handleSecurityGroupInput}
-              handleAddSecurityGroup={handleAddSecurityGroup}
-              handleRemoveSecurityGroup={handleRemoveSecurityGroup}
-            />
-          );
-        })}
-      </TableBody>
-    );
-  }
+const TableBodySortable = ({
+  children,
+  handleRegionInput,
+  handleSecurityGroupInput,
+  handleAddSecurityGroup,
+  handleRemoveSecurityGroup,
+}) => (
+  <TableBody>
+    {children.map((row, index) => (
+      <Ec2SecurityGroupRow
+        index={index}
+        key={'Ec2SecuritGroupTable' + index}
+        pIndex={index}
+        data={row}
+        handleRegionInput={handleRegionInput}
+        handleSecurityGroupInput={handleSecurityGroupInput}
+        handleAddSecurityGroup={handleAddSecurityGroup}
+        handleRemoveSecurityGroup={handleRemoveSecurityGroup}
+      />
+    ))}
+  </TableBody>
 );
-
-TableBodySortable.muiName = 'TableBody';
 
 class Group extends Component {
   constructor(props) {

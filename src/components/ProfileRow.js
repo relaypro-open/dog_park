@@ -12,7 +12,6 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { SortableElement, SortableHandle } from 'react-sortable-hoc';
 import debounce from 'lodash/debounce';
 import Autocomplete from '@mui/material/Autocomplete';
 
@@ -33,11 +32,11 @@ const styles = theme => ({
   },
 });
 
-const DragHandle = SortableHandle(() => (
-  <span>
+const DragHandle = ({ listeners }) => (
+  <span {...listeners} style={{ cursor: 'grab' }}>
     <MenuIcon />
   </span>
-));
+);
 
 class ProfileRow extends Component {
   constructor(props) {
@@ -690,11 +689,16 @@ class ProfileRow extends Component {
       </TableCell>
     );
 
+    const { dragRef, dragListeners, dragAttributes, dragStyle } = this.props;
     return (
       <React.Fragment>
-        <TableRow style={{ zIndex: 10000000 }}>
+        <TableRow
+          ref={dragRef}
+          style={{ zIndex: 10000000, ...dragStyle }}
+          {...(dragAttributes || {})}
+        >
           <TableCell>
-            <DragHandle />
+            <DragHandle listeners={dragListeners || {}} />
           </TableCell>
           <TableCell padding="none">
             <Checkbox checked={active} onChange={this.handleActiveCheckbox} />
@@ -873,4 +877,4 @@ class ProfileRow extends Component {
   }
 }
 
-export default SortableElement(withStyles(styles)(ProfileRow));
+export default withStyles(styles)(ProfileRow);

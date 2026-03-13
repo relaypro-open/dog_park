@@ -4,7 +4,6 @@ import Fab from '@mui/material/Fab';
 import { TableCell, TableRow } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { SortableElement } from 'react-sortable-hoc';
 import debounce from 'lodash/debounce';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
@@ -164,4 +163,4 @@ class Ec2SecurityGroupRow extends Component {
   }
 }
 
-export default SortableElement(withStyles(styles)(Ec2SecurityGroupRow));
+export default withStyles(styles)(Ec2SecurityGroupRow);

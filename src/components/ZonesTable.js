@@ -9,7 +9,7 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
-import { pure } from 'recompose';
+
 
 const styles = (theme) => ({
   root: {
@@ -22,7 +22,7 @@ const styles = (theme) => ({
   },
 });
 
-const ZonesTable = pure((props) => {
+const ZonesTable = React.memo((props) => {
   const { classes, zones } = props;
 
   return (

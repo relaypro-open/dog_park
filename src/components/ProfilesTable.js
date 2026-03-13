@@ -1,5 +1,4 @@
 import React from 'react';
-import moment from 'moment';
 import { withStyles } from '@mui/styles';
 import withRouter from '../withRouter';
 import {
@@ -10,7 +9,7 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
-import { pure } from 'recompose';
+
 
 const styles = theme => ({
   root: {
@@ -23,7 +22,7 @@ const styles = theme => ({
   },
 });
 
-const ProfilesTable = pure(props => {
+const ProfilesTable = React.memo(props => {
   const { classes, profiles } = props;
 
   return (
@@ -48,7 +47,7 @@ const ProfilesTable = pure(props => {
               >
                 <TableCell>{profile}</TableCell>
                 <TableCell>{profiles[profile][0].id}</TableCell>
-                <TableCell>{moment(profiles[profile][0].created * 1000).format()}</TableCell>
+                <TableCell>{new Date(profiles[profile][0].created * 1000).toISOString()}</TableCell>
               </TableRow>
             );
           })}

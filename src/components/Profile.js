@@ -34,8 +34,22 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import { SortableContainer } from 'react-sortable-hoc';
-import arrayMove from 'array-move';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import update from 'immutability-helper';
 
 const styles = (theme) => ({
@@ -74,80 +88,93 @@ const styles = (theme) => ({
   },
 });
 
-const TableBodySortable = SortableContainer(
-  ({
-    children,
-    ruleType,
-    environments,
-    environmentAdd,
-    groups,
-    services,
-    zones,
-    handleActiveCheckbox,
-    handleTypeSelect,
-    handleIntfSelect,
-    handleEnvironmentSelect,
-    handleGroupSelect,
-    handleGroupTypeSelect,
-    handleServiceSelect,
-    handleActionSelect,
-    handleLogCheckbox,
-    handleLogPrefixInput,
-    handleCommentInput,
-    handleConnLimitAboveInput,
-    handleConnLimitMaskInput,
-    handleRecentNameInput,
-    handleRecentMaskInput,
-    handleSecondsInput,
-    handleHitCountInput,
-    handleAddProfile,
-    handleRemoveProfile,
-    handleStatesSelection,
-  }) => {
-    return (
-      <TableBody>
-        {children.map((row, index) => {
-          return (
-            <ProfileRow
-              index={index}
-              key={'profileTable' + index}
-              pIndex={index}
-              ruleType={ruleType}
-              data={row}
-              environments={environments}
-              environmentAdd={environmentAdd}
-              groups={groups}
-              zones={zones}
-              services={services}
-              handleActiveCheckbox={handleActiveCheckbox}
-              handleTypeSelect={handleTypeSelect}
-              handleIntfSelect={handleIntfSelect}
-              handleEnvironmentSelect={handleEnvironmentSelect}
-              handleGroupSelect={handleGroupSelect}
-              handleGroupTypeSelect={handleGroupTypeSelect}
-              handleServiceSelect={handleServiceSelect}
-              handleActionSelect={handleActionSelect}
-              handleLogCheckbox={handleLogCheckbox}
-              handleLogPrefixInput={handleLogPrefixInput}
-              handleCommentInput={handleCommentInput}
-              handleConnLimitAboveInput={handleConnLimitAboveInput}
-              handleConnLimitMaskInput={handleConnLimitMaskInput}
-              handleRecentNameInput={handleRecentNameInput}
-              handleRecentMaskInput={handleRecentMaskInput}
-              handleSecondsInput={handleSecondsInput}
-              handleHitCountInput={handleHitCountInput}
-              handleAddProfile={handleAddProfile}
-              handleRemoveProfile={handleRemoveProfile}
-              handleStatesSelection={handleStatesSelection}
-            />
-          );
-        })}
-      </TableBody>
-    );
-  }
-);
+const SortableProfileRow = ({ id, pIndex, data, ...rowProps }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+  const style = { transform: CSS.Transform.toString(transform), transition };
+  return (
+    <ProfileRow
+      pIndex={pIndex}
+      data={data}
+      dragRef={setNodeRef}
+      dragListeners={listeners}
+      dragAttributes={attributes}
+      dragStyle={style}
+      {...rowProps}
+    />
+  );
+};
 
-TableBodySortable.muiName = 'TableBody';
+const TableBodySortable = ({
+  children,
+  onSortEnd,
+  ruleType,
+  environments,
+  environmentAdd,
+  groups,
+  services,
+  zones,
+  handleActiveCheckbox,
+  handleTypeSelect,
+  handleIntfSelect,
+  handleEnvironmentSelect,
+  handleGroupSelect,
+  handleGroupTypeSelect,
+  handleServiceSelect,
+  handleActionSelect,
+  handleLogCheckbox,
+  handleLogPrefixInput,
+  handleCommentInput,
+  handleConnLimitAboveInput,
+  handleConnLimitMaskInput,
+  handleRecentNameInput,
+  handleRecentMaskInput,
+  handleSecondsInput,
+  handleHitCountInput,
+  handleAddProfile,
+  handleRemoveProfile,
+  handleStatesSelection,
+}) => {
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+  const ids = children.map((_, i) => i);
+
+  const handleDragEnd = ({ active, over }) => {
+    if (over && active.id !== over.id) {
+      onSortEnd({ oldIndex: active.id, newIndex: over.id });
+    }
+  };
+
+  const rowProps = {
+    ruleType, environments, environmentAdd, groups, services, zones,
+    handleActiveCheckbox, handleTypeSelect, handleIntfSelect,
+    handleEnvironmentSelect, handleGroupSelect, handleGroupTypeSelect,
+    handleServiceSelect, handleActionSelect, handleLogCheckbox,
+    handleLogPrefixInput, handleCommentInput, handleConnLimitAboveInput,
+    handleConnLimitMaskInput, handleRecentNameInput, handleRecentMaskInput,
+    handleSecondsInput, handleHitCountInput, handleAddProfile,
+    handleRemoveProfile, handleStatesSelection,
+  };
+
+  return (
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <SortableContext items={ids} strategy={verticalListSortingStrategy}>
+        <TableBody>
+          {children.map((row, index) => (
+            <SortableProfileRow
+              key={'profileTable' + index}
+              id={index}
+              pIndex={index}
+              data={row}
+              {...rowProps}
+            />
+          ))}
+        </TableBody>
+      </SortableContext>
+    </DndContext>
+  );
+};
 
 class Profile extends Component {
   constructor(props) {
@@ -1000,7 +1027,6 @@ class Profile extends Component {
                 groups={this.props.groups}
                 zones={this.props.zones}
                 services={this.props.services}
-                useDragHandle
                 handleActiveCheckbox={this.handleActiveCheckbox}
                 handleTypeSelect={this.handleTypeSelect}
                 handleIntfSelect={this.handleIntfSelect}
@@ -1056,7 +1082,6 @@ class Profile extends Component {
                 groups={this.props.groups}
                 zones={this.props.zones}
                 services={this.props.services}
-                useDragHandle
                 handleActiveCheckbox={this.handleActiveCheckbox}
                 handleTypeSelect={this.handleTypeSelect}
                 handleIntfSelect={this.handleIntfSelect}
