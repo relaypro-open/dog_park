@@ -1,31 +1,24 @@
 import { api } from '../api';
-import { createActions } from 'redux-actions';
+import { createAction } from '@reduxjs/toolkit';
 
-export const {
-  zonesHasErrored,
-  zonesIsLoading,
-  zonesFetchDataSuccess,
-} = createActions(
-  {},
-  'ZONES_HAS_ERRORED',
-  'ZONES_IS_LOADING',
-  'ZONES_FETCH_DATA_SUCCESS'
-);
+export const zonesHasErrored = createAction('ZONES_HAS_ERRORED');
+export const zonesIsLoading = createAction('ZONES_IS_LOADING');
+export const zonesFetchDataSuccess = createAction('ZONES_FETCH_DATA_SUCCESS');
 
-export function zonesFetchData(zoneId) {
-  return dispatch => {
+export function zonesFetchData() {
+  return (dispatch) => {
     dispatch(zonesIsLoading(true));
 
     api
       .get('zones')
-      .then(response => {
+      .then((response) => {
         if (response.status !== 200) {
           throw Error(response.statusText);
         }
         dispatch(zonesIsLoading(false));
         return response.data;
       })
-      .then(zones => dispatch(zonesFetchDataSuccess(zones)))
+      .then((zones) => dispatch(zonesFetchDataSuccess(zones)))
       .catch(() => dispatch(zonesHasErrored(true)));
   };
 }

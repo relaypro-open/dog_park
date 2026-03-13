@@ -1,20 +1,15 @@
 import { api } from '../api';
-import { createActions } from 'redux-actions';
+import { createAction } from '@reduxjs/toolkit';
 import { profilesIsLoading } from './profiles';
 import { environmentsIsLoading } from './environments';
 
-export const {
-  groupsIsLoading,
-  groupsHasErrored,
-  groupsFetchDataSuccess,
-} = createActions(
-  {
-    GROUPS_FETCH_DATA_SUCCESS: (groups, profiles, environments) => {
-      return { groups: groups, profiles: profiles, environments: environments};
-    },
-  },
-  'GROUPS_IS_LOADING',
-  'GROUPS_HAS_ERRORED',
+export const groupsIsLoading = createAction('GROUPS_IS_LOADING');
+export const groupsHasErrored = createAction('GROUPS_HAS_ERRORED');
+export const groupsFetchDataSuccess = createAction(
+  'GROUPS_FETCH_DATA_SUCCESS',
+  (groups, profiles, environments) => ({
+    payload: { groups, profiles, environments },
+  })
 );
 
 export function groupsFetchData() {
@@ -25,7 +20,7 @@ export function groupsFetchData() {
 
     api
       .get('groups')
-      .then(response => {
+      .then((response) => {
         if (response.status !== 200) {
           throw Error(response.statusText);
         }
@@ -34,7 +29,9 @@ export function groupsFetchData() {
         dispatch(groupsIsLoading(false));
         return response.data;
       })
-      .then(groups => dispatch(groupsFetchDataSuccess(groups, profiles, environments)))
+      .then((groups) =>
+        dispatch(groupsFetchDataSuccess(groups, profiles, environments))
+      )
       .catch(() => dispatch(groupsHasErrored(true)));
   };
 }

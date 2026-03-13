@@ -1,10 +1,4 @@
-import { handleAction } from 'redux-actions';
-
-export const selectedTab = handleAction(
-  'HANDLE_SELECTED_TAB',
-  (state, action) => {
-    return action.payload;
-  },
-  0
-);
-
+export function selectedTab(state = 0, action) {
+  if (action.type === 'HANDLE_SELECTED_TAB') return action.payload;
+  return state;
+}

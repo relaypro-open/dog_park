@@ -1,31 +1,23 @@
 import { api } from '../api';
-import { createActions } from 'redux-actions';
+import { createAction } from '@reduxjs/toolkit';
 
-export const {
-  groupHasErrored,
-  groupIsLoading,
-  groupFetchDataSuccess,
-} = createActions(
-  {},
-  'GROUP_HAS_ERRORED',
-  'GROUP_IS_LOADING',
-  'GROUP_FETCH_DATA_SUCCESS'
-);
+export const groupHasErrored = createAction('GROUP_HAS_ERRORED');
+export const groupIsLoading = createAction('GROUP_IS_LOADING');
+export const groupFetchDataSuccess = createAction('GROUP_FETCH_DATA_SUCCESS');
 
-//get group
 export function groupFetchData(groupId) {
-  return dispatch => {
+  return (dispatch) => {
     dispatch(groupIsLoading(true));
 
     api
       .get('group/' + groupId)
-      .then(response => {
+      .then((response) => {
         if (response.status !== 200) {
           throw Error(response.statusText);
         }
         return response.data;
       })
-      .then(group => {
+      .then((group) => {
         dispatch(groupIsLoading(false));
         dispatch(groupFetchDataSuccess(group));
       })
