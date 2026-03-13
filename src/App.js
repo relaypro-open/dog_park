@@ -5,9 +5,10 @@ import logo from './dog-segmented-green.network-200x200.png';
 import './App.css';
 import { Routes, Route, Link } from 'react-router-dom';
 import withRouter from './withRouter';
-import { MuiThemeProvider, withStyles } from '@material-ui/core/styles';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import MomentUtils from '@date-io/moment';
+import { ThemeProvider } from '@mui/material/styles';
+import { withStyles } from '@mui/styles';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { dogTheme } from './styles/muiTheme';
 import {
   AppBar,
@@ -19,19 +20,19 @@ import {
   IconButton,
   Tooltip,
   CircularProgress,
-} from '@material-ui/core';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
+} from '@mui/material';
+import ListSubheader from '@mui/material/ListSubheader';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
 import CreateGroup from './components/CreateGroup';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 
 //icons
-import MenuIcon from '@material-ui/icons/Menu';
-import AddIcon from '@material-ui/icons/Add';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import MenuIcon from '@mui/icons-material/Menu';
+import AddIcon from '@mui/icons-material/Add';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Groups from './components/Groups';
 import Group from './components/Group';
 import Profiles from './components/Profiles';
@@ -308,8 +309,8 @@ class App extends Component {
     return (
       <div className="App">
         <div>
-          <MuiThemeProvider theme={dogTheme}>
-            <MuiPickersUtilsProvider utils={MomentUtils} theme={dogTheme}>
+          <ThemeProvider theme={dogTheme}>
+            <LocalizationProvider dateAdapter={AdapterMoment}>
               <div className={classes.appFrame}>
                 <AppBar
                   className={classNames(classes.appBar, {
@@ -395,8 +396,8 @@ class App extends Component {
                   </Routes>
                 </main>
               </div>
-            </MuiPickersUtilsProvider>
-          </MuiThemeProvider>
+            </LocalizationProvider>
+          </ThemeProvider>
         </div>
       </div>
     );

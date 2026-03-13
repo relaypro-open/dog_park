@@ -1,6 +1,6 @@
 import React from 'react';
 import withRouter from '../withRouter';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@mui/styles';
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableHead,
   TableRow,
   Paper,
-} from '@material-ui/core';
+} from '@mui/material';
 import GitChanges from './GitChanges';
 import { pure } from 'recompose';
 

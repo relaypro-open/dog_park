@@ -1,11 +1,11 @@
-import { createMuiTheme } from '@material-ui/core/styles';
-//import indigo from '@material-ui/core/colors/indigo';
-//import pink from '@material-ui/core/colors/pink';
-import red from '@material-ui/core/colors/red';
+import { createTheme } from '@mui/material/styles';
+//import indigo from '@mui/material/colors/indigo';
+//import pink from '@mui/material/colors/pink';
+import red from '@mui/material/colors/red';
 
 // All the following keys are optional.
 // We try our best to provide a great default value.
-export const dogTheme = createMuiTheme({
+export const dogTheme = createTheme({
   palette: {
     primary: {
       main: '#212121',

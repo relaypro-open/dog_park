@@ -1,6 +1,6 @@
 import React from 'react';
 import withRouter from '../withRouter';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@mui/styles';
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   Collapse,
   IconButton,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 import {
   CloudOff,
   Check,
@@ -19,7 +19,7 @@ import {
   Help,
   ExpandLess,
   ExpandMore,
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import { pure } from 'recompose';
 
 const styles = (theme) => ({

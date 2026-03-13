@@ -9,26 +9,25 @@ import { hostsFetchData } from '../actions/hosts';
 import { servicesFetchData } from '../actions/services';
 import { linksFetchData } from '../actions/links';
 import { handleSelectedTab } from '../actions/app';
-import { withStyles } from '@material-ui/core/styles';
-import { CircularProgress } from '@material-ui/core';
+import { withStyles } from '@mui/styles';
+import { CircularProgress } from '@mui/material';
 import ServicesTable from './ServicesTable';
-import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Fab from '@material-ui/core/Fab';
+import Button from '@mui/material/Button';
+import AddIcon from '@mui/icons-material/Add';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Fab from '@mui/material/Fab';
 import validator from 'validator';
 
 const styles = (theme) => ({
   root: {
-    ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
     maxWidth: 700,

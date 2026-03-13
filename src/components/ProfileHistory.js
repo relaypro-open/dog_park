@@ -1,6 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@mui/styles';
 import withRouter from '../withRouter';
 import {
   Table,
@@ -9,8 +9,8 @@ import {
   TableHead,
   TableRow,
   Paper,
-} from '@material-ui/core';
-import { CircularProgress } from '@material-ui/core';
+} from '@mui/material';
+import { CircularProgress } from '@mui/material';
 
 const styles = theme => ({
   root: {

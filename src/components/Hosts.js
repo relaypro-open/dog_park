@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
 import HostsTable from './HostsTable';
 import { handleSelectedTab } from '../actions/app';
 
