@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { api } from '../api';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
-import { withRouter } from 'react-router-dom';
+import withRouter from '../withRouter';
 import { CircularProgress, Button, Fab } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';

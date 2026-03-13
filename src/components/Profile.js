@@ -9,7 +9,7 @@ import { linksFetchData } from '../actions/links';
 import { handleSelectedTab } from '../actions/app';
 import ProfileRow from './ProfileRow';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import withRouter from '../withRouter';
 import { withStyles } from '@material-ui/core/styles';
 import { CircularProgress, Button } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 //import { api } from '../api';
 import { withStyles } from '@material-ui/core/styles';
+import withRouter from '../withRouter';
 import { linksFetchData } from '../actions/links';
 import { handleSelectedTab } from '../actions/app';
 import { CircularProgress } from '@material-ui/core';
@@ -126,4 +127,4 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(Links));
+)(withRouter(withStyles(styles)(Links)));

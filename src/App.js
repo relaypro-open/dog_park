@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import classNames from 'classnames';
 import logo from './dog-segmented-green.network-200x200.png';
 import './App.css';
-import { withRouter, Link, Route } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
+import withRouter from './withRouter';
 import { MuiThemeProvider, withStyles } from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
@@ -201,25 +202,25 @@ class App extends Component {
   handleTabChange = (event, value) => {
     switch (value) {
       case 0:
-        this.props.history.push('/groups');
+        this.props.navigate('/groups');
         break;
       case 1:
-        this.props.history.push('/profiles');
+        this.props.navigate('/profiles');
         break;
       case 2:
-        this.props.history.push('/services');
+        this.props.navigate('/services');
         break;
       case 3:
-        this.props.history.push('/hosts');
+        this.props.navigate('/hosts');
         break;
       case 4:
-        this.props.history.push('/zones');
+        this.props.navigate('/zones');
         break;
       case 5:
-        this.props.history.push('/links');
+        this.props.navigate('/links');
         break;
       default:
-        this.props.history.push('/groups');
+        this.props.navigate('/groups');
     }
     this.props.handleSelectedTab(value);
   };
@@ -237,7 +238,7 @@ class App extends Component {
   };
 
   handleAddGroup = () => {
-    this.props.history.push('/createGroup');
+    this.props.navigate('/createGroup');
   };
 
   render() {
@@ -275,7 +276,7 @@ class App extends Component {
           <Tooltip id="tooltip-fab" title="Add Group">
             <IconButton
               onClick={() => {
-                this.props.history.push('/createGroup');
+                this.props.navigate('/createGroup');
               }}
             >
               <AddIcon />
@@ -374,26 +375,24 @@ class App extends Component {
                   )}
                 >
                   <div className={classes.drawerHeader} />
-                  <Route exact={true} path="/" component={Groups} />
-                  <Route exact={true} path="/groups" component={Groups} />
-                  <Route path="/group/:id" component={Group} />
-                  <Route path="/groupByName/:id" component={Group} />
-                  <Route exact={true} path="/profiles" component={Profiles} />
-                  <Route exact={true} path="/zones" component={Zones} />
-                  <Route
-                    exact={true}
-                    path="/createGroup"
-                    component={CreateGroup}
-                  />
-                  <Route path="/profile/:id" component={Profile} />
-                  <Route path="/zone/:id" component={Zone} />
-                  <Route exact={true} path="/hosts" component={Hosts} />
-                  <Route path="/host/:id" component={Host} />
-                  <Route exact={true} path="/services" component={Services} />
-                  <Route path="/service/:id" component={Service} />
-                  <Route exact={true} path="/links" component={Links} />
-                  <Route path="/link/:id" component={EnvLink} />
-                  <Route exact={true} path="/link" component={EnvLink} />
+                  <Routes>
+                    <Route path="/" element={<Groups />} />
+                    <Route path="/groups" element={<Groups />} />
+                    <Route path="/group/:id" element={<Group />} />
+                    <Route path="/groupByName/:id" element={<Group />} />
+                    <Route path="/profiles" element={<Profiles />} />
+                    <Route path="/zones" element={<Zones />} />
+                    <Route path="/createGroup" element={<CreateGroup />} />
+                    <Route path="/profile/:id" element={<Profile />} />
+                    <Route path="/zone/:id" element={<Zone />} />
+                    <Route path="/hosts" element={<Hosts />} />
+                    <Route path="/host/:id" element={<Host />} />
+                    <Route path="/services" element={<Services />} />
+                    <Route path="/service/:id" element={<Service />} />
+                    <Route path="/links" element={<Links />} />
+                    <Route path="/link/:id" element={<EnvLink />} />
+                    <Route path="/link" element={<EnvLink />} />
+                  </Routes>
                 </main>
               </div>
             </MuiPickersUtilsProvider>

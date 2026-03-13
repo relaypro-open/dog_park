@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter } from 'react-router';
+import withRouter from '../withRouter';
 import { withStyles } from '@material-ui/core/styles';
 import {
   Table,

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
+import withRouter from '../withRouter';
 import { withStyles } from '@material-ui/core/styles';
 import { api } from '../api';
 import { groupsFetchData } from '../actions/groups';

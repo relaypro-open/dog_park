@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { api } from '../api';
 import { withStyles } from '@material-ui/core/styles';
+import withRouter from '../withRouter';
 import { groupsFetchData } from '../actions/groups';
 import { profilesFetchData } from '../actions/profiles';
 import { zonesFetchData } from '../actions/zones';
@@ -268,4 +269,4 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(Profiles));
+)(withRouter(withStyles(styles)(Profiles)));

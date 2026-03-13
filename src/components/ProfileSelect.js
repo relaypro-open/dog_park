@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import { withRouter } from 'react-router';
+import withRouter from '../withRouter';
 import {
   Table,
   TableBody,

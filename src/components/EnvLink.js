@@ -3,7 +3,7 @@ import { api } from '../api';
 import { linksFetchData } from '../actions/links';
 import { handleSelectedTab } from '../actions/app';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import withRouter from '../withRouter';
 import { withStyles } from '@material-ui/core/styles';
 import { CircularProgress, Button } from '@material-ui/core';
 import Select from '@material-ui/core/Select';
