@@ -1,36 +1,33 @@
 import React, { Component } from 'react';
 import { api } from '../api';
 import { groupsFetchData } from '../actions/groups';
-import { flanIpsFetchData } from '../actions/flan_ips';
 import { profilesFetchData } from '../actions/profiles';
 import { zonesFetchData } from '../actions/zones';
 import { hostsFetchData } from '../actions/hosts';
 import { servicesFetchData } from '../actions/services';
 import { linksFetchData } from '../actions/links';
 import { handleSelectedTab } from '../actions/app';
-import FlanApp from './FlanApp';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { withStyles } from '@material-ui/core/styles';
-import { CircularProgress, Button } from '@material-ui/core';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import DeleteIcon from '@material-ui/icons/Delete';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Snackbar from '@material-ui/core/Snackbar';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import { CloudOff, Check, Error, Help } from '@material-ui/icons';
+import withRouter from '../withRouter';
+import { withStyles } from '@mui/styles';
+import { CircularProgress, Button } from '@mui/material';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Snackbar from '@mui/material/Snackbar';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import { CloudOff, Check, Error, Help } from '@mui/icons-material';
 
 const styles = (theme) => ({
   root: {
-    ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
     maxWidth: '100%',
@@ -341,8 +338,7 @@ class Host extends Component {
     if (
       this.state.isLoading ||
       this.props.groupsIsLoading ||
-      this.state.isDeleting ||
-      this.props.flanIpsIsLoading
+      this.state.isDeleting
     ) {
       return (
         <div>
@@ -352,7 +348,7 @@ class Host extends Component {
       );
     }
 
-    const { classes, flanIps } = this.props;
+    const { classes } = this.props;
 
     const groups = this.props.groups.groupList.map((group) => {
       return (
@@ -361,23 +357,6 @@ class Host extends Component {
         </MenuItem>
       );
     });
-
-    let flanApps = [];
-    let hostName = this.state.hostName;
-
-    if (
-      !hostName.includes('.phonebooth.net') &&
-      !hostName.includes('.phoneboothdev.info')
-    ) {
-      if (hostName.includes('-qa-')) {
-        hostName = hostName + '.phoneboothdev.info';
-      } else if (hostName.includes('-pro-')) {
-        hostName = hostName + '.phonebooth.net';
-      }
-    }
-    if (hostName in flanIps.hosts) {
-      flanApps = flanIps.hosts[hostName];
-    }
 
     let activeIcon = null;
 
@@ -584,27 +563,6 @@ class Host extends Component {
             </IconButton>,
           ]}
         />
-        <br />
-        <br />
-        <br />
-        <Typography variant="subtitle1">
-          <strong>Flan Discovered Apps</strong>
-        </Typography>
-        <br />
-
-        {flanApps.map((a) => (
-          <div>
-            <FlanApp
-              key={'appkey_' + a.app}
-              app={a.app}
-              ip={a.ip}
-              port={a.port}
-              vulns={a.vulns}
-              certs={a.certs}
-            />
-            <br />
-          </div>
-        ))}
       </div>
     );
   }
@@ -615,16 +573,12 @@ const mapStateToProps = (state) => {
     groups: state.groups,
     groupsHasErrored: state.groupsHasErrored,
     groupsIsLoading: state.groupsIsLoading,
-    flanIps: state.flanIps,
-    flanIpsHasErrored: state.flanIpsHasErrored,
-    flanIpsIsLoading: state.flanIpsIsLoading,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchGroups: () => dispatch(groupsFetchData()),
-    fetchFlanIps: () => dispatch(flanIpsFetchData()),
     fetchProfiles: () => dispatch(profilesFetchData()),
     fetchZones: () => dispatch(zonesFetchData()),
     fetchHosts: () => dispatch(hostsFetchData()),

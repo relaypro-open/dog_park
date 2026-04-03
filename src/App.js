@@ -3,11 +3,9 @@ import { connect } from 'react-redux';
 import classNames from 'classnames';
 import logo from './dog-segmented-green.network-200x200.png';
 import './App.css';
-import { withRouter, Link, Route } from 'react-router-dom';
-import { MuiThemeProvider, withStyles } from '@material-ui/core/styles';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import MomentUtils from '@date-io/moment';
-import { dogTheme } from './styles/muiTheme';
+import { Routes, Route, Link } from 'react-router-dom';
+import withRouter from './withRouter';
+import { withStyles } from '@mui/styles';
 import {
   AppBar,
   Toolbar,
@@ -18,23 +16,19 @@ import {
   IconButton,
   Tooltip,
   CircularProgress,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from '@material-ui/core';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
+} from '@mui/material';
+import ListSubheader from '@mui/material/ListSubheader';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
 import CreateGroup from './components/CreateGroup';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 
 //icons
-import MenuIcon from '@material-ui/icons/Menu';
-import AddIcon from '@material-ui/icons/Add';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import MenuIcon from '@mui/icons-material/Menu';
+import AddIcon from '@mui/icons-material/Add';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Groups from './components/Groups';
 import Group from './components/Group';
 import Profiles from './components/Profiles';
@@ -45,22 +39,17 @@ import Service from './components/Service';
 import Hosts from './components/Hosts';
 import Services from './components/Services';
 import Host from './components/Host';
-import Vulnerabilities from './components/Vulnerabilities';
-import Certificates from './components/Certificates';
-import AWSCertificates from './components/AWSCertificates';
 import Links from './components/Links';
 import EnvLink from './components/EnvLink';
 
 //redux store
 import { groupsFetchData } from './actions/groups';
-import { flanIpsFetchData } from './actions/flan_ips';
 import { profilesFetchData } from './actions/profiles';
 import { zonesFetchData } from './actions/zones';
 import { hostsFetchData } from './actions/hosts';
 import { servicesFetchData } from './actions/services';
 import { linksFetchData } from './actions/links';
 import { handleSelectedTab } from './actions/app';
-import { handleSelectedScanLocation } from './actions/app';
 
 const drawerWidth = 240;
 
@@ -71,10 +60,14 @@ const styles = (theme) => ({
   appFrame: {
     height: '100%',
     zIndex: 1,
-    overflow: 'scroll',
+    overflow: 'hidden',
     position: 'relative',
     display: 'flex',
     width: '100%',
+  },
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
   },
   appBar: {
     position: 'fixed',
@@ -173,13 +166,6 @@ const styles = (theme) => ({
   flex: {
     flexGrow: 1,
   },
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
 });
 
 class App extends Component {
@@ -206,16 +192,6 @@ class App extends Component {
     this.props.fetchLinks();
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.scanLocation !== this.props.scanLocation) {
-      this.props.fetchFlanIps();
-    }
-  }
-
-  handleChange = (event) => {
-    this.props.handleSelectedScanLocation(event.target.value);
-  };
-
   handleDrawerOpen = () => {
     this.setState({ sideBarActive: true });
   };
@@ -227,34 +203,25 @@ class App extends Component {
   handleTabChange = (event, value) => {
     switch (value) {
       case 0:
-        this.props.history.push('/groups');
+        this.props.navigate('/groups');
         break;
       case 1:
-        this.props.history.push('/profiles');
+        this.props.navigate('/profiles');
         break;
       case 2:
-        this.props.history.push('/services');
+        this.props.navigate('/services');
         break;
       case 3:
-        this.props.history.push('/hosts');
+        this.props.navigate('/hosts');
         break;
       case 4:
-        this.props.history.push('/zones');
+        this.props.navigate('/zones');
         break;
       case 5:
-        this.props.history.push('/vulnerabilities');
-        break;
-      case 6:
-        this.props.history.push('/certificates');
-        break;
-      case 7:
-        this.props.history.push('/aws_certificates');
-        break;
-      case 8:
-        this.props.history.push('/links');
+        this.props.navigate('/links');
         break;
       default:
-        this.props.history.push('/groups');
+        this.props.navigate('/groups');
     }
     this.props.handleSelectedTab(value);
   };
@@ -272,7 +239,7 @@ class App extends Component {
   };
 
   handleAddGroup = () => {
-    this.props.history.push('/createGroup');
+    this.props.navigate('/createGroup');
   };
 
   render() {
@@ -284,11 +251,12 @@ class App extends Component {
         </div>
       );
     }
-    const { classes, theme, scanLocation } = this.props;
+    const { classes, theme } = this.props;
     const { sideBarActive } = this.state;
 
     const drawer = (
       <Drawer
+        className={classes.drawer}
         variant="persistent"
         anchor="left"
         open={sideBarActive}
@@ -310,26 +278,13 @@ class App extends Component {
           <Tooltip id="tooltip-fab" title="Add Group">
             <IconButton
               onClick={() => {
-                this.props.history.push('/createGroup');
+                this.props.navigate('/createGroup');
               }}
             >
               <AddIcon />
             </IconButton>
           </Tooltip>
         </div>
-        <Divider />
-        <FormControl className={classes.formControl}>
-          <InputLabel id="scan-location-input">Scan Location</InputLabel>
-          <Select
-            labelId="scan-location-input-label"
-            id="scan-location-input"
-            value={scanLocation}
-            onChange={this.handleChange}
-          >
-            <MenuItem value={'external'}>External</MenuItem>
-            <MenuItem value={'internal'}>Internal</MenuItem>
-          </Select>
-        </FormControl>
         <Divider />
         <List
           component="nav"
@@ -355,9 +310,7 @@ class App extends Component {
     return (
       <div className="App">
         <div>
-          <MuiThemeProvider theme={dogTheme}>
-            <MuiPickersUtilsProvider utils={MomentUtils} theme={dogTheme}>
-              <div className={classes.appFrame}>
+          <div className={classes.appFrame}>
                 <AppBar
                   className={classNames(classes.appBar, {
                     [classes.appBarShift]: sideBarActive,
@@ -389,15 +342,14 @@ class App extends Component {
                       onChange={this.handleTabChange}
                       variant="scrollable"
                       scrollButtons="auto"
+                      textColor="inherit"
+                      indicatorColor="secondary"
                     >
                       <Tab label="Groups" />
                       <Tab label="Profiles" />
                       <Tab label="Services" />
                       <Tab label="Hosts" />
                       <Tab label="Zones" />
-                      <Tab label="Vulnerabilities" />
-                      <Tab label="Certificates" />
-                      <Tab label="AWS Certificates" />
                       <Tab label="Links" />
                     </Tabs>
                     {
@@ -425,45 +377,26 @@ class App extends Component {
                   )}
                 >
                   <div className={classes.drawerHeader} />
-                  <Route exact={true} path="/" component={Groups} />
-                  <Route exact={true} path="/groups" component={Groups} />
-                  <Route path="/group/:id" component={Group} />
-                  <Route path="/groupByName/:id" component={Group} />
-                  <Route exact={true} path="/profiles" component={Profiles} />
-                  <Route exact={true} path="/zones" component={Zones} />
-                  <Route
-                    exact={true}
-                    path="/createGroup"
-                    component={CreateGroup}
-                  />
-                  <Route path="/profile/:id" component={Profile} />
-                  <Route path="/zone/:id" component={Zone} />
-                  <Route exact={true} path="/hosts" component={Hosts} />
-                  <Route path="/host/:id" component={Host} />
-                  <Route exact={true} path="/services" component={Services} />
-                  <Route path="/service/:id" component={Service} />
-                  <Route
-                    exact={true}
-                    path="/vulnerabilities"
-                    component={Vulnerabilities}
-                  />
-                  <Route
-                    exact={true}
-                    path="/certificates"
-                    component={Certificates}
-                  />
-                  <Route
-                    exact={true}
-                    path="/aws_certificates"
-                    component={AWSCertificates}
-                  />
-                  <Route exact={true} path="/links" component={Links} />
-                  <Route path="/link/:id" component={EnvLink} />
-                  <Route exact={true} path="/link" component={EnvLink} />
+                  <Routes>
+                    <Route path="/" element={<Groups />} />
+                    <Route path="/groups" element={<Groups />} />
+                    <Route path="/group/:id" element={<Group />} />
+                    <Route path="/groupByName/:id" element={<Group />} />
+                    <Route path="/profiles" element={<Profiles />} />
+                    <Route path="/zones" element={<Zones />} />
+                    <Route path="/createGroup" element={<CreateGroup />} />
+                    <Route path="/profile/:id" element={<Profile />} />
+                    <Route path="/zone/:id" element={<Zone />} />
+                    <Route path="/hosts" element={<Hosts />} />
+                    <Route path="/host/:id" element={<Host />} />
+                    <Route path="/services" element={<Services />} />
+                    <Route path="/service/:id" element={<Service />} />
+                    <Route path="/links" element={<Links />} />
+                    <Route path="/link/:id" element={<EnvLink />} />
+                    <Route path="/link" element={<EnvLink />} />
+                  </Routes>
                 </main>
-              </div>
-            </MuiPickersUtilsProvider>
-          </MuiThemeProvider>
+            </div>
         </div>
       </div>
     );
@@ -475,22 +408,18 @@ const mapStateToProps = (state) => {
     groups: state.groups,
     hosts: state.hosts,
     selectedTab: state.selectedTab,
-    scanLocation: state.scanLocation,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchGroups: () => dispatch(groupsFetchData()),
-    fetchFlanIps: () => dispatch(flanIpsFetchData()),
     fetchProfiles: () => dispatch(profilesFetchData()),
     fetchZones: () => dispatch(zonesFetchData()),
     fetchHosts: () => dispatch(hostsFetchData()),
     fetchServices: () => dispatch(servicesFetchData()),
     fetchLinks: () => dispatch(linksFetchData()),
     handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
-    handleSelectedScanLocation: (value) =>
-      dispatch(handleSelectedScanLocation(value)),
   };
 };
 

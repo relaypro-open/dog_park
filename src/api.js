@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const api = axios.create({
   //all axios can be used, shown in axios documentation
-  baseURL: process.env.REACT_APP_DOG_API_HOST + '/api/',
+  baseURL: import.meta.env.VITE_DOG_API_HOST + '/api/',
   responseType: 'json',
   headers: {
     Accept: 'application/json',

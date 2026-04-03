@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { api } from '../api';
 import { groupsFetchData } from '../actions/groups';
-import { flanIpsFetchData } from '../actions/flan_ips';
 import { profilesFetchData } from '../actions/profiles';
 import { zonesFetchData } from '../actions/zones';
 import { hostsFetchData } from '../actions/hosts';
@@ -10,33 +9,47 @@ import { linksFetchData } from '../actions/links';
 import { handleSelectedTab } from '../actions/app';
 import ProfileRow from './ProfileRow';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { withStyles } from '@material-ui/core/styles';
-import { CircularProgress, Button } from '@material-ui/core';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import DeleteIcon from '@material-ui/icons/Delete';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import withRouter from '../withRouter';
+import { withStyles } from '@mui/styles';
+import { CircularProgress, Button } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import ProfileHistory from './ProfileHistory';
-import Snackbar from '@material-ui/core/Snackbar';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
+import Snackbar from '@mui/material/Snackbar';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 import IptablesView from './IptablesView';
 import HclView from './HclView';
-import TextField from '@material-ui/core/TextField';
+import TextField from '@mui/material/TextField';
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-} from '@material-ui/core';
-import { SortableContainer } from 'react-sortable-hoc';
-import arrayMove from 'array-move';
+} from '@mui/material';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import update from 'immutability-helper';
 
 const styles = (theme) => ({
@@ -75,80 +88,93 @@ const styles = (theme) => ({
   },
 });
 
-const TableBodySortable = SortableContainer(
-  ({
-    children,
-    ruleType,
-    environments,
-    environmentAdd,
-    groups,
-    services,
-    zones,
-    handleActiveCheckbox,
-    handleTypeSelect,
-    handleIntfSelect,
-    handleEnvironmentSelect,
-    handleGroupSelect,
-    handleGroupTypeSelect,
-    handleServiceSelect,
-    handleActionSelect,
-    handleLogCheckbox,
-    handleLogPrefixInput,
-    handleCommentInput,
-    handleConnLimitAboveInput,
-    handleConnLimitMaskInput,
-    handleRecentNameInput,
-    handleRecentMaskInput,
-    handleSecondsInput,
-    handleHitCountInput,
-    handleAddProfile,
-    handleRemoveProfile,
-    handleStatesSelection,
-  }) => {
-    return (
-      <TableBody>
-        {children.map((row, index) => {
-          return (
-            <ProfileRow
-              index={index}
-              key={'profileTable' + index}
-              pIndex={index}
-              ruleType={ruleType}
-              data={row}
-              environments={environments}
-              environmentAdd={environmentAdd}
-              groups={groups}
-              zones={zones}
-              services={services}
-              handleActiveCheckbox={handleActiveCheckbox}
-              handleTypeSelect={handleTypeSelect}
-              handleIntfSelect={handleIntfSelect}
-              handleEnvironmentSelect={handleEnvironmentSelect}
-              handleGroupSelect={handleGroupSelect}
-              handleGroupTypeSelect={handleGroupTypeSelect}
-              handleServiceSelect={handleServiceSelect}
-              handleActionSelect={handleActionSelect}
-              handleLogCheckbox={handleLogCheckbox}
-              handleLogPrefixInput={handleLogPrefixInput}
-              handleCommentInput={handleCommentInput}
-              handleConnLimitAboveInput={handleConnLimitAboveInput}
-              handleConnLimitMaskInput={handleConnLimitMaskInput}
-              handleRecentNameInput={handleRecentNameInput}
-              handleRecentMaskInput={handleRecentMaskInput}
-              handleSecondsInput={handleSecondsInput}
-              handleHitCountInput={handleHitCountInput}
-              handleAddProfile={handleAddProfile}
-              handleRemoveProfile={handleRemoveProfile}
-              handleStatesSelection={handleStatesSelection}
-            />
-          );
-        })}
-      </TableBody>
-    );
-  }
-);
+const SortableProfileRow = ({ id, pIndex, data, ...rowProps }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+  const style = { transform: CSS.Transform.toString(transform), transition };
+  return (
+    <ProfileRow
+      pIndex={pIndex}
+      data={data}
+      dragRef={setNodeRef}
+      dragListeners={listeners}
+      dragAttributes={attributes}
+      dragStyle={style}
+      {...rowProps}
+    />
+  );
+};
 
-TableBodySortable.muiName = 'TableBody';
+const TableBodySortable = ({
+  children,
+  onSortEnd,
+  ruleType,
+  environments,
+  environmentAdd,
+  groups,
+  services,
+  zones,
+  handleActiveCheckbox,
+  handleTypeSelect,
+  handleIntfSelect,
+  handleEnvironmentSelect,
+  handleGroupSelect,
+  handleGroupTypeSelect,
+  handleServiceSelect,
+  handleActionSelect,
+  handleLogCheckbox,
+  handleLogPrefixInput,
+  handleCommentInput,
+  handleConnLimitAboveInput,
+  handleConnLimitMaskInput,
+  handleRecentNameInput,
+  handleRecentMaskInput,
+  handleSecondsInput,
+  handleHitCountInput,
+  handleAddProfile,
+  handleRemoveProfile,
+  handleStatesSelection,
+}) => {
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+  const ids = children.map((_, i) => i);
+
+  const handleDragEnd = ({ active, over }) => {
+    if (over && active.id !== over.id) {
+      onSortEnd({ oldIndex: active.id, newIndex: over.id });
+    }
+  };
+
+  const rowProps = {
+    ruleType, environments, environmentAdd, groups, services, zones,
+    handleActiveCheckbox, handleTypeSelect, handleIntfSelect,
+    handleEnvironmentSelect, handleGroupSelect, handleGroupTypeSelect,
+    handleServiceSelect, handleActionSelect, handleLogCheckbox,
+    handleLogPrefixInput, handleCommentInput, handleConnLimitAboveInput,
+    handleConnLimitMaskInput, handleRecentNameInput, handleRecentMaskInput,
+    handleSecondsInput, handleHitCountInput, handleAddProfile,
+    handleRemoveProfile, handleStatesSelection,
+  };
+
+  return (
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <SortableContext items={ids} strategy={verticalListSortingStrategy}>
+        <TableBody>
+          {children.map((row, index) => (
+            <SortableProfileRow
+              key={'profileTable' + index}
+              id={index}
+              pIndex={index}
+              data={row}
+              {...rowProps}
+            />
+          ))}
+        </TableBody>
+      </SortableContext>
+    </DndContext>
+  );
+};
 
 class Profile extends Component {
   constructor(props) {
@@ -1001,7 +1027,6 @@ class Profile extends Component {
                 groups={this.props.groups}
                 zones={this.props.zones}
                 services={this.props.services}
-                useDragHandle
                 handleActiveCheckbox={this.handleActiveCheckbox}
                 handleTypeSelect={this.handleTypeSelect}
                 handleIntfSelect={this.handleIntfSelect}
@@ -1057,7 +1082,6 @@ class Profile extends Component {
                 groups={this.props.groups}
                 zones={this.props.zones}
                 services={this.props.services}
-                useDragHandle
                 handleActiveCheckbox={this.handleActiveCheckbox}
                 handleTypeSelect={this.handleTypeSelect}
                 handleIntfSelect={this.handleIntfSelect}
@@ -1291,7 +1315,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchGroups: () => dispatch(groupsFetchData()),
-    fetchFlanIps: () => dispatch(flanIpsFetchData()),
+
     fetchProfiles: () => dispatch(profilesFetchData()),
     fetchZones: () => dispatch(zonesFetchData()),
     fetchHosts: () => dispatch(hostsFetchData()),

@@ -1,6 +1,6 @@
 import React from 'react';
-import { withRouter } from 'react-router';
-import { withStyles } from '@material-ui/core/styles';
+import withRouter from '../withRouter';
+import { withStyles } from '@mui/styles';
 import {
   Table,
   TableBody,
@@ -8,10 +8,9 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Avatar,
-} from '@material-ui/core';
+} from '@mui/material';
 import GitChanges from './GitChanges';
-import { pure } from 'recompose';
+
 
 const styles = (theme) => ({
   root: {
@@ -22,19 +21,10 @@ const styles = (theme) => ({
   table: {
     width: '100%',
   },
-  high: {
-    backgroundColor: '#FD6864',
-  },
-  medium: {
-    backgroundColor: '#F8A102',
-  },
-  low: {
-    backgroundColor: '#34CDF9',
-  },
 });
 
-const GroupsTable = pure((props) => {
-  const { classes, groups, flanIps } = props;
+const GroupsTable = React.memo((props) => {
+  const { classes, groups } = props;
 
   return (
     <Paper className={classes.root}>
@@ -47,9 +37,7 @@ const GroupsTable = pure((props) => {
             <TableCell>Profile ID</TableCell>
             <TableCell>Profile Version</TableCell>
             <TableCell>Profile Status</TableCell>
-            <TableCell>Hosts</TableCell>
             <TableCell>Changes</TableCell>
-            <TableCell>Flan Events</TableCell>
             <TableCell>Dog Validation</TableCell>
           </TableRow>
         </TableHead>
@@ -57,9 +45,6 @@ const GroupsTable = pure((props) => {
           {groups.map((group) => {
             let profileStatus = '';
             let gitChanges = '';
-            let groupHostCount = 0;
-            let flanEventCount = 0;
-            let flanEvent = '';
             if (group.hasUpdated) {
               profileStatus = (
                 <font color="red">
@@ -72,24 +57,6 @@ const GroupsTable = pure((props) => {
                   profile1={group.currentProfileId}
                   profile2={group.profile_id}
                 />
-              );
-            }
-            if (group.name in flanIps.groups) {
-              groupHostCount = flanIps.groups[group.name].length;
-              if (flanIps.groups[group.name].length > 0) {
-                flanIps.groups[group.name].forEach((host) => {
-                  host[Object.keys(host)[0]].forEach((app) => {
-                    flanEventCount += app['vulns'].length;
-                  });
-                });
-              }
-            }
-
-            if (flanEventCount > 0) {
-              flanEvent = (
-                <Avatar aria-label="recipe" className={classes.high}>
-                  {flanEventCount}
-                </Avatar>
               );
             }
             return (
@@ -116,9 +83,7 @@ const GroupsTable = pure((props) => {
                 <TableCell>{group.profile_id}</TableCell>
                 <TableCell>{group.profile_version}</TableCell>
                 <TableCell>{profileStatus}</TableCell>
-                <TableCell>{groupHostCount}</TableCell>
                 <TableCell>{gitChanges}</TableCell>
-                <TableCell>{flanEvent}</TableCell>
                 <TableCell></TableCell>
               </TableRow>
             );

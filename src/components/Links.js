@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 //import { api } from '../api';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@mui/styles';
+import withRouter from '../withRouter';
 import { linksFetchData } from '../actions/links';
 import { handleSelectedTab } from '../actions/app';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
 import LinksTable from './LinksTable';
-import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
-import Fab from '@material-ui/core/Fab';
+import Button from '@mui/material/Button';
+import AddIcon from '@mui/icons-material/Add';
+import Fab from '@mui/material/Fab';
 
 const styles = (theme) => ({
   root: {
-    ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
     maxWidth: 700,
@@ -53,7 +53,7 @@ class Links extends Component {
     if (this.props.links === []) {
       this.props.fetchLinks();
     }
-    this.props.handleSelectedTab(8);
+    this.props.handleSelectedTab(5);
   }
 
   handleCreateLinkButton = () => {
@@ -126,4 +126,4 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(Links));
+)(withRouter(withStyles(styles)(Links)));
