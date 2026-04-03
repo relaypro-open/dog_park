@@ -7,6 +7,8 @@ pipeline {
         choice(name: 'env', choices: ['mob_qa', 'mob_pro'], description: 'Build environment')
         choice(name: 'branch', choices: ['origin/master', 'origin/develop'], description: 'Branch to build')
         choice(name: 'host_family', choices: ['dog_trainer'], description: 'Host family for deployment')
+        booleanParam(name: 'deploy', defaultValue: false, description: 'Deploy after build')
+        choice(name: 'hosts', choices: ['dog-trainer-pro-aws-oh257d61.phonebooth.net', 'dog-trainer-qa-aws-a3ff71.phoneboothdev.info'], description: 'Host to deploy to')
     }
 
     environment {
