@@ -54,7 +54,7 @@ pipeline {
 all: install
 
 install:
-\tcp -r ./build/* /usr/share/nginx/html
+\ttar -xzf dog_park-*.tar.gz -C /usr/share/nginx/html
 EOF
                 ARCHIVE=${params.env}-${BUILD_ID}.tar.gz
                 tar -czf \$ARCHIVE -C build .
