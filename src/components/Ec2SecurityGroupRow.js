@@ -1,17 +1,15 @@
 import React, { Component } from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import Fab from '@material-ui/core/Fab';
-import { TableCell, TableRow } from '@material-ui/core';
-import TextField from '@material-ui/core/TextField';
-import RemoveIcon from '@material-ui/icons/Remove';
-import { SortableElement } from 'react-sortable-hoc';
+import { withStyles } from '@mui/styles';
+import Fab from '@mui/material/Fab';
+import { TableCell, TableRow } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import RemoveIcon from '@mui/icons-material/Remove';
 import debounce from 'lodash/debounce';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 const styles = theme => ({
   root: {
-    ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
     maxWidth: '100%',
@@ -165,4 +163,4 @@ class Ec2SecurityGroupRow extends Component {
   }
 }
 
-export default SortableElement(withStyles(styles)(Ec2SecurityGroupRow));
+export default withStyles(styles)(Ec2SecurityGroupRow);

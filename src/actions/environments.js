@@ -1,21 +1,14 @@
 import { api } from '../api';
-import { createActions } from 'redux-actions';
+import { createAction } from '@reduxjs/toolkit';
 import { groupsFetchData } from './groups';
 
-export const {
-  environmentsIsLoading,
-  environmentsHasErrored,
-  environmentsFetchDataSuccess,
-  environmentAdded,
-} = createActions(
-  'ENVIRONMENTS_FETCH_DATA_SUCCESS',
-  'ENVIRONMENTS_IS_LOADING',
-  'ENVIRONMENTS_HAS_ERRORED',
-  'ENVIRONMENT_ADDED'
-);
+export const environmentsIsLoading = createAction('ENVIRONMENTS_IS_LOADING');
+export const environmentsHasErrored = createAction('ENVIRONMENTS_HAS_ERRORED');
+export const environmentsFetchDataSuccess = createAction('ENVIRONMENTS_FETCH_DATA_SUCCESS');
+export const environmentAdded = createAction('ENVIRONMENT_ADDED');
 
 export function environmentsFetchData() {
-  return (dispatch, getState) => {
+  return (dispatch) => {
     dispatch(environmentsIsLoading(true));
 
     api

@@ -1,16 +1,12 @@
-import { createStore, applyMiddleware, compose } from 'redux';
-import thunk from 'redux-thunk';
+import { configureStore } from '@reduxjs/toolkit';
 import logger from 'redux-logger';
 import rootReducer from '../reducers';
 
-export default function configureStore(initialState) {
-  const composeEnhancers =
-    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-  const store = createStore(
-    rootReducer,
-    initialState,
-    composeEnhancers(applyMiddleware(logger, thunk))
-  );
-
-  return store;
+export default function configureStoreRTK(initialState) {
+  return configureStore({
+    reducer: rootReducer,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(logger),
+    preloadedState: initialState,
+  });
 }

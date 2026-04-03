@@ -1,6 +1,6 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import { withRouter } from 'react-router';
+import { withStyles } from '@mui/styles';
+import withRouter from '../withRouter';
 import {
   Table,
   TableBody,
@@ -8,8 +8,8 @@ import {
   TableHead,
   TableRow,
   Paper,
-} from '@material-ui/core';
-import { pure } from 'recompose';
+} from '@mui/material';
+
 
 const styles = (theme) => ({
   root: {
@@ -22,7 +22,7 @@ const styles = (theme) => ({
   },
 });
 
-const ZonesTable = pure((props) => {
+const ZonesTable = React.memo((props) => {
   const { classes, zones } = props;
 
   return (

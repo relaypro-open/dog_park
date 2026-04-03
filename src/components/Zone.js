@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { api } from '../api';
 import { groupsFetchData } from '../actions/groups';
-import { flanIpsFetchData } from '../actions/flan_ips';
 import { profilesFetchData } from '../actions/profiles';
 import { zonesFetchData } from '../actions/zones';
 import { hostsFetchData } from '../actions/hosts';
@@ -9,37 +8,36 @@ import { servicesFetchData } from '../actions/services';
 import { linksFetchData } from '../actions/links';
 import { handleSelectedTab } from '../actions/app';
 import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
-import { withRouter } from 'react-router-dom';
-import { CircularProgress, Button, Fab } from '@material-ui/core';
-import TextField from '@material-ui/core/TextField';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import AddIcon from '@material-ui/icons/Add';
-import RemoveIcon from '@material-ui/icons/Remove';
+import { withStyles } from '@mui/styles';
+import withRouter from '../withRouter';
+import { CircularProgress, Button, Fab } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-} from '@material-ui/core';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DeleteIcon from '@material-ui/icons/Delete';
+} from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import DeleteIcon from '@mui/icons-material/Delete';
 import debounce from 'lodash/debounce';
 import ipRegex from '../libs/ip-regex';
 import cidrRegex from '../libs/cidr-regex';
-import Snackbar from '@material-ui/core/Snackbar';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
+import Snackbar from '@mui/material/Snackbar';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 const styles = (theme) => ({
   root: {
-    ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
     maxWidth: '100%',
@@ -753,7 +751,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
     fetchGroups: () => dispatch(groupsFetchData()),
-    fetchFlanIps: () => dispatch(flanIpsFetchData()),
+
     fetchProfiles: () => dispatch(profilesFetchData()),
     fetchZones: () => dispatch(zonesFetchData()),
     fetchHosts: () => dispatch(hostsFetchData()),

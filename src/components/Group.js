@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { api } from '../api';
 import { groupsFetchData } from '../actions/groups';
-import { flanIpsFetchData } from '../actions/flan_ips';
 import { profilesFetchData } from '../actions/profiles';
 import { zonesFetchData } from '../actions/zones';
 import { hostsFetchData } from '../actions/hosts';
@@ -9,29 +8,29 @@ import { servicesFetchData } from '../actions/services';
 import { linksFetchData } from '../actions/links';
 import { handleSelectedTab } from '../actions/app';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { withStyles } from '@material-ui/core/styles';
-import { CircularProgress, Button } from '@material-ui/core';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import DeleteIcon from '@material-ui/icons/Delete';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import withRouter from '../withRouter';
+import { withStyles } from '@mui/styles';
+import { CircularProgress, Button } from '@mui/material';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import HostsTable from './HostsTable';
 import GitDiff from './GitDiff';
 import GitChanges from './GitChanges';
-import Snackbar from '@material-ui/core/Snackbar';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
+import Snackbar from '@mui/material/Snackbar';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 import Ec2SecurityGroupRow from './Ec2SecurityGroupRow';
-import Fab from '@material-ui/core/Fab';
-import AddIcon from '@material-ui/icons/Add';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 
 import {
   Table,
@@ -39,13 +38,11 @@ import {
   TableCell,
   TableHead,
   TableRow,
-} from '@material-ui/core';
-import { SortableContainer } from 'react-sortable-hoc';
+} from '@mui/material';
 import update from 'immutability-helper';
 
 const styles = (theme) => ({
   root: {
-    ...theme.mixins.gutters(),
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
     maxWidth: '100%',
@@ -68,36 +65,28 @@ const styles = (theme) => ({
   },
 });
 
-const TableBodySortable = SortableContainer(
-  ({
-    children,
-    handleRegionInput,
-    handleSecurityGroupInput,
-    handleAddSecurityGroup,
-    handleRemoveSecurityGroup
-  }) => {
-    return (
-      <TableBody>
-        {children.map((row, index) => {
-          return (
-            <Ec2SecurityGroupRow
-              index={index}
-              key={'Ec2SecuritGroupTable' + index}
-              pIndex={index}
-              data={row}
-              handleRegionInput={handleRegionInput}
-              handleSecurityGroupInput={handleSecurityGroupInput}
-              handleAddSecurityGroup={handleAddSecurityGroup}
-              handleRemoveSecurityGroup={handleRemoveSecurityGroup}
-            />
-          );
-        })}
-      </TableBody>
-    );
-  }
+const TableBodySortable = ({
+  children,
+  handleRegionInput,
+  handleSecurityGroupInput,
+  handleAddSecurityGroup,
+  handleRemoveSecurityGroup,
+}) => (
+  <TableBody>
+    {children.map((row, index) => (
+      <Ec2SecurityGroupRow
+        index={index}
+        key={'Ec2SecuritGroupTable' + index}
+        pIndex={index}
+        data={row}
+        handleRegionInput={handleRegionInput}
+        handleSecurityGroupInput={handleSecurityGroupInput}
+        handleAddSecurityGroup={handleAddSecurityGroup}
+        handleRemoveSecurityGroup={handleRemoveSecurityGroup}
+      />
+    ))}
+  </TableBody>
 );
-
-TableBodySortable.muiName = 'TableBody';
 
 class Group extends Component {
   constructor(props) {
@@ -143,7 +132,7 @@ class Group extends Component {
     ) {
       this.props.fetchProfiles();
     }
-    if (this.props.match.path === '/groupByName/:id') {
+    if (this.props.location.pathname.startsWith('/groupByName/')) {
       this.fetchGroupByName(this.props.match.params.id);
     } else {
       this.fetchGroup(this.props.match.params.id);
@@ -637,8 +626,7 @@ class Group extends Component {
     if (
       this.state.isLoading ||
       this.props.profilesIsLoading ||
-      this.props.hostsIsLoading ||
-      this.props.flanIpsIsLoading
+      this.props.hostsIsLoading
     ) {
       return (
         <div>
@@ -648,7 +636,7 @@ class Group extends Component {
       );
     }
 
-    const { classes, hosts, flanIps } = this.props;
+    const { classes, hosts } = this.props;
     let isDiff = '';
 
     let groupHosts = [];
@@ -733,7 +721,7 @@ class Group extends Component {
             <Typography variant="body1">
               <strong>Group Hosts:</strong>
             </Typography>
-            <HostsTable hosts={groupHosts} flanIps={flanIps} expand={true} />
+            <HostsTable hosts={groupHosts} expand={true} />
             <br />
             <Typography variant="subtitle1">
               <strong>Ec2 Security Groups:</strong>&nbsp;&nbsp;
@@ -940,16 +928,12 @@ const mapStateToProps = (state) => {
     hosts: state.hosts,
     hostsHasErrored: state.hostsHasErrored,
     hostsIsLoading: state.hostsIsLoading,
-    flanIps: state.flanIps,
-    flanIpsHasErrored: state.flanIpsHasErrored,
-    flanIpsIsLoading: state.flanIpsIsLoading,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchGroups: () => dispatch(groupsFetchData()),
-    fetchFlanIps: () => dispatch(flanIpsFetchData()),
     fetchProfiles: () => dispatch(profilesFetchData()),
     fetchZones: () => dispatch(zonesFetchData()),
     fetchHosts: () => dispatch(hostsFetchData()),

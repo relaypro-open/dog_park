@@ -1,7 +1,6 @@
 import React from 'react';
-import moment from 'moment';
-import { withStyles } from '@material-ui/core/styles';
-import { withRouter } from 'react-router';
+import { withStyles } from '@mui/styles';
+import withRouter from '../withRouter';
 import {
   Table,
   TableBody,
@@ -9,8 +8,8 @@ import {
   TableHead,
   TableRow,
   Paper,
-} from '@material-ui/core';
-import { CircularProgress } from '@material-ui/core';
+} from '@mui/material';
+import { CircularProgress } from '@mui/material';
 
 const styles = theme => ({
   root: {
@@ -47,7 +46,8 @@ const ProfileHistory = props => {
         </TableHead>
         <TableBody>
           {profiles.map(profile => {
-            const createdTime = moment(profile.created * 1000).format('llll');
+            const _d = new Date(profile.created * 1000);
+            const createdTime = isNaN(_d.getTime()) ? String(profile.created ?? '') : _d.toLocaleString();
             return (
               <TableRow
                 key={'history' + profile.id}

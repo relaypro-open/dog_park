@@ -1,7 +1,6 @@
 import React from 'react';
-import moment from 'moment';
-import { withStyles } from '@material-ui/core/styles';
-import { withRouter } from 'react-router';
+import { withStyles } from '@mui/styles';
+import withRouter from '../withRouter';
 import {
   Table,
   TableBody,
@@ -9,8 +8,8 @@ import {
   TableHead,
   TableRow,
   Paper,
-} from '@material-ui/core';
-import { pure } from 'recompose';
+} from '@mui/material';
+
 
 const styles = theme => ({
   root: {
@@ -23,7 +22,7 @@ const styles = theme => ({
   },
 });
 
-const ProfilesTable = pure(props => {
+const ProfilesTable = React.memo(props => {
   const { classes, profiles } = props;
 
   return (
@@ -48,7 +47,7 @@ const ProfilesTable = pure(props => {
               >
                 <TableCell>{profile}</TableCell>
                 <TableCell>{profiles[profile][0].id}</TableCell>
-                <TableCell>{moment(profiles[profile][0].created * 1000).format()}</TableCell>
+                <TableCell>{(() => { const d = new Date(profiles[profile][0].created * 1000); return isNaN(d.getTime()) ? String(profiles[profile][0].created ?? '') : d.toISOString(); })()}</TableCell>
               </TableRow>
             );
           })}

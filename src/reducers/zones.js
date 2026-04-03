@@ -1,43 +1,31 @@
-import { handleAction } from 'redux-actions';
+export function zonesHasErrored(state = false, action) {
+  if (action.type === 'ZONES_HAS_ERRORED') return action.payload;
+  return state;
+}
 
-export const zonesHasErrored = handleAction(
-  'ZONES_HAS_ERRORED',
-  (state, action) => {
-    return action.payload;
-  },
-  false
-);
+export function zonesIsLoading(state = false, action) {
+  if (action.type === 'ZONES_IS_LOADING') return action.payload;
+  return state;
+}
 
-export const zonesIsLoading = handleAction(
-  'ZONES_IS_LOADING',
-  (state, action) => {
-    return action.payload;
-  },
-  false
-);
+export function zones(
+  state = { zoneList: [], zoneNames: {}, zoneIds: {} },
+  action
+) {
+  if (action.type !== 'ZONES_FETCH_DATA_SUCCESS') return state;
 
-export const zones = handleAction(
-  'ZONES_FETCH_DATA_SUCCESS',
-  (state, action) => {
-    const zones = action.payload.sort((x, y) => {
-      if (x.name.toLowerCase() < y.name.toLowerCase()) {
-        return -1;
-      } else if (x.name.toLowerCase() > y.name.toLowerCase()) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
+  const zones = action.payload.sort((x, y) => {
+    if (x.name.toLowerCase() < y.name.toLowerCase()) return -1;
+    if (x.name.toLowerCase() > y.name.toLowerCase()) return 1;
+    return 0;
+  });
 
-    let zoneIds = {};
-    let zoneNames = {};
+  let zoneIds = {};
+  let zoneNames = {};
+  zones.forEach((z) => {
+    zoneNames[z.name] = z.id;
+    zoneIds[z.id] = z.name;
+  });
 
-    zones.forEach((z) => {
-      zoneNames[z.name] = z.id;
-      zoneIds[z.id] = z.name;
-    });
-
-    return { zoneList: zones, zoneNames: zoneNames, zoneIds: zoneIds };
-  },
-  { zoneList: [], zoneNames: {}, zoneIds: {} }
-);
+  return { zoneList: zones, zoneNames, zoneIds };
+}
