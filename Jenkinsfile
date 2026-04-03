@@ -1,20 +1,99 @@
+#!/usr/bin/env groovy
+
 pipeline {
-    agent { 
-        dockerfile {
-            filename 'Dockerfile'
-            args '-i --entrypoint='
-    	    additionalBuildArgs '-t dog_park_build'
-        }
+    agent any
+
+    parameters {
+        choice(name: 'env', choices: ['mob_qa', 'mob_pro'], description: 'Build environment')
+        choice(name: 'branch', choices: ['origin/master', 'origin/develop'], description: 'Branch to build')
+        choice(name: 'host_family', choices: ['dog_trainer'], description: 'Host family for deployment')
+    }
+
+    environment {
+        SLACK_CHANNEL = 'dog_trainer'
+        BUILD_ENV = "${build_stream}"
+        BUILD_ID = "${VersionNumber(projectStartDate: '1970-01-01', versionNumberString: '${BUILD_DATE_FORMATTED, \"yyyy-MM-dd_H-m-s\"}')}"
+        API_ENV = "${params.env.split('_')[1]}"
+        VITE_DOG_API_HOST = "https://dog-${params.env.split('_')[1]}.relaydev.sh"
     }
 
     stages {
-        stage('Upload artifact to S3') {
+        stage('Checkout') {
             steps {
-                sh 'docker cp dog_park_build:*.tar.gz .'
-                withAWS(profile: 'default') {
-                    s3Upload bucket:'product-builds', path: 'dog_park/', workingDir: '.', includePathPattern: '*.tar.gz'
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '${branch}']],
+                    userRemoteConfigs: [[
+                        credentialsId: 'admin',
+                        url: 'https://github.com/relaypro-open/dog_park.git'
+                    ]]
+                ])
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh """#!/bin/bash -xe
+                docker build --rm \
+                    --build-arg VITE_DOG_API_ENV=\$API_ENV \
+                    --build-arg VITE_DOG_API_HOST=\$VITE_DOG_API_HOST \
+                    --target tar \
+                    --output type=local,dest=. \
+                    -t dog_park_build \
+                    .
+                ls -la *.tar.gz
+                """
+            }
+        }
+
+        stage('Archive') {
+            steps {
+                sh 'mv dog_park-*.tar.gz dog_park-$API_ENV-$BUILD_ID.tar.gz'
+                archiveArtifacts artifacts: '*.tar.gz', fingerprint: true
+            }
+        }
+
+        stage('Upload to S3') {
+            steps {
+                withAWS(credentials: 'aws-iam-user/product-jenkins-artifact-uploads') {
+                    s3Upload bucket: 'product-builds', path: 'dog_park/', includePathPattern: '*.tar.gz'
                 }
             }
+        }
+
+        stage('Deploy') {
+            when {
+                expression { params.deploy }
+            }
+            steps {
+                build job: '/playbyplay/pbp-common-deploy', parameters: [
+                    string(name: 'deployEnv', value: params.deploy_env),
+                    string(name: 'app', value: 'dog_park'),
+                    string(name: 'target', value: params.hosts),
+                    string(name: 'ansibleFlags', value: '')
+                ]
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                new org.gradiant.jenkins.slack.SlackNotifier().notifyResultWithMessage(
+                    "dog_park build ${BUILD_ENV} #${env.BUILD_NUMBER} succeeded"
+                )
+            }
+        }
+        changed {
+            emailext(
+                to: 'dgulino@relaypro.com',
+                body: '${DEFAULT_CONTENT}',
+                mimeType: 'text/html',
+                subject: '${DEFAULT_SUBJECT}',
+                replyTo: '$DEFAULT_REPLYTO'
+            )
+        }
+        cleanup {
+            deleteDir()
         }
     }
 }
