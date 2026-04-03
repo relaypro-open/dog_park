@@ -39,17 +39,27 @@ pipeline {
                     --build-arg VITE_DOG_API_ENV=\$API_ENV \
                     --build-arg VITE_DOG_API_HOST=\$VITE_DOG_API_HOST \
                     --target tar \
-                    --output type=local,dest=. \
+                    --output type=local,dest=build \
                     -t dog_park_build \
                     .
-                ls -la *.tar.gz
+                ls -la build/*.tar.gz
                 """
             }
         }
 
         stage('Archive') {
             steps {
-                sh "mv dog_park-*.tar.gz ${params.env}-${BUILD_ID}.tar.gz"
+                sh """
+                cat > build/Makefile << 'EOF'
+all: install
+
+install:
+\tcp -r ./build/* /usr/share/nginx/html
+EOF
+                ARCHIVE=${params.env}-${BUILD_ID}.tar.gz
+                tar -czf \$ARCHIVE -C build .
+                rm -f build/dog_park-*.tar.gz
+                """
                 archiveArtifacts artifacts: '*.tar.gz', fingerprint: true
             }
         }
