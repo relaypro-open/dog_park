@@ -1,5 +1,5 @@
 # ---- Base Node ----
-FROM docker.io/chekote/node:18.12.1-alpine as base
+FROM docker.io/chekote/node:22.12.0-alpine as base
 
 ARG VITE_DOG_API_ENV="local"
 ENV VITE_DOG_API_ENV=$VITE_DOG_API_ENV
