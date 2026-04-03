@@ -1,11 +1,6 @@
 # ---- Base Node ----
 FROM node:22-alpine as base
 
-ARG VITE_DOG_API_ENV="local"
-ENV VITE_DOG_API_ENV=$VITE_DOG_API_ENV
-ARG VITE_DOG_API_HOST="http://dog"
-ENV VITE_DOG_API_HOST=$VITE_DOG_API_HOST
-
 # set working directory
 WORKDIR /data
 # copy project file
