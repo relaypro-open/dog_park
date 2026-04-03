@@ -22,6 +22,8 @@ RUN ls -latr /data
 #
 # ---- Release ----
 FROM base AS release
+ARG VITE_DOG_API_ENV="local"
+ARG VITE_DOG_API_HOST="http://dog"
 # copy production node_modules
 COPY --from=dependencies /data/node_modules ./node_modules
 # copy app sources
