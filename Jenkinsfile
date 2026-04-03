@@ -49,7 +49,7 @@ pipeline {
 
         stage('Archive') {
             steps {
-                sh 'mv dog_park-*.tar.gz dog_park-$API_ENV-$BUILD_ID.tar.gz'
+                sh "mv dog_park-*.tar.gz ${params.env}-${BUILD_ID}.tar.gz"
                 archiveArtifacts artifacts: '*.tar.gz', fingerprint: true
             }
         }
