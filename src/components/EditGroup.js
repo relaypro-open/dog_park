@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Dialog from '@mui/material/Dialog';
@@ -75,11 +75,11 @@ class EditGroup extends Component {
           //this.props.handleCloseButton();
           return response.data;
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
-      .catch(() => {
-        this.setState({ editGroupStatus: <div>An error has occurred!</div> });
+      .catch((error) => {
+        this.setState({ editGroupStatus: <div>{error.message || 'An error has occurred!'}</div> });
         this.setState({ hasErrored: true });
       });
   }

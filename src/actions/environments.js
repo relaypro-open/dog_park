@@ -1,4 +1,4 @@
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { createAction } from '@reduxjs/toolkit';
 import { groupsFetchData } from './groups';
 
@@ -15,7 +15,7 @@ export function environmentsFetchData() {
       .get('externals')
       .then((response) => {
         if (response.status !== 200) {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
         return response.data;
       })
@@ -24,19 +24,19 @@ export function environmentsFetchData() {
         environments.forEach((env) => {
           getEnvironment(env['id'])
             .then((environment) => dispatch(environmentAdded(environment)))
-            .catch(() => dispatch(environmentsHasErrored(true)));
+            .catch((err) => dispatch(environmentsHasErrored(err.message || true)));
         });
         dispatch(groupsFetchData());
         dispatch(environmentsIsLoading(false));
       })
-      .catch(() => dispatch(environmentsHasErrored(true)));
+      .catch((err) => dispatch(environmentsHasErrored(err.message || true)));
   };
 }
 
 async function getEnvironment(env) {
   let response = await api.get('external/' + env);
   if (response.status !== 200) {
-    throw Error(response.statusText);
+    throw Error(getErrorMessage(response));
   }
   return response.data;
 }

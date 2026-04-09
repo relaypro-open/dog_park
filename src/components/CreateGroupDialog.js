@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import withRouter from '../withRouter';
 import { withStyles } from '@mui/styles';
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { groupsFetchData } from '../actions/groups';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -35,7 +35,6 @@ class CreateGroup extends Component {
     this.state = {
       groupName: '',
       selectedProfile: '',
-      createGroupProgress: '',
       isLoading: false,
       hasErrored: false,
       open: false,
@@ -71,14 +70,12 @@ class CreateGroup extends Component {
   }
 
   createGroup() {
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, hasErrored: false });
 
     api
       .post('group', {
         name: this.state.groupName,
-        profile_name: this.props.profiles.profileList[
-          this.state.selectedProfile
-        ],
+        profile_name: this.state.selectedProfile,
         profile_version: 'latest',
       })
       .then((response) => {
@@ -89,14 +86,16 @@ class CreateGroup extends Component {
           let newGroupId = groupId.replace(re, '$1');
           return newGroupId;
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((groupId) => {
         this.props.history.push('/group/' + groupId);
         this.props.fetchGroups();
       })
-      .catch(() => this.setState({ hasErrored: true }));
+      .catch((err) => {
+        this.setState({ hasErrored: err.message || true, isLoading: false });
+      });
   }
 
   handleCloseButton() {
@@ -108,10 +107,9 @@ class CreateGroup extends Component {
     const profiles = Object.keys(this.props.profiles.profileList)
       .sort()
       .map((profile) => {
-        let profileName = this.props.profiles.profileList[profile];
         return (
           <MenuItem key={profile} value={profile}>
-            {profileName}
+            {profile}
           </MenuItem>
         );
       });
@@ -153,6 +151,17 @@ class CreateGroup extends Component {
                 </Select>
               </FormControl>
             </form>
+            <br />
+            {this.state.isLoading && (
+              <CircularProgress size={24} />
+            )}
+            {this.state.hasErrored && (
+              <Typography variant="body1" color="error">
+                {typeof this.state.hasErrored === 'string'
+                  ? this.state.hasErrored
+                  : 'An error has occurred while creating the group.'}
+              </Typography>
+            )}
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleCloseButton} color="primary">
@@ -165,7 +174,6 @@ class CreateGroup extends Component {
             >
               Create Group
             </Button>
-            &nbsp;&nbsp;{this.state.createGroupStatus}
           </DialogActions>
         </Dialog>
         <form autoComplete="off">
@@ -207,11 +215,23 @@ class CreateGroup extends Component {
               size="large"
               onClick={this.handleCreateGroup}
             >
-              Add Group{this.state.createGroupProgress}
+              Add Group
             </Button>
             <Button size="large" onClick={this.handleCancel}>
               Cancel
             </Button>
+            <br />
+            <br />
+            {this.state.isLoading && (
+              <CircularProgress size={24} />
+            )}
+            {this.state.hasErrored && (
+              <Typography variant="body1" color="error">
+                {typeof this.state.hasErrored === 'string'
+                  ? this.state.hasErrored
+                  : 'An error has occurred while creating the group.'}
+              </Typography>
+            )}
           </Paper>
         </form>
       </div>

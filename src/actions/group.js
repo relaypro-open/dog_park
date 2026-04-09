@@ -1,4 +1,4 @@
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { createAction } from '@reduxjs/toolkit';
 
 export const groupHasErrored = createAction('GROUP_HAS_ERRORED');
@@ -13,7 +13,7 @@ export function groupFetchData(groupId) {
       .get('group/' + groupId)
       .then((response) => {
         if (response.status !== 200) {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
         return response.data;
       })
@@ -21,6 +21,6 @@ export function groupFetchData(groupId) {
         dispatch(groupIsLoading(false));
         dispatch(groupFetchDataSuccess(group));
       })
-      .catch(() => dispatch(groupHasErrored(true)));
+      .catch((err) => dispatch(groupHasErrored(err.message || true)));
   };
 }

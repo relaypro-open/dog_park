@@ -1,4 +1,4 @@
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { createAction } from '@reduxjs/toolkit';
 
 export const zonesHasErrored = createAction('ZONES_HAS_ERRORED');
@@ -13,12 +13,12 @@ export function zonesFetchData() {
       .get('zones')
       .then((response) => {
         if (response.status !== 200) {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
         dispatch(zonesIsLoading(false));
         return response.data;
       })
       .then((zones) => dispatch(zonesFetchDataSuccess(zones)))
-      .catch(() => dispatch(zonesHasErrored(true)));
+      .catch((err) => dispatch(zonesHasErrored(err.message || true)));
   };
 }

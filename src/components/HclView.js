@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withStyles } from '@mui/styles';
 import { CircularProgress } from '@mui/material';
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 
 const styles = theme => ({
   root: {
@@ -58,15 +58,15 @@ class HclView extends Component {
           return response.data;
         } else if (response.status === 404) {
           this.setState({ noExist: true });
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then(hcl => {
         this.setState({ hcl });
       })
-      .catch(() => this.setState({ hasErrored: true }));
+      .catch((err) => this.setState({ hasErrored: err.message || true }));
   };
 
   /*renderFile = ({ oldRevision, newRevision, type, hunks }) => {
@@ -89,7 +89,7 @@ class HclView extends Component {
   render() {
 
     if (this.state.hasErrored || this.props.profilesHasErrored) {
-      return <p>Sorry! There was an error loading the items</p>;
+      return <p>{typeof this.state.hasErrored === 'string' ? this.state.hasErrored : (typeof this.props.profilesHasErrored === 'string' ? this.props.profilesHasErrored : (typeof this.props.hostsHasErrored === 'string' ? this.props.hostsHasErrored : 'Sorry! There was an error loading the items'))}</p>;
     }
     if (
       this.state.isLoading ||

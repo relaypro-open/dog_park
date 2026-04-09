@@ -1,4 +1,4 @@
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { createAction } from '@reduxjs/toolkit';
 
 export const hostsHasErrored = createAction('HOSTS_HAS_ERRORED');
@@ -13,12 +13,12 @@ export function hostsFetchData() {
       .get('hosts')
       .then((response) => {
         if (response.status !== 200) {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
         dispatch(hostsIsLoading(false));
         return response.data;
       })
       .then((hosts) => dispatch(hostsFetchDataSuccess(hosts)))
-      .catch(() => dispatch(hostsHasErrored(true)));
+      .catch((err) => dispatch(hostsHasErrored(err.message || true)));
   };
 }

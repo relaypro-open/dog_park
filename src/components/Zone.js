@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { groupsFetchData } from '../actions/groups';
 import { profilesFetchData } from '../actions/profiles';
 import { zonesFetchData } from '../actions/zones';
@@ -264,9 +264,9 @@ class Zone extends Component {
           return response.data;
         } else if (response.status === 404) {
           this.setState({ noExist: true });
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((zone) => {
@@ -305,7 +305,7 @@ class Zone extends Component {
           this.setState({ v6ZoneAddresses: [''] });
         }
       })
-      .catch(() => this.setState({ hasErrored: true }));
+      .catch((err) => this.setState({ hasErrored: err.message || true }));
   }
 
   updateZone = () => {
@@ -349,14 +349,14 @@ class Zone extends Component {
           });
           return response.data;
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((zone) => {
         this.setState({ snackBarOpen: true });
       })
-      .catch(() => {
-        this.setState({ updateZoneStatus: <div>An error has occurred!</div> });
+      .catch((error) => {
+        this.setState({ updateZoneStatus: <div>{error.message || 'An error has occurred!'}</div> });
         this.setState({ hasErrored: true });
       });
   };
@@ -393,7 +393,7 @@ class Zone extends Component {
           );
           throw Error(error_msg);
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .catch((error) => {
@@ -550,7 +550,7 @@ class Zone extends Component {
     if (this.state.hasErrored && this.state.noExist) {
       return <p>This zone no longer exists!</p>;
     } else if (this.state.hasErrored) {
-      return <p>Sorry! There was an error loading the items</p>;
+      return <p>{typeof this.state.hasErrored === 'string' ? this.state.hasErrored : (typeof this.props.profilesHasErrored === 'string' ? this.props.profilesHasErrored : (typeof this.props.hostsHasErrored === 'string' ? this.props.hostsHasErrored : 'Sorry! There was an error loading the items'))}</p>;
     }
     if (this.state.isLoading) {
       return (

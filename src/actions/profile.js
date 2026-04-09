@@ -38,6 +38,6 @@ export function createProfile(profileName, profileProfileName) {
         return response.data;
       })
       .then(profile => dispatch(createProfileSuccess(profile)))
-      .catch(() => dispatch(createProfileHasErrored(true)));
+      .catch((err) => dispatch(createProfileHasErrored(err.message || true)));
   };
 }

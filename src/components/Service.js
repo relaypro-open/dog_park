@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { connect } from 'react-redux';
 import { withStyles } from '@mui/styles';
 import withRouter from '../withRouter';
@@ -225,9 +225,9 @@ class Service extends Component {
           return response.data;
         } else if (response.status === 404) {
           this.setState({ noExist: true });
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((service) => {
@@ -246,7 +246,7 @@ class Service extends Component {
           this.setState({ serviceErrors: [true] });
         }
       })
-      .catch(() => this.setState({ hasErrored: true }));
+      .catch((err) => this.setState({ hasErrored: err.message || true }));
   }
 
   updateService = () => {
@@ -281,15 +281,15 @@ class Service extends Component {
           });
           return response.data;
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((service) => {
         this.setState({ snackBarOpen: true });
       })
-      .catch(() => {
+      .catch((error) => {
         this.setState({
-          updateServiceStatus: <div>An error has occurred!</div>,
+          updateServiceStatus: <div>{error.message || 'An error has occurred!'}</div>,
         });
         this.setState({ hasErrored: true });
       });
@@ -327,7 +327,7 @@ class Service extends Component {
           );
           throw Error(error_msg);
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .catch((error) => {
@@ -434,7 +434,7 @@ class Service extends Component {
     if (this.state.hasErrored && this.state.noExist) {
       return <p>This service no longer exists!</p>;
     } else if (this.state.hasErrored) {
-      return <p>Sorry! There was an error loading the items</p>;
+      return <p>{typeof this.state.hasErrored === 'string' ? this.state.hasErrored : (typeof this.props.profilesHasErrored === 'string' ? this.props.profilesHasErrored : (typeof this.props.hostsHasErrored === 'string' ? this.props.hostsHasErrored : 'Sorry! There was an error loading the items'))}</p>;
     }
     if (this.state.isLoading) {
       return (

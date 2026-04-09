@@ -37,6 +37,6 @@ export function createZone(zoneName, zoneAddresses) {
         return response.data;
       })
       .then(zone => dispatch(createZoneSuccess(zone)))
-      .catch(() => dispatch(createZoneHasErrored(true)));
+      .catch((err) => dispatch(createZoneHasErrored(err.message || true)));
   };
 }

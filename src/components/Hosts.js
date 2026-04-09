@@ -17,7 +17,7 @@ class Hosts extends Component {
 
   render() {
     if (this.props.hasErrored) {
-      return <p>Sorry! There was an error loading the items</p>;
+      return <p>{typeof this.state.hasErrored === 'string' ? this.state.hasErrored : (typeof this.props.profilesHasErrored === 'string' ? this.props.profilesHasErrored : (typeof this.props.hostsHasErrored === 'string' ? this.props.hostsHasErrored : 'Sorry! There was an error loading the items'))}</p>;
     }
     if (this.props.isLoading) {
       return (

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { groupsFetchData } from '../actions/groups';
 import { profilesFetchData } from '../actions/profiles';
 import { zonesFetchData } from '../actions/zones';
@@ -168,9 +168,9 @@ class Group extends Component {
           return response.data;
         } else if (response.status === 404) {
           this.setState({ noExist: true });
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((group) => {
@@ -207,7 +207,7 @@ class Group extends Component {
       .then((id) => {
         this.fetchGroupHosts(id);
       })
-      .catch(() => this.setState({ hasErrored: true }));
+      .catch((err) => this.setState({ hasErrored: err.message || true }));
   };
 
   fetchGroup = (groupId) => {
@@ -221,9 +221,9 @@ class Group extends Component {
           return response.data;
         } else if (response.status === 404) {
           this.setState({ noExist: true });
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((group) => {
@@ -259,7 +259,7 @@ class Group extends Component {
       .then((id) => {
         this.fetchGroupHosts(id);
       })
-      .catch(() => this.setState({ hasErrored: true }));
+      .catch((err) => this.setState({ hasErrored: err.message || true }));
   };
 
   fetchGroupHosts = (groupId) => {
@@ -273,15 +273,15 @@ class Group extends Component {
           return response.data;
         } else if (response.status === 404) {
           this.setState({ noExist: true });
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((group) => {
         this.setState({ groupHosts: group });
       })
-      .catch(() => this.setState({ hasErrored: true }));
+      .catch((err) => this.setState({ hasErrored: err.message || true }));
   };
 
   fetchGroupEc2SecurityGroups = (groupId) => {
@@ -295,15 +295,15 @@ class Group extends Component {
           return response.data;
         } else if (response.status === 404) {
           this.setState({ noExist: true });
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((ids) => {
         this.setState({ groupEc2SecurityGroups: ids });
       })
-      .catch(() => this.setState({ hasErrored: true }));
+      .catch((err) => this.setState({ hasErrored: err.message || true }));
   };
 
   fetchHostGroup = (hostId) => {
@@ -353,14 +353,14 @@ class Group extends Component {
           });
           return response.data;
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((group) => {
         this.setState({ snackBarOpen: true });
       })
-      .catch(() => {
-        this.setState({ editGroupStatus: <div>An error has occurred!</div> });
+      .catch((error) => {
+        this.setState({ editGroupStatus: <div>{error.message || 'An error has occurred!'}</div> });
         this.setState({ hasErrored: true });
       });
   };
@@ -403,12 +403,12 @@ class Group extends Component {
           this.props.fetchLinks();
           return response.data;
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((group) => {})
-      .catch(() => {
-        this.setState({ editGroupStatus: <div>An error has occurred!</div> });
+      .catch((error) => {
+        this.setState({ editGroupStatus: <div>{error.message || 'An error has occurred!'}</div> });
         this.setState({ hasErrored: true });
       });
   };
@@ -445,7 +445,7 @@ class Group extends Component {
           );
           throw Error(error_msg);
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .catch((error) => {
@@ -621,7 +621,7 @@ class Group extends Component {
       this.props.profilesHasErrored ||
       this.props.hostsHasErrored
     ) {
-      return <p>Sorry! There was an error loading the items</p>;
+      return <p>{typeof this.state.hasErrored === 'string' ? this.state.hasErrored : (typeof this.props.profilesHasErrored === 'string' ? this.props.profilesHasErrored : (typeof this.props.hostsHasErrored === 'string' ? this.props.hostsHasErrored : 'Sorry! There was an error loading the items'))}</p>;
     }
     if (
       this.state.isLoading ||

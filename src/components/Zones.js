@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { withStyles } from '@mui/styles';
 import withRouter from '../withRouter';
 import { groupsFetchData } from '../actions/groups';
@@ -87,7 +87,7 @@ class Zones extends Component {
             let newZoneId = zoneId.replace(re, '$1');
             return newZoneId;
           } else {
-            throw Error(response.statusText);
+            throw Error(getErrorMessage(response));
           }
         })
         .then((zoneId) => {
@@ -101,7 +101,7 @@ class Zones extends Component {
           this.props.fetchLinks();
           this.props.history.push('/zone/' + zoneId);
         })
-        .catch(() => this.setState({ hasErrored: true }));
+        .catch((err) => this.setState({ hasErrored: err.message || true }));
     }
   };
 
@@ -124,7 +124,7 @@ class Zones extends Component {
 
   render() {
     if (this.props.hasErrored) {
-      return <p>Sorry! There was an error loading the items</p>;
+      return <p>{typeof this.state.hasErrored === 'string' ? this.state.hasErrored : (typeof this.props.profilesHasErrored === 'string' ? this.props.profilesHasErrored : (typeof this.props.hostsHasErrored === 'string' ? this.props.hostsHasErrored : 'Sorry! There was an error loading the items'))}</p>;
     }
     if (this.props.isLoading) {
       return (

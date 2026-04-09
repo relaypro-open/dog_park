@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from '@mui/styles';
 import withRouter from '../withRouter';
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { groupsFetchData } from '../actions/groups';
 import { profilesFetchData } from '../actions/profiles';
 import { zonesFetchData } from '../actions/zones';
@@ -98,7 +98,7 @@ class Groups extends Component {
           let newGroupId = groupId.replace(re, '$1');
           return newGroupId;
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((groupId) => {
@@ -113,7 +113,7 @@ class Groups extends Component {
         this.props.fetchLinks();
         this.props.history.push('/group/' + groupId);
       })
-      .catch(() => this.setState({ hasErrored: true }));
+      .catch((err) => this.setState({ hasErrored: err.message || true }));
   };
 
   handleCreateGroupOpen = () => {
@@ -170,7 +170,7 @@ class Groups extends Component {
       this.props.profilesHasErrored ||
       this.props.hostsHasErrored
     ) {
-      return <p>Sorry! There was an error loading the items</p>;
+      return <p>{typeof this.state.hasErrored === 'string' ? this.state.hasErrored : (typeof this.props.profilesHasErrored === 'string' ? this.props.profilesHasErrored : (typeof this.props.hostsHasErrored === 'string' ? this.props.hostsHasErrored : 'Sorry! There was an error loading the items'))}</p>;
     }
     if (
       this.props.isLoading ||

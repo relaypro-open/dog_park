@@ -1,4 +1,4 @@
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { createAction } from '@reduxjs/toolkit';
 
 export const servicesHasErrored = createAction('SERVICES_HAS_ERRORED');
@@ -13,12 +13,12 @@ export function servicesFetchData() {
       .get('services')
       .then((response) => {
         if (response.status !== 200) {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
         dispatch(servicesIsLoading(false));
         return response.data;
       })
       .then((services) => dispatch(servicesFetchDataSuccess(services)))
-      .catch(() => dispatch(servicesHasErrored(true)));
+      .catch((err) => dispatch(servicesHasErrored(err.message || true)));
   };
 }

@@ -49,6 +49,6 @@ export function createLink(linkName, linkAddresses) {
         return response.data;
       })
       .then(link => dispatch(createLinkSuccess(link)))
-      .catch(() => dispatch(createLinkHasErrored(true)));
+      .catch((err) => dispatch(createLinkHasErrored(err.message || true)));
   };
 }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { linksFetchData } from '../actions/links';
 import { handleSelectedTab } from '../actions/app';
 import { connect } from 'react-redux';
@@ -130,9 +130,9 @@ class EnvLink extends Component {
             return response.data;
           } else if (response.status === 404) {
             this.setState({ noExist: true });
-            throw Error(response.statusText);
+            throw Error(getErrorMessage(response));
           } else {
-            throw Error(response.statusText);
+            throw Error(getErrorMessage(response));
           }
         })
         .then((link) => {
@@ -160,7 +160,7 @@ class EnvLink extends Component {
             linkVerify: link.connection.ssl_options.verify,
           });
         })
-        .catch(() => this.setState({ hasErrored: true }));
+        .catch((err) => this.setState({ hasErrored: err.message || true }));
     }
   }
 
@@ -204,10 +204,10 @@ class EnvLink extends Component {
           this.props.history.push('/links');
           return newLinkId;
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
-      .catch(() => this.setState({ hasErrored: true }));
+      .catch((err) => this.setState({ hasErrored: err.message || true }));
   };
 
   updateLink = () => {
@@ -258,11 +258,11 @@ class EnvLink extends Component {
           this.props.history.push('/links');
           return response.data;
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
-      .catch(() => {
-        this.setState({ editLinkStatus: <div>An error has occurred!</div> });
+      .catch((error) => {
+        this.setState({ editLinkStatus: <div>{error.message || 'An error has occurred!'}</div> });
         this.setState({ hasErrored: true });
       });
   };
@@ -285,11 +285,11 @@ class EnvLink extends Component {
           this.props.fetchLinks();
           this.props.history.push('/links');
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
-      .catch(() => {
-        this.setState({ deleteLinkStatus: <div>An error has occurred!</div> });
+      .catch((error) => {
+        this.setState({ deleteLinkStatus: <div>{error.message || 'An error has occurred!'}</div> });
         this.setState({ deleteHasErrored: true });
       });
   };
@@ -410,7 +410,7 @@ class EnvLink extends Component {
     if (this.state.hasErrored && this.state.noExist) {
       return <p>This link no longer exists!</p>;
     } else if (this.state.hasErrored || this.props.linksHasErrored) {
-      return <p>Sorry! There was an error loading the items</p>;
+      return <p>{typeof this.state.hasErrored === 'string' ? this.state.hasErrored : (typeof this.props.profilesHasErrored === 'string' ? this.props.profilesHasErrored : (typeof this.props.hostsHasErrored === 'string' ? this.props.hostsHasErrored : 'Sorry! There was an error loading the items'))}</p>;
     }
     if (
       this.state.isLoading ||

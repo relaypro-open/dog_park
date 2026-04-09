@@ -1,4 +1,4 @@
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { createAction } from '@reduxjs/toolkit';
 
 export const linksHasErrored = createAction('LINKS_HAS_ERRORED');
@@ -13,12 +13,12 @@ export function linksFetchData() {
       .get('links')
       .then((response) => {
         if (response.status !== 200) {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
         dispatch(linksIsLoading(false));
         return response.data;
       })
       .then((links) => dispatch(linksFetchDataSuccess(links)))
-      .catch(() => dispatch(linksHasErrored(true)));
+      .catch((err) => dispatch(linksHasErrored(err.message || true)));
   };
 }

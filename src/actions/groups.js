@@ -1,4 +1,4 @@
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { createAction } from '@reduxjs/toolkit';
 import { profilesIsLoading } from './profiles';
 import { environmentsIsLoading } from './environments';
@@ -22,7 +22,7 @@ export function groupsFetchData() {
       .get('groups')
       .then((response) => {
         if (response.status !== 200) {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
         dispatch(profilesIsLoading(false));
         dispatch(environmentsIsLoading(false));
@@ -32,6 +32,6 @@ export function groupsFetchData() {
       .then((groups) =>
         dispatch(groupsFetchDataSuccess(groups, profiles, environments))
       )
-      .catch(() => dispatch(groupsHasErrored(true)));
+      .catch((err) => dispatch(groupsHasErrored(err.message || true)));
   };
 }

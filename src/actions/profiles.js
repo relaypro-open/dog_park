@@ -1,4 +1,4 @@
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { createAction } from '@reduxjs/toolkit';
 import { environmentsFetchData } from './environments';
 
@@ -14,12 +14,12 @@ export function profilesFetchData() {
       .get('profiles')
       .then((response) => {
         if (response.status !== 200) {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
         return response.data;
       })
       .then((profiles) => dispatch(profilesFetchDataSuccess(profiles)))
       .then(() => dispatch(environmentsFetchData()))
-      .catch(() => dispatch(profilesHasErrored(true)));
+      .catch((err) => dispatch(profilesHasErrored(err.message || true)));
   };
 }

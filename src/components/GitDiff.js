@@ -4,7 +4,7 @@ import { withStyles } from '@mui/styles';
 import { CircularProgress } from '@mui/material';
 import { sumBy } from 'lodash';
 import '../styles/GitDiff.css';
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 
 const styles = theme => ({
   root: {
@@ -61,15 +61,15 @@ class GitDiff extends Component {
           return response.data;
         } else if (response.status === 404) {
           this.setState({ noExist: true });
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then(diff => {
         this.setState({ diff });
       })
-      .catch(() => this.setState({ hasErrored: true }));
+      .catch((err) => this.setState({ hasErrored: err.message || true }));
   };
 
 
@@ -93,7 +93,7 @@ class GitDiff extends Component {
   render() {
 
     if (this.state.hasErrored || this.props.profilesHasErrored) {
-      return <p>Sorry! There was an error loading the items</p>;
+      return <p>{typeof this.state.hasErrored === 'string' ? this.state.hasErrored : (typeof this.props.profilesHasErrored === 'string' ? this.props.profilesHasErrored : (typeof this.props.hostsHasErrored === 'string' ? this.props.hostsHasErrored : 'Sorry! There was an error loading the items'))}</p>;
     }
     if (
       this.state.isLoading ||

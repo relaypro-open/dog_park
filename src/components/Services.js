@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import withRouter from '../withRouter';
 import { groupsFetchData } from '../actions/groups';
 import { profilesFetchData } from '../actions/profiles';
@@ -95,7 +95,7 @@ class Services extends Component {
           let newServiceId = serviceId.replace(re, '$1');
           return newServiceId;
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((serviceId) => {
@@ -109,7 +109,7 @@ class Services extends Component {
         this.props.fetchLinks();
         this.props.history.push('/service/' + serviceId);
       })
-      .catch(() => this.setState({ hasErrored: true }));
+      .catch((err) => this.setState({ hasErrored: err.message || true }));
   };
 
   handleCreateServiceButton = () => {
@@ -161,7 +161,7 @@ class Services extends Component {
 
   render() {
     if (this.props.hasErrored) {
-      return <p>Sorry! There was an error loading the items</p>;
+      return <p>{typeof this.state.hasErrored === 'string' ? this.state.hasErrored : (typeof this.props.profilesHasErrored === 'string' ? this.props.profilesHasErrored : (typeof this.props.hostsHasErrored === 'string' ? this.props.hostsHasErrored : 'Sorry! There was an error loading the items'))}</p>;
     }
     if (this.props.isLoading) {
       return (

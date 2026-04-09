@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { api } from '../api';
+import { api, getErrorMessage } from '../api';
 import { groupsFetchData } from '../actions/groups';
 import { profilesFetchData } from '../actions/profiles';
 import { zonesFetchData } from '../actions/zones';
@@ -243,7 +243,7 @@ class Profile extends Component {
           let newProfileId = profileId.replace(re, '$1');
           return newProfileId;
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((profileId) => {
@@ -252,7 +252,7 @@ class Profile extends Component {
         this.props.history.push('/profile/' + profileId);
         this.props.fetchProfiles();
       })
-      .catch(() => this.setState({ hasErrored: true }));
+      .catch((err) => this.setState({ hasErrored: err.message || true }));
   };
 
   fetchProfile = (profileId) => {
@@ -266,9 +266,9 @@ class Profile extends Component {
           return response.data;
         } else if (response.status === 404) {
           this.setState({ noExist: true });
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((profile) => {
@@ -344,7 +344,7 @@ class Profile extends Component {
           };
         });
       })
-      .catch(() => this.setState({ hasErrored: true }));
+      .catch((err) => this.setState({ hasErrored: err.message || true }));
   };
 
   updateProfile = () => {
@@ -379,9 +379,9 @@ class Profile extends Component {
           return response.data;
         } else if (response.status === 404) {
           this.setState({ noExist: true });
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         } else {
-          throw Error(response.statusText);
+          throw Error(getErrorMessage(response));
         }
       })
       .then((profile) => {
@@ -392,7 +392,7 @@ class Profile extends Component {
         this.setState({ profileId: profile.id });
         this.props.history.push('/profile/' + profile.id);
       })
-      .catch(() => this.setState({ hasErrored: true }));
+      .catch((err) => this.setState({ hasErrored: err.message || true }));
   };
 
   deleteProfile = () => {
@@ -940,7 +940,7 @@ class Profile extends Component {
       this.props.profilesHasErrored ||
       this.props.zonesHasErrored
     ) {
-      return <p>Sorry! There was an error loading the items</p>;
+      return <p>{typeof this.state.hasErrored === 'string' ? this.state.hasErrored : (typeof this.props.profilesHasErrored === 'string' ? this.props.profilesHasErrored : (typeof this.props.hostsHasErrored === 'string' ? this.props.hostsHasErrored : 'Sorry! There was an error loading the items'))}</p>;
     }
     if (
       this.state.isLoading ||
