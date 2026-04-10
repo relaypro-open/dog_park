@@ -75,7 +75,11 @@ class Groups extends Component {
       this.state.createGroupProfile === '' ||
       this.state.createGroupName in this.props.groups.groupNames
     ) {
-      this.setState({ groupErrorOpen: true });
+      this.setState({
+        groupErrorOpen: true,
+        groupErrorMessage:
+          'You have not entered a valid/unused group name or defined a profile to use. Please make sure you enter all fields and create a group name that does not already exist.',
+      });
       return;
     }
     this.setState({ isLoading: true });
@@ -114,11 +118,18 @@ class Groups extends Component {
         this.props.fetchLinks();
         this.props.history.push('/group/' + groupId);
       })
-      .catch((err) => this.setState({ hasErrored: err.message || true }));
+      .catch((err) => {
+        this.setState({
+          groupErrorOpen: true,
+          groupErrorMessage: err.message,
+          isLoading: false,
+          createGroupStatus: '',
+        });
+      });
   };
 
   handleCreateGroupOpen = () => {
-    this.setState({ createGroupOpen: true });
+    this.setState({ createGroupOpen: true, createGroupStatus: '' });
   };
 
   handleCreateGroupButton = (enabled) => {
@@ -302,9 +313,9 @@ class Groups extends Component {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
-              You have not entered a valid/unused group name or defined a
-              profile to use. Please make sure you enter all fields and create a
-              group name that does not already exist.
+              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {this.state.groupErrorMessage}
+              </pre>
             </DialogContentText>
           </DialogContent>
           <DialogActions>

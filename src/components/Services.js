@@ -58,6 +58,7 @@ class Services extends Component {
       createServiceOpen: false,
       isErrored: true,
       serviceErrorOpen: false,
+      serviceErrorMessage: '',
     };
   }
 
@@ -110,11 +111,18 @@ class Services extends Component {
         this.props.fetchLinks();
         this.props.history.push('/service/' + serviceId);
       })
-      .catch((err) => this.setState({ hasErrored: err.message || true }));
+      .catch((err) => {
+        this.setState({
+          serviceErrorOpen: true,
+          serviceErrorMessage: err.message,
+          isLoading: false,
+          createServiceStatus: '',
+        });
+      });
   };
 
   handleCreateServiceButton = () => {
-    this.setState({ createServiceOpen: true });
+    this.setState({ createServiceOpen: true, createServiceStatus: '' });
   };
 
   handleServiceErrorButton = () => {
@@ -259,8 +267,9 @@ class Services extends Component {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
-              You have invalid port/port ranges defined or you have not entered
-              a unique name. Please fix these before updating service.
+              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {this.state.serviceErrorMessage}
+              </pre>
             </DialogContentText>
           </DialogContent>
           <DialogActions>

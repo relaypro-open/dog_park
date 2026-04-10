@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { CircularProgress } from '@mui/material';
 import HostsTable from './HostsTable';
 import { handleSelectedTab } from '../actions/app';
+import { hostsFetchData } from '../actions/hosts';
 
 class Hosts extends Component {
   constructor(props) {
@@ -51,6 +52,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    fetchHosts: () => dispatch(hostsFetchData()),
     handleSelectedTab: (value) => dispatch(handleSelectedTab(value)),
   };
 };

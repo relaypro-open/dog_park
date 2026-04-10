@@ -129,7 +129,14 @@ class Profiles extends Component {
           this.props.fetchHosts();
           this.props.fetchLinks();
         })
-        .catch((err) => this.setState({ hasErrored: err.message || true }));
+        .catch((err) => {
+          this.setState({
+            profileErrorOpen: true,
+            profileErrorMessage: err.message,
+            isLoading: false,
+            createProfileStatus: '',
+          });
+        });
     }
   };
 
@@ -138,7 +145,7 @@ class Profiles extends Component {
   };
 
   handleCreateProfileOpen = () => {
-    this.setState({ createProfileOpen: true });
+    this.setState({ createProfileOpen: true, createProfileStatus: '' });
   };
 
   handleCreateProfileClose = () => {
@@ -214,8 +221,9 @@ class Profiles extends Component {
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
-              The profile name you entered already exists, please choose a
-              different name.
+              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {this.state.profileErrorMessage}
+              </pre>
             </DialogContentText>
           </DialogContent>
           <DialogActions>
