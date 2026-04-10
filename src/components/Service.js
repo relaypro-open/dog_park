@@ -311,13 +311,7 @@ class Service extends Component {
           this.setState({ isDeleting: false });
           this.setState({ deleteServiceStatus: <div>Deleted!</div> });
           this.props.history.push('/services');
-          this.props.fetchGroups();
-          this.props.fetchProfiles();
-          this.props.fetchZones();
-          this.props.fetchServices();
-          this.props.fetchHosts();
-          this.props.fetchLinks();
-        } else if (response.status === 500) {
+        } else if (response.status === 500 && response.data && response.data.errors) {
           let error_msg = Object.entries(response.data.errors).map(
             ([key, value]) => {
               return `${key}: ${value.map((entry) => {

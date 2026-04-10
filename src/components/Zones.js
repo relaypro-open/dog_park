@@ -56,9 +56,7 @@ class Zones extends Component {
   }
 
   componentDidMount() {
-    if (this.props.zones === []) {
-      this.props.fetchZones();
-    }
+    this.props.fetchZones();
     this.props.handleSelectedTab(4);
   }
 

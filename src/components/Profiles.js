@@ -42,15 +42,7 @@ class Profiles extends Component {
   }
 
   componentDidMount() {
-    if (
-      this.props.profiles ===
-      {
-        profileList: {},
-        profileIds: {},
-      }
-    ) {
-      this.props.fetchProfiles();
-    }
+    this.props.fetchProfiles();
     this.props.handleSelectedTab(1);
   }
 

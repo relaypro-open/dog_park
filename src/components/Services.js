@@ -62,6 +62,7 @@ class Services extends Component {
   }
 
   componentDidMount() {
+    this.props.fetchServices();
     this.props.handleSelectedTab(2);
   }
 

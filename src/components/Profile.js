@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { api, getErrorMessage } from '../api';
 import { groupsFetchData } from '../actions/groups';
 import { profilesFetchData } from '../actions/profiles';
@@ -408,24 +409,23 @@ class Profile extends Component {
       .delete('/profile/' + this.props.match.params.id)
       .then((response) => {
         if (response.status === 204) {
-          this.setState((state, props) => {
-            props.fetchProfiles();
-            return {
-              isDeleting: false,
-              deleteProfileStatus: <div>Deleted!</div>,
-            };
+          this.setState({
+            isDeleting: false,
+            deleteProfileStatus: <div>Deleted!</div>,
           });
           this.props.history.push('/profiles');
-        } else if (response.status === 500) {
+        } else if (response.status === 500 && response.data && response.data.errors) {
           console.log(response);
           let error_msg = Object.entries(response.data.errors).map(
             ([key, value]) => {
               return `${key}: ${value.map((entry) => {
-                return this.props.groups.groupIds[entry];
+                return (this.props.groups && this.props.groups.groupIds && this.props.groups.groupIds[entry]) || entry;
               })}`;
             }
           );
           throw Error(error_msg);
+        } else {
+          throw Error(getErrorMessage(response));
         }
       })
       .catch((error) => {
@@ -965,7 +965,15 @@ class Profile extends Component {
 
       return (
         <div>
-          <Typography variant="h5">Profile {this.state.profileName}</Typography>
+          <Typography variant="h5">
+            <Link
+              to="/profiles"
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              Profile
+            </Link>{' '}
+            {this.state.profileName}
+          </Typography>
           <br />
           <br />
           <span className={classes.wrapper}>

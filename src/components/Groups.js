@@ -65,6 +65,7 @@ class Groups extends Component {
   }
 
   componentDidMount() {
+    this.props.fetchGroups();
     this.props.handleSelectedTab(0);
   }
 

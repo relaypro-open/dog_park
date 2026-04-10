@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { api, getErrorMessage } from '../api';
 import { groupsFetchData } from '../actions/groups';
 import { profilesFetchData } from '../actions/profiles';
@@ -429,13 +430,7 @@ class Group extends Component {
           this.setState({ isDeleting: false });
           this.setState({ deleteGroupStatus: <div>Deleted!</div> });
           this.props.history.push('/groups');
-          this.props.fetchGroups();
-          this.props.fetchProfiles();
-          this.props.fetchZones();
-          this.props.fetchServices();
-          this.props.fetchHosts();
-          this.props.fetchLinks();
-        } else if (response.status === 500) {
+        } else if (response.status === 500 && response.data && response.data.errors) {
           let error_msg = Object.entries(response.data.errors).map(
             ([key, value]) => {
               return `${key}: ${value.map((entry) => {
@@ -704,7 +699,15 @@ class Group extends Component {
         <form autoComplete="off">
           <Paper className={this.props.classes.root} elevation={1}>
             <Typography variant="subtitle1">
-              <strong>Group:</strong>&nbsp;&nbsp;
+              <strong>
+                <Link
+                  to="/groups"
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  Group:
+                </Link>
+              </strong>
+              &nbsp;&nbsp;
               <TextField
                 margin="dense"
                 id="comment"

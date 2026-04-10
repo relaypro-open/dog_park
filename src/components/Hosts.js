@@ -12,6 +12,7 @@ class Hosts extends Component {
   }
 
   componentDidMount() {
+    this.props.fetchHosts();
     this.props.handleSelectedTab(3);
   }
 
