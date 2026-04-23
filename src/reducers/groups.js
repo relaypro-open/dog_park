@@ -20,7 +20,7 @@ export function groups(
     return 0;
   });
 
-  if (action.payload.profiles.profileList !== {}) {
+  if (action.payload.profiles && action.payload.profiles.profileList && Object.keys(action.payload.profiles.profileList).length !== 0) {
     groups.map((group) => {
       if (
         action.payload.profiles.profileList[group.profile_name] !== undefined
@@ -39,14 +39,14 @@ export function groups(
       }
       return true;
     });
-
-    let groupNames = {};
-    let groupIds = {};
-    groups.forEach((grp) => {
-      groupNames[grp.name] = grp.id;
-      groupIds[grp.id] = grp.name;
-    });
-
-    return { groupList: groups, groupNames, groupIds };
   }
+
+  let groupNames = {};
+  let groupIds = {};
+  groups.forEach((grp) => {
+    groupNames[grp.name] = grp.id;
+    groupIds[grp.id] = grp.name;
+  });
+
+  return { groupList: groups, groupNames, groupIds };
 }

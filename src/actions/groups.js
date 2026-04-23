@@ -16,8 +16,6 @@ export function groupsFetchData() {
   return (dispatch, getState) => {
     dispatch(groupsIsLoading(true));
 
-    const { profiles, environments } = getState();
-
     api
       .get('groups')
       .then((response) => {
@@ -29,9 +27,10 @@ export function groupsFetchData() {
         dispatch(groupsIsLoading(false));
         return response.data;
       })
-      .then((groups) =>
-        dispatch(groupsFetchDataSuccess(groups, profiles, environments))
-      )
+      .then((groups) => {
+        const { profiles, environments } = getState();
+        dispatch(groupsFetchDataSuccess(groups, profiles, environments));
+      })
       .catch((err) => dispatch(groupsHasErrored(err.message || true)));
   };
 }
