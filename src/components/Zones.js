@@ -52,13 +52,17 @@ class Zones extends Component {
       createZoneProfile: '',
       createZoneStatus: '',
       createZoneOpen: false,
+      zoneErrorOpen: false,
+      zoneErrorMessage: '',
     };
   }
 
+  handleZoneErrorButton = () => {
+    this.setState({ zoneErrorOpen: false });
+  };
+
   componentDidMount() {
-    if (this.props.zones === []) {
-      this.props.fetchZones();
-    }
+    this.props.fetchZones();
     this.props.handleSelectedTab(4);
   }
 
@@ -101,12 +105,19 @@ class Zones extends Component {
           this.props.fetchLinks();
           this.props.history.push('/zone/' + zoneId);
         })
-        .catch((err) => this.setState({ hasErrored: err.message || true }));
+        .catch((err) => {
+          this.setState({
+            zoneErrorOpen: true,
+            zoneErrorMessage: err.message,
+            isLoading: false,
+            createZoneStatus: '',
+          });
+        });
     }
   };
 
   handleCreateZoneButton = () => {
-    this.setState({ createZoneOpen: true });
+    this.setState({ createZoneOpen: true, createZoneStatus: '' });
   };
 
   handleCreateZoneClose = () => {
@@ -186,6 +197,27 @@ class Zones extends Component {
               Create Zone
             </Button>
             &nbsp;&nbsp;{this.state.createZoneStatus}
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={this.state.zoneErrorOpen}
+          onClose={this.handleZoneErrorButton}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">
+            Zone Validation Errors
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {this.state.zoneErrorMessage}
+              </pre>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleZoneErrorButton} color="primary">
+              Ok
+            </Button>
           </DialogActions>
         </Dialog>
       </div>
